@@ -64,7 +64,7 @@ export default function LoginPage() {
               <div className="space-y-1.5">
                 <div className="flex items-center justify-between">
                   <label className="text-[12px] font-semibold text-gray-700 uppercase tracking-wider">Password</label>
-                  <button className="text-[12px] font-medium text-blue-600 hover:text-blue-500 transition-colors">Forgot password?</button>
+                  <Link href="/forgot-password" className="text-[12px] font-medium text-blue-600 hover:text-blue-500 transition-colors">Forgot password?</Link>
                 </div>
                 <div className={`flex items-center gap-3 px-4 py-3 rounded-xl border transition-all duration-200 ${
                   focused === 'password' 
