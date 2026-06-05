@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useRef, useEffect, useCallback } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
 
 // ─── TYPES ───────────────────────────────────────────────
 interface Resource {
@@ -242,102 +243,156 @@ const chatSteps: Record<string, ChatStep> = {
 }
 
 const starters = [
-  { id: 'job', label: 'Multi-Need', description: "I lost my job and can't pay rent. My kids need food." },
-  { id: 'crisis', label: 'Crisis', description: "I can't take this anymore. I want it all to end." },
-  { id: 'stress', label: 'Low Confidence', description: 'I need help with my situation' },
-  { id: 'senior', label: 'Senior', description: "I'm 78 and need help getting groceries delivered" },
-  { id: 'veteran', label: 'Complex', description: "I'm a veteran dealing with PTSD and housing issues" }
+  { id: 'job', label: 'Multi-Need', description: "I lost my job and can't pay rent. My kids need food.", icon: 'layers' },
+  { id: 'crisis', label: 'Crisis', description: "I can't take this anymore. I want it all to end.", icon: 'shield' },
+  { id: 'stress', label: 'Low Confidence', description: 'I need help with my situation', icon: 'help' },
+  { id: 'senior', label: 'Senior', description: "I'm 78 and need help getting groceries delivered", icon: 'heart' },
+  { id: 'veteran', label: 'Complex', description: "I'm a veteran dealing with PTSD and housing issues", icon: 'star' }
 ]
 
-// ─── COMPONENTS ──────────────────────────────────────────
-
-function ConfidenceBar({ value, animated = false }: { value: number; animated?: boolean }) {
-  const color = value >= 80 ? 'bg-emerald-500' : value >= 70 ? 'bg-sky-500' : value >= 50 ? 'bg-amber-500' : 'bg-orange-500'
-  const textColor = value >= 80 ? 'text-emerald-600' : value >= 70 ? 'text-sky-600' : value >= 50 ? 'text-amber-600' : 'text-orange-600'
-  return (
-    <div className="flex items-center gap-2.5">
-      <div className="flex-1 h-[3px] bg-gray-100 rounded-full overflow-hidden">
-        <div
-          className={`h-full rounded-full transition-all duration-1000 ease-out ${color}`}
-          style={{ width: animated ? `${value}%` : '0%' }}
-        />
-      </div>
-      <span className={`text-[11px] font-bold tabular-nums tracking-tight ${textColor}`}>{value}%</span>
-    </div>
-  )
+// ─── UTILITIES ───────────────────────────────────────────
+function getConfidenceColor(v: number): string {
+  if (v >= 80) return '#10b981'
+  if (v >= 70) return '#3b82f6'
+  if (v >= 50) return '#f59e0b'
+  return '#f97316'
+}
+function getConfidenceBg(v: number): string {
+  if (v >= 80) return 'rgba(16,185,129,0.08)'
+  if (v >= 70) return 'rgba(59,130,246,0.08)'
+  if (v >= 50) return 'rgba(245,158,11,0.08)'
+  return 'rgba(249,115,22,0.08)'
+}
+function getConfidenceGlow(v: number): string {
+  if (v >= 80) return '0 0 12px rgba(16,185,129,0.3)'
+  if (v >= 70) return '0 0 12px rgba(59,130,246,0.3)'
+  if (v >= 50) return '0 0 12px rgba(245,158,11,0.3)'
+  return '0 0 12px rgba(249,115,22,0.3)'
+}
+function getConfidenceLabel(v: number): string {
+  if (v >= 80) return 'High'
+  if (v >= 70) return 'Good'
+  if (v >= 50) return 'Moderate'
+  return 'Low'
 }
 
-function StatusBadge({ type, text }: { type: 'crisis' | 'clarify' | 'verified' | 'upgrade'; text: string }) {
-  const styles = {
-    crisis: 'bg-red-50 text-red-700 border-red-200',
-    clarify: 'bg-amber-50 text-amber-700 border-amber-200',
-    verified: 'bg-emerald-50 text-emerald-700 border-emerald-200',
-    upgrade: 'bg-emerald-50 text-emerald-700 border-emerald-200'
-  }
-  const dotStyles = {
-    crisis: 'bg-red-500 animate-pulse',
-    clarify: 'bg-amber-500',
-    verified: 'bg-emerald-500',
-    upgrade: 'bg-emerald-500'
-  }
-  return (
-    <div className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-semibold border ${styles[type]} mb-3`}>
-      <span className={`w-1.5 h-1.5 rounded-full ${dotStyles[type]}`} />
-      {text}
-    </div>
-  )
-}
-
-function CategoryCard({ cat, index }: { cat: Category; index: number }) {
-  const [open, setOpen] = useState(false)
-  const [animated, setAnimated] = useState(false)
-  const low = cat.confidence < 70
+// ─── CONFIDENCE RING ─────────────────────────────────────
+function ConfidenceRing({ value, size = 48, strokeWidth = 3, animated = true, delay = 0 }: {
+  value: number; size?: number; strokeWidth?: number; animated?: boolean; delay?: number
+}) {
+  const r = (size - strokeWidth * 2) / 2
+  const circ = 2 * Math.PI * r
+  const offset = circ * (1 - value / 100)
+  const color = getConfidenceColor(value)
+  const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
-    const timer = setTimeout(() => setAnimated(true), 200 + index * 150)
-    return () => clearTimeout(timer)
-  }, [index])
+    const t = setTimeout(() => setMounted(true), 100 + delay)
+    return () => clearTimeout(t)
+  }, [delay])
 
   return (
-    <div
-      className={`rounded-2xl border transition-all duration-200 cursor-pointer hover:shadow-sm active:scale-[0.995] ${
+    <div className="relative shrink-0" style={{ width: size, height: size }}>
+      <svg width={size} height={size} className="-rotate-90">
+        <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke="#f1f5f9" strokeWidth={strokeWidth} />
+        <circle
+          cx={size / 2} cy={size / 2} r={r} fill="none"
+          stroke={color} strokeWidth={strokeWidth} strokeLinecap="round"
+          strokeDasharray={circ}
+          strokeDashoffset={mounted ? offset : circ}
+          style={{
+            transition: animated ? 'stroke-dashoffset 1.2s cubic-bezier(0.4, 0, 0.2, 1), stroke 0.6s ease' : 'none',
+            filter: `drop-shadow(${getConfidenceGlow(value)})`
+          }}
+        />
+      </svg>
+      <div className="absolute inset-0 flex items-center justify-center">
+        <span className="text-[11px] font-bold tabular-nums tracking-tight" style={{ color }}>{value}</span>
+      </div>
+    </div>
+  )
+}
+
+// ─── STATUS PILL ──────────────────────────────────────────
+function StatusPill({ type, text }: { type: 'crisis' | 'clarify' | 'verified' | 'upgrade'; text: string }) {
+  const config = {
+    crisis: { bg: 'bg-red-50', text: 'text-red-700', border: 'border-red-200/80', dot: 'bg-red-500' },
+    clarify: { bg: 'bg-amber-50', text: 'text-amber-700', border: 'border-amber-200/80', dot: 'bg-amber-500' },
+    verified: { bg: 'bg-emerald-50', text: 'text-emerald-700', border: 'border-emerald-200/80', dot: 'bg-emerald-500' },
+    upgrade: { bg: 'bg-emerald-50', text: 'text-emerald-700', border: 'border-emerald-200/80', dot: 'bg-emerald-500' }
+  }
+  const c = config[type]
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: -4, scale: 0.95 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+      className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-semibold border ${c.bg} ${c.text} ${c.border} mb-3`}
+    >
+      <span className={`w-1.5 h-1.5 rounded-full ${c.dot} ${type === 'crisis' ? 'animate-pulse' : ''}`} />
+      {text}
+    </motion.div>
+  )
+}
+
+// ─── CATEGORY CARD ───────────────────────────────────────
+function CategoryCard({ cat, index }: { cat: Category; index: number }) {
+  const [open, setOpen] = useState(false)
+  const low = cat.confidence < 70
+  const color = getConfidenceColor(cat.confidence)
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 12 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ type: 'spring', stiffness: 400, damping: 28, delay: index * 0.08 }}
+      onClick={() => setOpen(!open)}
+      className={`rounded-2xl border cursor-pointer transition-all duration-200 hover:shadow-md active:scale-[0.995] ${
         low
-          ? 'border-amber-200/60 bg-gradient-to-b from-amber-50/30 to-white'
+          ? 'border-amber-200/70 bg-gradient-to-b from-amber-50/20 to-white'
           : 'border-gray-100 bg-white hover:border-gray-200'
       }`}
-      onClick={() => setOpen(!open)}
+      style={{ boxShadow: `inset 0 0 0 1px ${low ? 'rgba(245,158,11,0.06)' : 'rgba(0,0,0,0.02)'}` }}
     >
       <div className="p-4">
-        <div className="flex items-start justify-between gap-3 mb-2.5">
+        {/* Header row */}
+        <div className="flex items-start justify-between gap-3 mb-3">
           <div className="min-w-0 flex-1">
-            <h4 className="text-[13px] font-semibold text-gray-900 leading-tight tracking-tight">{cat.label}</h4>
-            <p className="text-[10px] text-gray-400 mt-1 leading-relaxed">{cat.why}</p>
+            <div className="flex items-center gap-2 mb-1">
+              <div className="w-1 h-4 rounded-full" style={{ backgroundColor: color }} />
+              <h4 className="text-[13px] font-semibold text-gray-900 leading-tight tracking-tight">{cat.label}</h4>
+            </div>
+            <p className="text-[10px] text-gray-400 leading-relaxed pl-3">{cat.why}</p>
           </div>
-          <div className="shrink-0 w-[72px]">
-            <ConfidenceBar value={cat.confidence} animated={animated} />
-          </div>
+          <ConfidenceRing value={cat.confidence} size={44} strokeWidth={2.5} delay={index * 120} />
         </div>
 
+        {/* Warning */}
         {cat.warning && (
-          <div className="flex items-start gap-1.5 text-[9px] text-amber-700 mb-2.5 leading-relaxed bg-amber-50/50 rounded-lg px-2.5 py-1.5 border border-amber-100/50">
-            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="shrink-0 mt-px"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          <div className="flex items-start gap-1.5 text-[10px] text-amber-700 mb-3 leading-relaxed bg-amber-50/60 rounded-xl px-3 py-2 border border-amber-100/50">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="shrink-0 mt-px"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
             {cat.warning}
           </div>
         )}
 
+        {/* Resources */}
         {cat.resources.length > 0 && (
-          <div className="space-y-2.5">
+          <div className="space-y-2">
             {cat.resources.map((r, i) => (
-              <div key={i} className="flex items-start gap-2.5">
-                <div className="w-[18px] h-[18px] rounded-md bg-emerald-50 border border-emerald-100/60 flex items-center justify-center shrink-0 mt-0.5">
-                  <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" className="text-emerald-600"><polyline points="20 6 9 17 4 12"/></svg>
+              <div key={i} className="flex items-start gap-2.5 group">
+                <div className="w-[18px] h-[18px] rounded-lg flex items-center justify-center shrink-0 mt-0.5 transition-colors" style={{ backgroundColor: getConfidenceBg(cat.confidence) }}>
+                  <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="3"><polyline points="20 6 9 17 4 12"/></svg>
                 </div>
                 <div className="min-w-0 flex-1">
-                  <p className="text-[12px] font-medium text-gray-800 leading-tight">{r.name}</p>
+                  <p className="text-[12px] font-medium text-gray-800 leading-tight group-hover:text-gray-900 transition-colors">{r.name}</p>
                   <p className="text-[10px] text-gray-500 mt-0.5 leading-relaxed">{r.detail}</p>
-                  <div className="flex gap-2 mt-1">
-                    {r.verified && <span className="text-[9px] text-emerald-600 font-medium bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-100/50">Verified {r.verified}</span>}
-                    {r.distance && <span className="text-[9px] text-sky-600 font-medium bg-sky-50 px-1.5 py-0.5 rounded border border-sky-100/50">{r.distance}</span>}
+                  <div className="flex flex-wrap gap-1.5 mt-1.5">
+                    {r.verified && (
+                      <span className="text-[9px] text-emerald-600 font-medium bg-emerald-50/80 px-1.5 py-0.5 rounded-md border border-emerald-100/50">Verified {r.verified}</span>
+                    )}
+                    {r.distance && (
+                      <span className="text-[9px] text-blue-600 font-medium bg-blue-50/80 px-1.5 py-0.5 rounded-md border border-blue-100/50">{r.distance}</span>
+                    )}
                   </div>
                 </div>
               </div>
@@ -345,98 +400,226 @@ function CategoryCard({ cat, index }: { cat: Category; index: number }) {
           </div>
         )}
 
-        {open && (
-          <div className="mt-3 pt-3 border-t border-gray-100">
-            {cat.also && <p className="text-[10px] text-gray-400 leading-relaxed"><span className="text-gray-500 font-medium">Also considered:</span> {cat.also}</p>}
-          </div>
-        )}
+        {/* Expandable: Also considered */}
+        <AnimatePresence>
+          {open && (
+            <motion.div
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: 'auto', opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+              className="overflow-hidden"
+            >
+              <div className="mt-3 pt-3 border-t border-gray-100/80">
+                {cat.also && (
+                  <p className="text-[10px] text-gray-400 leading-relaxed">
+                    <span className="text-gray-500 font-medium">Also considered: </span>{cat.also}
+                  </p>
+                )}
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
-    </div>
+    </motion.div>
   )
 }
 
+// ─── CRISIS OVERLAY ───────────────────────────────────────
 function CrisisBlock({ lines }: { lines: { name: string; action: string; call?: string }[] }) {
   return (
-    <div className="rounded-2xl border border-red-200/50 bg-white overflow-hidden shadow-sm">
-      <div className="bg-red-600 px-4 py-3.5">
-        <div className="flex items-center gap-2 mb-1">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-white"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-          <p className="text-[13px] font-bold text-white tracking-tight">You are not alone.</p>
+    <motion.div
+      initial={{ opacity: 0, scale: 0.97 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{ type: 'spring', stiffness: 350, damping: 25 }}
+      className="rounded-2xl border border-red-200/50 bg-white overflow-hidden"
+      style={{ boxShadow: '0 8px 40px -12px rgba(239,68,68,0.15), 0 0 0 1px rgba(239,68,68,0.08)' }}
+    >
+      {/* Red header */}
+      <div className="bg-gradient-to-r from-red-600 to-red-500 px-4 py-4">
+        <div className="flex items-center gap-2.5 mb-1">
+          <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-white"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          </div>
+          <div>
+            <p className="text-[14px] font-bold text-white tracking-tight">You are not alone.</p>
+            <p className="text-[10px] text-red-200">Crisis keyword detected — AI classification bypassed</p>
+          </div>
         </div>
-        <p className="text-[10px] text-red-200 ml-[22px]">Crisis keyword detected — AI classification bypassed.</p>
       </div>
+
+      {/* Crisis lines */}
       <div className="p-3 space-y-2">
         {lines.map((l, i) => (
-          <div key={i} className="flex items-center gap-3 bg-red-50/50 rounded-xl p-3 border border-red-100/50">
-            <div className="w-9 h-9 rounded-full bg-red-100 flex items-center justify-center shrink-0">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-red-600"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+          <motion.div
+            key={i}
+            initial={{ opacity: 0, x: -8 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.1 + i * 0.08, type: 'spring', stiffness: 400, damping: 30 }}
+            className="flex items-center gap-3 bg-red-50/40 rounded-xl p-3 border border-red-100/40"
+          >
+            <div className="w-10 h-10 rounded-full bg-red-100/80 flex items-center justify-center shrink-0">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-red-600"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-[12px] font-semibold text-gray-900 leading-tight">{l.name}</p>
               <p className="text-[10px] text-gray-500 mt-0.5">{l.action}</p>
             </div>
             {l.call && (
-              <button className="bg-red-600 text-white text-[10px] font-bold px-3 py-2 rounded-xl shrink-0 hover:bg-red-700 transition-colors shadow-sm">
+              <button className="bg-gradient-to-b from-red-500 to-red-600 text-white text-[11px] font-bold px-4 py-2.5 rounded-xl shrink-0 hover:from-red-600 hover:to-red-700 transition-all shadow-sm shadow-red-500/20 active:scale-95">
                 {l.call}
               </button>
             )}
-          </div>
+          </motion.div>
         ))}
-        <p className="text-[9px] text-gray-400 text-center pt-1 flex items-center justify-center gap-1">
-          <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-          Nothing was stored or logged
-        </p>
+        <div className="flex items-center justify-center gap-1.5 pt-1.5 pb-0.5">
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-gray-300"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          <p className="text-[9px] text-gray-400">Nothing was stored or logged</p>
+        </div>
       </div>
-    </div>
+    </motion.div>
   )
 }
 
-function ClarifyCard({ confidence, options, onSelect }: { confidence: number; options: { label: string; nextId: string }[]; onSelect: (label: string, nextId: string) => void }) {
+// ─── CLARIFY PANEL ────────────────────────────────────────
+function ClarifyPanel({ confidence, options, onSelect }: {
+  confidence: number; options: { label: string; nextId: string }[]; onSelect: (label: string, nextId: string) => void
+}) {
   return (
-    <div className="bg-gray-50 rounded-2xl p-4">
-      <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-1">AI Confidence: {confidence}%</p>
-      <p className="text-[13px] font-medium text-gray-900 leading-snug mb-3">Which of these best describes what you need?</p>
+    <motion.div
+      initial={{ opacity: 0, y: 8 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ type: 'spring', stiffness: 400, damping: 28 }}
+      className="bg-gray-50/80 rounded-2xl p-4 border border-gray-100/60"
+    >
+      <div className="flex items-center gap-3 mb-3">
+        <ConfidenceRing value={confidence} size={40} strokeWidth={2.5} />
+        <div>
+          <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">AI Confidence: {confidence}%</p>
+          <p className="text-[13px] font-medium text-gray-900 leading-snug mt-0.5">Which best describes what you need?</p>
+        </div>
+      </div>
       <div className="flex flex-col gap-1.5">
         {options.map((opt, i) => (
-          <button
+          <motion.button
             key={i}
+            initial={{ opacity: 0, x: -8 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.15 + i * 0.06, type: 'spring', stiffness: 400, damping: 30 }}
             onClick={() => onSelect(opt.label, opt.nextId)}
-            className="w-full text-left bg-white border border-gray-200 rounded-xl px-3.5 py-2.5 text-[13px] font-medium text-gray-800 hover:border-gray-300 hover:shadow-sm active:scale-[0.98] transition-all duration-150"
+            className="w-full text-left bg-white border border-gray-200/80 rounded-xl px-3.5 py-2.5 text-[13px] font-medium text-gray-800 hover:border-gray-300 hover:shadow-sm active:scale-[0.98] transition-all duration-150"
           >
             {opt.label}
-          </button>
+          </motion.button>
         ))}
       </div>
-    </div>
+    </motion.div>
   )
 }
 
-function TransparencySection({ items }: { items: string[] }) {
+// ─── TRANSPARENCY SECTION ─────────────────────────────────
+function TransparencyPanel({ items }: { items: string[] }) {
   const [open, setOpen] = useState(false)
   return (
-    <div className="mt-3 border-t border-gray-100 pt-3">
+    <div className="mt-3">
       <button
         onClick={() => setOpen(!open)}
         className="flex items-center gap-1.5 text-[10px] font-semibold text-gray-400 uppercase tracking-wider hover:text-gray-600 transition-colors"
       >
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className={`transition-transform duration-200 ${open ? 'rotate-180' : ''}`}><polyline points="6 9 12 15 18 9"/></svg>
+        <motion.svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"
+          animate={{ rotate: open ? 180 : 0 }}
+          transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+        ><polyline points="6 9 12 15 18 9"/></motion.svg>
         Why these results?
       </button>
-      <div className={`overflow-hidden transition-all duration-300 ${open ? 'max-h-[300px] opacity-100 mt-2' : 'max-h-0 opacity-0'}`}>
-        <div className="flex flex-col gap-1.5">
-          {items.map((item, i) => (
-            <div key={i} className="flex gap-2 items-start text-[11px] text-gray-500 leading-relaxed">
-              <span className="w-1 h-1 rounded-full bg-gray-300 shrink-0 mt-[6px]" />
-              {item}
+      <AnimatePresence>
+        {open && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+            className="overflow-hidden"
+          >
+            <div className="flex flex-col gap-2 mt-2 pt-3 border-t border-gray-100/60">
+              {items.map((item, i) => (
+                <motion.div
+                  key={i}
+                  initial={{ opacity: 0, x: -4 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: i * 0.05 }}
+                  className="flex gap-2 items-start text-[10px] text-gray-500 leading-relaxed"
+                >
+                  <span className="w-1 h-1 rounded-full bg-gray-300 shrink-0 mt-[6px]" />
+                  {item}
+                </motion.div>
+              ))}
             </div>
-          ))}
-        </div>
-      </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   )
 }
 
-// ─── MAIN ────────────────────────────────────────────────
+// ─── TYPING INDICATOR ─────────────────────────────────────
+function TypingIndicator() {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 6 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -4 }}
+      className="flex gap-2.5 items-start"
+    >
+      <div className="w-7 h-7 rounded-full bg-gray-900 flex items-center justify-center shrink-0">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="white"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+      </div>
+      <div className="flex items-center gap-1 py-2.5 px-1">
+        {[0, 1, 2].map(i => (
+          <motion.div
+            key={i}
+            className="w-1.5 h-1.5 bg-gray-300 rounded-full"
+            animate={{ y: [0, -4, 0] }}
+            transition={{ duration: 0.6, repeat: Infinity, delay: i * 0.15, ease: 'easeInOut' }}
+          />
+        ))}
+      </div>
+    </motion.div>
+  )
+}
+
+// ─── SUGGESTION CARD ──────────────────────────────────────
+function SuggestionCard({ s, index, onSelect }: {
+  s: typeof starters[0]; index: number; onSelect: (id: string, label: string) => void
+}) {
+  const icons: Record<string, JSX.Element> = {
+    layers: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>,
+    shield: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>,
+    help: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>,
+    heart: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>,
+    star: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>,
+  }
+
+  return (
+    <motion.button
+      initial={{ opacity: 0, y: 8 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ type: 'spring', stiffness: 400, damping: 28, delay: index * 0.06 }}
+      onClick={() => onSelect(s.id, s.label)}
+      className="w-full text-left border border-gray-100 bg-white rounded-2xl px-4 py-3.5 hover:bg-gray-50/80 hover:border-gray-200 hover:shadow-sm active:scale-[0.995] transition-all duration-200 group"
+    >
+      <div className="flex items-center gap-2.5 mb-1">
+        <div className="w-5 h-5 flex items-center justify-center text-gray-400 group-hover:text-gray-600 transition-colors">
+          {icons[s.icon] || icons.help}
+        </div>
+        <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">{s.label}</p>
+      </div>
+      <p className="text-[12px] text-gray-700 font-medium leading-snug pl-[30px]">&ldquo;{s.description}&rdquo;</p>
+    </motion.button>
+  )
+}
+
+// ─── MAIN ─────────────────────────────────────────────────
 export default function Home() {
   const [messages, setMessages] = useState<Array<{
     role: 'user' | 'ai'
@@ -445,7 +628,6 @@ export default function Home() {
     isCrisis?: boolean
     crisisLines?: { name: string; action: string; call?: string }[]
     categories?: Category[]
-    confidenceChange?: { before: number; after: number; label: string }
     statusBadge?: 'crisis' | 'clarify' | 'verified' | 'upgrade'
     upgradeInfo?: { from: number; to: number; category: string }
     isClarify?: boolean
@@ -456,13 +638,12 @@ export default function Home() {
   }>>([])
   const [suggestions, setSuggestions] = useState(starters)
   const [isTyping, setIsTyping] = useState(false)
-  const [activeClarify, setActiveClarify] = useState<string | null>(null)
   const chatRef = useRef<HTMLDivElement>(null)
 
   const scrollToBottom = useCallback(() => {
     setTimeout(() => {
       chatRef.current?.scrollTo({ top: chatRef.current.scrollHeight, behavior: 'smooth' })
-    }, 50)
+    }, 80)
   }, [])
 
   const handleSelect = useCallback((id: string, label: string) => {
@@ -472,7 +653,6 @@ export default function Home() {
     setMessages(prev => [...prev, { role: 'user', text: label, stepId: id }])
     setSuggestions([])
     setIsTyping(true)
-    setActiveClarify(null)
 
     setTimeout(() => {
       setIsTyping(false)
@@ -483,7 +663,6 @@ export default function Home() {
         isCrisis: step.isCrisis,
         crisisLines: step.crisisLines,
         categories: step.categories,
-        confidenceChange: step.confidenceChange,
         statusBadge: step.statusBadge,
         upgradeInfo: step.upgradeInfo,
         isClarify: step.isClarify,
@@ -492,9 +671,8 @@ export default function Home() {
         clarifyReason: step.clarifyReason,
         transparencyItems: getTransparencyItems(step)
       }])
-      setSuggestions(step.followUp)
-      if (step.isClarify) setActiveClarify(id)
-    }, 800 + Math.random() * 400)
+      setSuggestions(step.followUp.length > 0 ? step.followUp : [])
+    }, 700 + Math.random() * 400)
   }, [])
 
   const handleClarifySelect = useCallback((label: string, nextId: string) => {
@@ -508,166 +686,232 @@ export default function Home() {
   const reset = () => {
     setMessages([])
     setSuggestions(starters)
-    setActiveClarify(null)
   }
 
   const hasMessages = messages.length > 0
 
   return (
-    <div className="h-screen flex flex-col bg-white overflow-hidden">
-      {/* Header */}
-      <div className="shrink-0 border-b border-gray-100 bg-white">
+    <div className="h-screen flex flex-col bg-gradient-to-b from-white via-white to-gray-50/30 overflow-hidden">
+      {/* ─── HEADER ─── */}
+      <div className="shrink-0 border-b border-gray-100/80 bg-white/80 backdrop-blur-md z-10">
         <div className="max-w-2xl mx-auto px-4 h-12 flex items-center justify-between">
           <div className="flex items-center gap-2.5">
-            <div className="w-7 h-7 rounded-full bg-gray-900 flex items-center justify-center">
+            <div className="w-7 h-7 rounded-lg bg-gray-900 flex items-center justify-center shadow-sm shadow-gray-900/10">
               <svg width="12" height="12" viewBox="0 0 24 24" fill="white"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
             </div>
             <span className="text-[14px] font-semibold text-gray-900 tracking-tight">ClearPath AI</span>
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse shadow-sm shadow-emerald-500/30" />
           </div>
-          {hasMessages && (
-            <button onClick={reset} className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-gray-50 transition-colors">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-gray-400"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
-            </button>
-          )}
+          <div className="flex items-center gap-2">
+            {hasMessages && (
+              <motion.button
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                onClick={reset}
+                className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-gray-100 transition-colors"
+              >
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-gray-400"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
+              </motion.button>
+            )}
+          </div>
         </div>
       </div>
 
-      {/* Chat area */}
+      {/* ─── CHAT AREA ─── */}
       <div ref={chatRef} className="flex-1 overflow-y-auto scroll-smooth">
         <div className="max-w-2xl mx-auto px-4">
 
           {/* Empty state */}
-          {!hasMessages && !isTyping && (
-            <div className="pt-[16vh] pb-8 text-center animate-[fadeUp_0.4s_ease]">
-              <div className="w-14 h-14 rounded-full bg-gray-900 flex items-center justify-center mx-auto mb-5 shadow-lg shadow-gray-900/10">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="white"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
-              </div>
-              <h1 className="text-[22px] font-bold text-gray-900 tracking-tight">How can I help?</h1>
-              <p className="text-[13px] text-gray-400 mt-2 max-w-[260px] mx-auto leading-relaxed">
-                I connect you with verified community resources. Tell me what you need.
-              </p>
-            </div>
-          )}
+          <AnimatePresence mode="wait">
+            {!hasMessages && !isTyping && (
+              <motion.div
+                key="welcome"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0, y: -8 }}
+                transition={{ duration: 0.3 }}
+                className="pt-[14vh] pb-8 text-center"
+              >
+                <motion.div
+                  initial={{ scale: 0.9, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  transition={{ type: 'spring', stiffness: 300, damping: 20, delay: 0.1 }}
+                  className="w-16 h-16 rounded-2xl bg-gray-900 flex items-center justify-center mx-auto mb-6 shadow-xl shadow-gray-900/15"
+                >
+                  <svg width="28" height="28" viewBox="0 0 24 24" fill="white"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+                </motion.div>
+                <motion.h1
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.2 }}
+                  className="text-[24px] font-bold text-gray-900 tracking-tight"
+                >
+                  How can I help?
+                </motion.h1>
+                <motion.p
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.3 }}
+                  className="text-[13px] text-gray-400 mt-2 max-w-[280px] mx-auto leading-relaxed"
+                >
+                  I connect you with verified community resources. Calibrated confidence, not guesswork.
+                </motion.p>
+              </motion.div>
+            )}
+          </AnimatePresence>
 
           {/* Messages */}
           <div className={`space-y-5 ${hasMessages ? 'pt-6 pb-6' : 'pt-4 pb-4'}`}>
-            {messages.map((msg, i) => (
-              <div key={i} className="animate-[fadeUp_0.3s_cubic-bezier(0.16,1,0.3,1)]">
-                {msg.role === 'user' ? (
-                  <div className="flex justify-end">
-                    <div className="max-w-[85%] bg-gray-100 rounded-2xl rounded-br-sm px-4 py-2.5">
-                      <p className="text-[13px] leading-relaxed text-gray-900">{msg.text}</p>
+            <AnimatePresence mode="popLayout">
+              {messages.map((msg, i) => (
+                <motion.div
+                  key={i}
+                  initial={{ opacity: 0, y: 12 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ type: 'spring', stiffness: 400, damping: 28 }}
+                >
+                  {msg.role === 'user' ? (
+                    <div className="flex justify-end">
+                      <div className="max-w-[85%] bg-gray-100/90 rounded-2xl rounded-br-sm px-4 py-2.5">
+                        <p className="text-[13px] leading-relaxed text-gray-900">{msg.text}</p>
+                      </div>
                     </div>
-                  </div>
-                ) : (
-                  <div className="flex gap-2.5 items-start">
-                    {/* AI Avatar */}
-                    <div className="w-7 h-7 rounded-full bg-gray-900 flex items-center justify-center shrink-0 mt-0.5">
-                      <svg width="12" height="12" viewBox="0 0 24 24" fill="white"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+                  ) : (
+                    <div className="flex gap-2.5 items-start">
+                      {/* AI Avatar */}
+                      <div className="w-7 h-7 rounded-lg bg-gray-900 flex items-center justify-center shrink-0 mt-0.5 shadow-sm shadow-gray-900/10">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="white"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        {/* Status badge */}
+                        {msg.statusBadge === 'crisis' && <StatusPill type="crisis" text="Crisis detected — AI classification bypassed" />}
+                        {msg.statusBadge === 'clarify' && <StatusPill type="clarify" text="Confidence too low — clarification needed" />}
+                        {msg.statusBadge === 'verified' && msg.categories && msg.categories.length > 0 && (
+                          <StatusPill type="verified" text={`${msg.categories.length} verified resource${msg.categories.length > 1 ? 's' : ''} found`} />
+                        )}
+                        {msg.statusBadge === 'upgrade' && msg.upgradeInfo && (
+                          <StatusPill type="upgrade" text={`Confidence upgraded: ${msg.upgradeInfo.from}% → ${msg.upgradeInfo.to}%`} />
+                        )}
+
+                        {/* Confidence upgrade ring animation */}
+                        {msg.upgradeInfo && (
+                          <motion.div
+                            initial={{ opacity: 0, scale: 0.8 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            transition={{ type: 'spring', stiffness: 400, damping: 25, delay: 0.2 }}
+                            className="flex items-center gap-3 mb-3 p-3 bg-gradient-to-r from-emerald-50/60 to-blue-50/40 rounded-xl border border-emerald-100/40"
+                          >
+                            <ConfidenceRing value={msg.upgradeInfo.to} size={52} strokeWidth={3} delay={200} />
+                            <div>
+                              <p className="text-[11px] font-semibold text-gray-900">{msg.upgradeInfo.category}</p>
+                              <p className="text-[10px] text-gray-500 mt-0.5">
+                                <span className="line-through text-gray-300 mr-1">{msg.upgradeInfo.from}%</span>
+                                <span className="font-semibold" style={{ color: getConfidenceColor(msg.upgradeInfo.to) }}>{msg.upgradeInfo.to}%</span>
+                                <span className="text-gray-400 ml-1">after clarification</span>
+                              </p>
+                              <p className="text-[9px] text-emerald-600 font-medium mt-1">+{msg.upgradeInfo.to - msg.upgradeInfo.from}% confidence boost</p>
+                            </div>
+                          </motion.div>
+                        )}
+
+                        {/* Crisis */}
+                        {msg.isCrisis && msg.crisisLines && (
+                          <>
+                            <p className="text-[13px] text-gray-700 leading-relaxed mb-3">I hear you, and I want to make sure you&apos;re safe right now. You don&apos;t have to go through this alone.</p>
+                            <CrisisBlock lines={msg.crisisLines} />
+                            <TransparencyPanel items={[
+                              'Crisis keywords detected by hardcoded safety layer — not AI',
+                              'AI models can misclassify crisis situations, so this check runs first and bypasses all AI processing',
+                              'Your safety is always prioritized over resource matching'
+                            ]} />
+                          </>
+                        )}
+
+                        {/* Clarification */}
+                        {msg.isClarify && msg.clarifyOptions && (
+                          <>
+                            <p className="text-[13px] text-gray-700 leading-relaxed mb-3">I want to help, but I need to understand your situation better to find the right resources.</p>
+                            <ClarifyPanel
+                              confidence={msg.clarifyConfidence || 0}
+                              options={msg.clarifyOptions}
+                              onSelect={handleClarifySelect}
+                            />
+                            <TransparencyPanel items={[
+                              'Your request scored below 50% across all categories — too ambiguous for reliable matching',
+                              'One clarification question can boost confidence by 30-40%, ensuring you get accurate resources',
+                              'This is active learning — the model uses your answer to refine its classification'
+                            ]} />
+                          </>
+                        )}
+
+                        {/* Categories */}
+                        {msg.categories && msg.categories.length > 0 && !msg.isCrisis && !msg.isClarify && (
+                          <div className="space-y-2.5">
+                            {msg.categories.map((cat, j) => <CategoryCard key={j} cat={cat} index={j} />)}
+                          </div>
+                        )}
+
+                        {/* Transparency for regular results */}
+                        {msg.categories && msg.categories.length > 0 && !msg.isCrisis && !msg.isClarify && msg.stepId && (
+                          <TransparencyPanel items={getTransparencyItems(chatSteps[msg.stepId])} />
+                        )}
+                      </div>
                     </div>
-                    <div className="flex-1 min-w-0">
-                      {/* Status badge */}
-                      {msg.statusBadge === 'crisis' && <StatusBadge type="crisis" text="Crisis detected — AI classification bypassed" />}
-                      {msg.statusBadge === 'clarify' && <StatusBadge type="clarify" text={`Confidence too low — clarification needed`} />}
-                      {msg.statusBadge === 'verified' && msg.categories && msg.categories.length > 0 && <StatusBadge type="verified" text={`${msg.categories.length} verified resource${msg.categories.length > 1 ? 's' : ''} found`} />}
-                      {msg.statusBadge === 'upgrade' && msg.upgradeInfo && <StatusBadge type="upgrade" text={`Confidence upgraded: ${msg.upgradeInfo.from}% → ${msg.upgradeInfo.to}%`} />}
-
-                      {/* Crisis */}
-                      {msg.isCrisis && msg.crisisLines && (
-                        <>
-                          <p className="text-[13px] text-gray-700 leading-relaxed mb-3">I hear you, and I want to make sure you&apos;re safe right now. You don&apos;t have to go through this alone.</p>
-                          <CrisisBlock lines={msg.crisisLines} />
-                          <TransparencySection items={[
-                            'Crisis keywords detected by hardcoded safety layer — not AI',
-                            'AI models can misclassify crisis situations, so this check runs first and bypasses all AI processing',
-                            'Your safety is always prioritized over resource matching'
-                          ]} />
-                        </>
-                      )}
-
-                      {/* Clarification */}
-                      {msg.isClarify && msg.clarifyOptions && (
-                        <>
-                          <p className="text-[13px] text-gray-700 leading-relaxed mb-3">I want to help, but I need to understand your situation better to find the right resources.</p>
-                          <ClarifyCard
-                            confidence={msg.clarifyConfidence || 0}
-                            options={msg.clarifyOptions}
-                            onSelect={handleClarifySelect}
-                          />
-                          <TransparencySection items={[
-                            `Your request scored below 50% across all categories — too ambiguous for reliable matching`,
-                            'One clarification question can boost confidence by 30-40%, ensuring you get accurate resources',
-                            'This is active learning — the model uses your answer to refine its classification'
-                          ]} />
-                        </>
-                      )}
-
-                      {/* Categories */}
-                      {msg.categories && msg.categories.length > 0 && !msg.isCrisis && !msg.isClarify && (
-                        <div className="space-y-2.5">
-                          {msg.categories.map((cat, j) => <CategoryCard key={j} cat={cat} index={j} />)}
-                        </div>
-                      )}
-
-                      {/* Transparency for regular results */}
-                      {msg.categories && msg.categories.length > 0 && !msg.isCrisis && !msg.isClarify && msg.stepId && (
-                        <TransparencySection items={getTransparencyItems(chatSteps[msg.stepId])} />
-                      )}
-                    </div>
-                  </div>
-                )}
-              </div>
-            ))}
+                  )}
+                </motion.div>
+              ))}
+            </AnimatePresence>
 
             {/* Typing */}
-            {isTyping && (
-              <div className="flex gap-2.5 items-start animate-[fadeUp_0.2s_ease-out]">
-                <div className="w-7 h-7 rounded-full bg-gray-900 flex items-center justify-center shrink-0">
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="white"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
-                </div>
-                <div className="flex items-center gap-1 py-2">
-                  <div className="w-1.5 h-1.5 bg-gray-300 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
-                  <div className="w-1.5 h-1.5 bg-gray-300 rounded-full animate-bounce" style={{ animationDelay: '120ms' }} />
-                  <div className="w-1.5 h-1.5 bg-gray-300 rounded-full animate-bounce" style={{ animationDelay: '240ms' }} />
-                </div>
-              </div>
-            )}
+            <AnimatePresence>
+              {isTyping && <TypingIndicator />}
+            </AnimatePresence>
           </div>
 
           {/* Suggestions */}
           {suggestions.length > 0 && (
             <div className={`space-y-1.5 ${hasMessages ? 'pb-6' : 'pb-4'}`}>
-              {suggestions.map((s, i) => (
-                <button
-                  key={i}
-                  onClick={() => handleSelect(s.id, s.label)}
-                  className="w-full text-left border border-gray-200 bg-white rounded-2xl px-4 py-3.5 hover:bg-gray-50 hover:border-gray-300 hover:shadow-sm active:scale-[0.995] transition-all duration-150 animate-[fadeUp_0.3s_cubic-bezier(0.16,1,0.3,1)]"
-                  style={{ animationDelay: `${i * 50}ms` }}
-                >
-                  <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-0.5">{s.label}</p>
-                  <p className="text-[12px] text-gray-700 font-medium leading-snug">&ldquo;{s.description}&rdquo;</p>
-                </button>
-              ))}
+              {suggestions.map((s, i) => {
+                if ('icon' in s) {
+                  return <SuggestionCard key={i} s={s as typeof starters[0]} index={i} onSelect={handleSelect} />
+                }
+                // Follow-up chips (smaller, simpler)
+                return (
+                  <motion.button
+                    key={i}
+                    initial={{ opacity: 0, y: 6 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ type: 'spring', stiffness: 400, damping: 28, delay: i * 0.05 }}
+                    onClick={() => handleSelect(s.id, s.label)}
+                    className="w-full text-left border border-gray-100 bg-white rounded-xl px-4 py-3 text-[12px] font-medium text-gray-700 hover:bg-gray-50/80 hover:border-gray-200 hover:shadow-sm active:scale-[0.995] transition-all duration-150"
+                  >
+                    {s.label}
+                  </motion.button>
+                )
+              })}
             </div>
           )}
         </div>
       </div>
 
-      {/* Input bar */}
-      <div className="shrink-0 border-t border-gray-100 bg-white">
+      {/* ─── INPUT BAR ─── */}
+      <div className="shrink-0 border-t border-gray-100/80 bg-white/80 backdrop-blur-md">
         <div className="max-w-2xl mx-auto px-4 py-2.5">
-          <div className="flex items-center gap-2 bg-gray-50 rounded-2xl px-4 py-3 border border-transparent focus-within:border-gray-200 focus-within:bg-white transition-all">
+          <div className="flex items-center gap-2 bg-gray-50/80 rounded-2xl px-4 py-3 border border-gray-100/60 focus-within:border-gray-200 focus-within:bg-white transition-all">
             <input
               type="text"
               placeholder={hasMessages ? 'Choose a response above' : 'Describe what you need...'}
               className="flex-1 bg-transparent text-[13px] outline-none text-gray-900 placeholder:text-gray-300"
               disabled
             />
-            <div className="w-8 h-8 rounded-full bg-gray-900 flex items-center justify-center shrink-0 opacity-40">
+            <div className="w-8 h-8 rounded-full bg-gray-900/80 flex items-center justify-center shrink-0">
               <svg width="12" height="12" viewBox="0 0 24 24" fill="white"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
             </div>
           </div>
-          <p className="text-[10px] text-gray-300 text-center mt-1.5">ClearPath AI — Verified resources, calibrated confidence</p>
+          <p className="text-[10px] text-gray-300 text-center mt-1.5 flex items-center justify-center gap-1.5">
+            <span className="inline-block w-1 h-1 rounded-full bg-emerald-400" />
+            ClearPath AI — Verified resources · Calibrated confidence
+          </p>
         </div>
       </div>
     </div>
