@@ -19,6 +19,19 @@ import {
   Mail,
   Heart,
   Users,
+  Clock,
+  Gavel,
+  Handshake,
+  Zap,
+  Database,
+  Accessibility,
+  Globe,
+  ShieldCheck,
+  Server,
+  UserCheck,
+  FileCheck,
+  Eye,
+  Lock,
 } from 'lucide-react'
 import Navbar from '@/components/Navbar'
 
@@ -36,8 +49,14 @@ const sections = [
   { id: 'user-conduct', number: 6, title: 'User Conduct', icon: Ban },
   { id: 'intellectual-property', number: 7, title: 'Intellectual Property', icon: Code2 },
   { id: 'limitation-of-liability', number: 8, title: 'Limitation of Liability', icon: Scale },
-  { id: 'modifications', number: 9, title: 'Modifications to Terms', icon: RefreshCw },
-  { id: 'contact-info', number: 10, title: 'Contact Information', icon: Mail },
+  { id: 'dispute-resolution', number: 9, title: 'Dispute Resolution', icon: Gavel },
+  { id: 'indemnification', number: 10, title: 'Indemnification', icon: Handshake },
+  { id: 'sla', number: 11, title: 'Service Level Agreement', icon: Zap },
+  { id: 'open-source', number: 12, title: 'Open Source Components', icon: Code2 },
+  { id: 'dpa', number: 13, title: 'Data Processing Addendum', icon: Database },
+  { id: 'accessibility', number: 14, title: 'Accessibility Statement', icon: Accessibility },
+  { id: 'modifications', number: 15, title: 'Modifications to Terms', icon: RefreshCw },
+  { id: 'contact-info', number: 16, title: 'Contact Information', icon: Mail },
 ]
 
 export default function TermsPage() {
@@ -567,7 +586,441 @@ export default function TermsPage() {
           </div>
         </section>
 
-        {/* Section 9: Modifications to Terms */}
+        {/* Section 9: Dispute Resolution */}
+        <section id="dispute-resolution" className="py-6">
+          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5 }}
+              className="glass-card rounded-2xl p-6 md:p-8 shadow-premium relative overflow-hidden"
+            >
+              <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-400 via-indigo-400 to-blue-400" />
+              <div className="flex items-start gap-4 mb-4">
+                <div className="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center shrink-0">
+                  <Gavel className="w-5 h-5 text-blue-600" />
+                </div>
+                <div>
+                  <span className="text-[11px] font-bold text-blue-600 tracking-wider uppercase">Section 9</span>
+                  <h2 className="text-xl font-extrabold text-gray-900 tracking-tight mt-0.5">Dispute Resolution</h2>
+                </div>
+              </div>
+              <div className="space-y-4 text-[15px] text-gray-500 leading-relaxed pl-0 md:pl-14">
+                <p>
+                  We prefer to resolve disputes informally and quickly. Here is our tiered approach to
+                  resolving any disagreements:
+                </p>
+                <div className="space-y-3">
+                  <div className="p-4 rounded-xl bg-blue-50/20 border border-blue-100/40">
+                    <div className="flex items-center gap-2 mb-2">
+                      <div className="w-6 h-6 rounded-md bg-blue-100 flex items-center justify-center">
+                        <span className="text-[10px] font-bold text-blue-600">1</span>
+                      </div>
+                      <p className="font-semibold text-gray-800 text-[14px]">Informal Resolution</p>
+                    </div>
+                    <p className="text-[13px] text-gray-500 leading-relaxed">
+                      Before filing any formal claim, you agree to first contact us at{' '}
+                      <a href="mailto:legal@clearpath-ai.org" className="text-blue-600 hover:text-blue-500 font-medium">legal@clearpath-ai.org</a>{' '}
+                      with a detailed description of the dispute. We will attempt to resolve the issue
+                      within 30 days. Most issues can be resolved through direct communication, and we
+                      commit to taking every concern seriously.
+                    </p>
+                  </div>
+                  <div className="p-4 rounded-xl bg-blue-50/20 border border-blue-100/40">
+                    <div className="flex items-center gap-2 mb-2">
+                      <div className="w-6 h-6 rounded-md bg-blue-100 flex items-center justify-center">
+                        <span className="text-[10px] font-bold text-blue-600">2</span>
+                      </div>
+                      <p className="font-semibold text-gray-800 text-[14px]">Mediation</p>
+                    </div>
+                    <p className="text-[13px] text-gray-500 leading-relaxed">
+                      If informal resolution fails, either party may request mediation through a mutually
+                      agreed-upon mediator. We will split the cost of mediation equally. Mediation is
+                      confidential, non-binding, and designed to find a mutually acceptable solution
+                      without the expense and formality of arbitration or litigation.
+                    </p>
+                  </div>
+                  <div className="p-4 rounded-xl bg-blue-50/20 border border-blue-100/40">
+                    <div className="flex items-center gap-2 mb-2">
+                      <div className="w-6 h-6 rounded-md bg-blue-100 flex items-center justify-center">
+                        <span className="text-[10px] font-bold text-blue-600">3</span>
+                      </div>
+                      <p className="font-semibold text-gray-800 text-[14px]">Binding Arbitration</p>
+                    </div>
+                    <p className="text-[13px] text-gray-500 leading-relaxed">
+                      If mediation is unsuccessful, disputes will be resolved by binding arbitration
+                      administered by the American Arbitration Association (AAA) under its Consumer
+                      Arbitration Rules. The arbitration will be conducted in English, and the
+                      arbitrator&apos;s decision will be final and binding. You retain the right to
+                      seek relief in small claims court as an alternative to arbitration.
+                    </p>
+                  </div>
+                </div>
+                <div className="p-4 rounded-xl bg-gray-50/60 border border-gray-100 mt-2">
+                  <p className="text-[13px] text-gray-500">
+                    <span className="font-semibold text-gray-700">Governing Law:</span> These Terms and any disputes
+                    arising from them are governed by the laws of the State of Georgia, United States,
+                    without regard to conflict of law principles. For any claims not subject to arbitration,
+                    you consent to the exclusive jurisdiction of the state and federal courts located in
+                    Atlanta, Georgia.
+                  </p>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        </section>
+
+        {/* Section 10: Indemnification */}
+        <section id="indemnification" className="py-6">
+          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5 }}
+              className="glass-card rounded-2xl p-6 md:p-8 shadow-premium"
+            >
+              <div className="flex items-start gap-4 mb-4">
+                <div className="w-10 h-10 rounded-xl bg-teal-50 flex items-center justify-center shrink-0">
+                  <Handshake className="w-5 h-5 text-teal-600" />
+                </div>
+                <div>
+                  <span className="text-[11px] font-bold text-teal-600 tracking-wider uppercase">Section 10</span>
+                  <h2 className="text-xl font-extrabold text-gray-900 tracking-tight mt-0.5">Indemnification</h2>
+                </div>
+              </div>
+              <div className="space-y-4 text-[15px] text-gray-500 leading-relaxed pl-0 md:pl-14">
+                <div className="space-y-3">
+                  <div className="p-4 rounded-xl bg-gray-50/60 border border-gray-100">
+                    <p className="font-semibold text-gray-800 text-[14px] mb-1">User Indemnification of ClearPath AI</p>
+                    <p className="text-[13px] text-gray-400 leading-relaxed">
+                      You agree to indemnify, defend, and hold harmless ClearPath AI and its team members,
+                      affiliates, and agents from and against any claims, liabilities, damages, losses,
+                      and expenses (including reasonable attorneys&apos; fees) arising out of or in any way
+                      connected with: (a) your violation of these Terms, (b) your misuse of the Service,
+                      (c) your violation of any applicable law or regulation, or (d) your submission of
+                      content that infringes or violates any third-party rights.
+                    </p>
+                  </div>
+                  <div className="p-4 rounded-xl bg-gray-50/60 border border-gray-100">
+                    <p className="font-semibold text-gray-800 text-[14px] mb-1">ClearPath AI Indemnification of Users</p>
+                    <p className="text-[13px] text-gray-400 leading-relaxed">
+                      ClearPath AI will indemnify you against any third-party claim that the Service (as
+                      provided, unmodified) directly infringes a valid patent, copyright, or trademark.
+                      This indemnification is conditioned on you providing prompt written notice of the claim,
+                      granting us control of the defense, and cooperating reasonably in the defense.
+                    </p>
+                  </div>
+                  <div className="p-4 rounded-xl bg-amber-50/30 border border-amber-100/40">
+                    <p className="font-semibold text-gray-800 text-[14px] mb-1">Exceptions and Limitations</p>
+                    <p className="text-[13px] text-gray-400 leading-relaxed">
+                      Neither party&apos;s indemnification obligation applies to claims arising from: (a) modifications
+                      of the Service not made by the indemnifying party; (b) combination of the Service with
+                      third-party products or services; (c) use of the Service in a manner not permitted by these
+                      Terms; or (d) failure to implement updates or fixes provided by ClearPath AI. Our total
+                      indemnification liability shall not exceed $100 USD.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        </section>
+
+        {/* Section 11: Service Level Agreement */}
+        <section id="sla" className="py-6">
+          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5 }}
+              className="glass-card rounded-2xl p-6 md:p-8 shadow-premium relative overflow-hidden"
+            >
+              <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-amber-400 via-orange-400 to-amber-400" />
+              <div className="flex items-start gap-4 mb-4">
+                <div className="w-10 h-10 rounded-xl bg-amber-50 flex items-center justify-center shrink-0">
+                  <Zap className="w-5 h-5 text-amber-600" />
+                </div>
+                <div>
+                  <span className="text-[11px] font-bold text-amber-600 tracking-wider uppercase">Section 11</span>
+                  <h2 className="text-xl font-extrabold text-gray-900 tracking-tight mt-0.5">Service Level Agreement</h2>
+                </div>
+              </div>
+              <div className="space-y-4 text-[15px] text-gray-500 leading-relaxed pl-0 md:pl-14">
+                <p>
+                  For enterprise users, ClearPath AI provides the following service level commitments:
+                </p>
+                <div className="grid sm:grid-cols-3 gap-3 my-4">
+                  {[
+                    { label: 'Uptime Guarantee', value: '99.9%', desc: 'Measured monthly, excluding scheduled maintenance', color: '#10b981' },
+                    { label: 'Response Time', value: '<2s', desc: '95th percentile for classification requests', color: '#3b82f6' },
+                    { label: 'Crisis Response', value: '100%', desc: 'Crisis detection must always function', color: '#ef4444' },
+                  ].map((item) => (
+                    <div key={item.label} className="p-4 rounded-xl text-center border bg-gray-50/60 border-gray-100">
+                      <p className="text-[20px] font-black" style={{ color: item.color }}>{item.value}</p>
+                      <p className="font-semibold text-gray-800 text-[13px] mt-1">{item.label}</p>
+                      <p className="text-[11px] text-gray-400 mt-0.5">{item.desc}</p>
+                    </div>
+                  ))}
+                </div>
+                <div className="space-y-3">
+                  <div className="p-4 rounded-xl bg-gray-50/60 border border-gray-100">
+                    <p className="font-semibold text-gray-800 text-[14px] mb-1">Credit for Downtime</p>
+                    <p className="text-[13px] text-gray-400 leading-relaxed">
+                      If uptime falls below 99.9% in a calendar month, enterprise customers are entitled to a
+                      service credit equal to 10x the duration of unplanned downtime applied to their next
+                      billing cycle. For example, 1 hour of downtime results in 10 hours of credit. Credits
+                      are the sole remedy for SLA violations and must be requested within 30 days.
+                    </p>
+                  </div>
+                  <div className="p-4 rounded-xl bg-gray-50/60 border border-gray-100">
+                    <p className="font-semibold text-gray-800 text-[14px] mb-1">SLA Exclusions</p>
+                    <p className="text-[13px] text-gray-400 leading-relaxed">
+                      Scheduled maintenance windows (announced 48 hours in advance), force majeure events,
+                      internet backbone failures, issues caused by third-party API providers (Hugging Face,
+                      211.org), and issues resulting from customer&apos;s own infrastructure or configuration
+                      are excluded from SLA calculations.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        </section>
+
+        {/* Section 12: Open Source Components */}
+        <section id="open-source" className="py-6">
+          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5 }}
+              className="glass-card rounded-2xl p-6 md:p-8 shadow-premium"
+            >
+              <div className="flex items-start gap-4 mb-4">
+                <div className="w-10 h-10 rounded-xl bg-violet-50 flex items-center justify-center shrink-0">
+                  <Code2 className="w-5 h-5 text-violet-600" />
+                </div>
+                <div>
+                  <span className="text-[11px] font-bold text-violet-600 tracking-wider uppercase">Section 12</span>
+                  <h2 className="text-xl font-extrabold text-gray-900 tracking-tight mt-0.5">Open Source Components</h2>
+                </div>
+              </div>
+              <div className="space-y-4 text-[15px] text-gray-500 leading-relaxed pl-0 md:pl-14">
+                <p>
+                  ClearPath AI is built on open source software. We acknowledge and comply with the
+                  licenses of all third-party components. Here is a summary of key dependencies:
+                </p>
+                <div className="overflow-x-auto">
+                  <table className="w-full">
+                    <thead>
+                      <tr className="bg-gray-50/60 border-b border-gray-100/60">
+                        <th className="text-left p-3 text-[11px] font-bold text-gray-400 uppercase tracking-wider">Component</th>
+                        <th className="text-left p-3 text-[11px] font-bold text-gray-400 uppercase tracking-wider">License</th>
+                        <th className="text-left p-3 text-[11px] font-bold text-gray-400 uppercase tracking-wider hidden sm:table-cell">Purpose</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {[
+                        { component: 'Next.js', license: 'MIT', purpose: 'Web application framework' },
+                        { component: 'React', license: 'MIT', purpose: 'UI component library' },
+                        { component: 'Tailwind CSS', license: 'MIT', purpose: 'Utility-first CSS framework' },
+                        { component: 'BART-large-MNLI (via Hugging Face)', license: 'Apache 2.0', purpose: 'Zero-shot text classification model' },
+                        { component: 'Framer Motion', license: 'MIT', purpose: 'Animation library' },
+                        { component: 'Lucide React', license: 'ISC', purpose: 'Icon library' },
+                        { component: 'TypeScript', license: 'Apache 2.0', purpose: 'Programming language' },
+                        { component: 'Node.js', license: 'MIT', purpose: 'Server runtime' },
+                      ].map((row, i) => (
+                        <tr key={i} className="border-b border-gray-50/60 last:border-b-0 hover:bg-white/40 transition-colors">
+                          <td className="p-3"><span className="text-[13px] font-medium text-gray-900">{row.component}</span></td>
+                          <td className="p-3"><span className="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-semibold bg-emerald-50 text-emerald-600 border border-emerald-100/60">{row.license}</span></td>
+                          <td className="p-3 hidden sm:table-cell"><span className="text-[12px] text-gray-400">{row.purpose}</span></td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+                <p className="text-[13px] text-gray-400">
+                  All open source components are used in accordance with their respective license terms.
+                  No modifications have been made that would alter the licensing obligations. Full license
+                  texts are available in our GitHub repository.
+                </p>
+              </div>
+            </motion.div>
+          </div>
+        </section>
+
+        {/* Section 13: Data Processing Addendum */}
+        <section id="dpa" className="py-6">
+          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5 }}
+              className="glass-card rounded-2xl p-6 md:p-8 shadow-premium"
+            >
+              <div className="flex items-start gap-4 mb-4">
+                <div className="w-10 h-10 rounded-xl bg-emerald-50 flex items-center justify-center shrink-0">
+                  <Database className="w-5 h-5 text-emerald-600" />
+                </div>
+                <div>
+                  <span className="text-[11px] font-bold text-emerald-600 tracking-wider uppercase">Section 13</span>
+                  <h2 className="text-xl font-extrabold text-gray-900 tracking-tight mt-0.5">Data Processing Addendum</h2>
+                </div>
+              </div>
+              <div className="space-y-4 text-[15px] text-gray-500 leading-relaxed pl-0 md:pl-14">
+                <p>
+                  This Data Processing Addendum (&ldquo;DPA&rdquo;) supplements the Terms of Service and forms part
+                  of the agreement between you and ClearPath AI regarding the processing of personal data.
+                </p>
+                <div className="space-y-3">
+                  <div className="p-4 rounded-xl bg-gray-50/60 border border-gray-100">
+                    <div className="flex items-center gap-2 mb-2">
+                      <Server className="w-4 h-4 text-emerald-500" />
+                      <p className="font-semibold text-gray-800 text-[14px]">Data Processor Responsibilities</p>
+                    </div>
+                    <p className="text-[13px] text-gray-400 leading-relaxed">
+                      ClearPath AI acts as both data controller and processor. As a processor, we: (a) process
+                      data only as necessary to provide the Service; (b) do not process data for any secondary
+                      purpose; (c) implement appropriate technical and organizational security measures; (d)
+                      ensure that all personnel with access to data are bound by confidentiality obligations;
+                      (e) assist in responding to data subject requests where technically feasible.
+                    </p>
+                  </div>
+                  <div className="p-4 rounded-xl bg-gray-50/60 border border-gray-100">
+                    <div className="flex items-center gap-2 mb-2">
+                      <Users className="w-4 h-4 text-emerald-500" />
+                      <p className="font-semibold text-gray-800 text-[14px]">Subprocessor List</p>
+                    </div>
+                    <p className="text-[13px] text-gray-400 leading-relaxed">
+                      ClearPath AI uses the following subprocessors: (1) Hugging Face, Inc. — AI model inference
+                      (classification API), US-based processing; (2) Vercel, Inc. — Application hosting and
+                      deployment, US-based processing. No other subprocessors are engaged. We will notify you
+                      of any changes to subprocessors with 30 days&apos; advance notice.
+                    </p>
+                  </div>
+                  <div className="p-4 rounded-xl bg-gray-50/60 border border-gray-100">
+                    <div className="flex items-center gap-2 mb-2">
+                      <AlertTriangle className="w-4 h-4 text-amber-500" />
+                      <p className="font-semibold text-gray-800 text-[14px]">Data Breach Notification</p>
+                    </div>
+                    <p className="text-[13px] text-gray-400 leading-relaxed">
+                      In the unlikely event of a personal data breach, ClearPath AI will notify affected users
+                      and relevant supervisory authorities within 72 hours of becoming aware of the breach, as
+                      required by GDPR Article 33. However, given our zero-storage architecture, the risk of
+                      a data breach involving personal data is extremely low — you cannot breach what was never
+                      stored.
+                    </p>
+                  </div>
+                  <div className="p-4 rounded-xl bg-gray-50/60 border border-gray-100">
+                    <div className="flex items-center gap-2 mb-2">
+                      <Eye className="w-4 h-4 text-emerald-500" />
+                      <p className="font-semibold text-gray-800 text-[14px]">Audit Rights</p>
+                    </div>
+                    <p className="text-[13px] text-gray-400 leading-relaxed">
+                      Enterprise users may conduct audits of our data processing practices, subject to reasonable
+                      notice (30 days) and confidentiality requirements. Our open-source codebase provides
+                      continuous transparency — you can review our data handling code at any time without a
+                      formal audit. We also engage independent third-party security assessments annually.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        </section>
+
+        {/* Section 14: Accessibility Statement */}
+        <section id="accessibility" className="py-6">
+          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5 }}
+              className="glass-card rounded-2xl p-6 md:p-8 shadow-premium"
+            >
+              <div className="flex items-start gap-4 mb-4">
+                <div className="w-10 h-10 rounded-xl bg-pink-50 flex items-center justify-center shrink-0">
+                  <Accessibility className="w-5 h-5 text-pink-600" />
+                </div>
+                <div>
+                  <span className="text-[11px] font-bold text-pink-600 tracking-wider uppercase">Section 14</span>
+                  <h2 className="text-xl font-extrabold text-gray-900 tracking-tight mt-0.5">Accessibility Statement</h2>
+                </div>
+              </div>
+              <div className="space-y-4 text-[15px] text-gray-500 leading-relaxed pl-0 md:pl-14">
+                <p>
+                  ClearPath AI is committed to ensuring digital accessibility for people with disabilities.
+                  We believe that community resources should be accessible to everyone, including those
+                  who rely on assistive technologies.
+                </p>
+                <div className="space-y-3">
+                  <div className="p-4 rounded-xl bg-gray-50/60 border border-gray-100">
+                    <div className="flex items-center gap-2 mb-2">
+                      <ShieldCheck className="w-4 h-4 text-emerald-500" />
+                      <p className="font-semibold text-gray-800 text-[14px]">WCAG Compliance Level</p>
+                    </div>
+                    <p className="text-[13px] text-gray-400 leading-relaxed">
+                      We aim to conform to the Web Content Accessibility Guidelines (WCAG) 2.1 Level AA.
+                      Our interface is designed with semantic HTML, ARIA labels, keyboard navigation support,
+                      and sufficient color contrast ratios. Confidence badges use both color and text labels
+                      (not color alone) to ensure accessibility for users with color vision deficiencies.
+                    </p>
+                  </div>
+                  <div className="p-4 rounded-xl bg-amber-50/30 border border-amber-100/40">
+                    <div className="flex items-center gap-2 mb-2">
+                      <AlertTriangle className="w-4 h-4 text-amber-500" />
+                      <p className="font-semibold text-gray-800 text-[14px]">Known Accessibility Limitations</p>
+                    </div>
+                    <ul className="space-y-1.5 mt-2">
+                      {[
+                        'Some interactive animations may not respect prefers-reduced-motion settings in all browsers',
+                        'Crisis detection animations (pulsing elements) may be distracting for some users',
+                        'Third-party resource links may not meet our accessibility standards',
+                        'Screen reader support for real-time confidence score updates needs improvement',
+                        'Mobile touch targets on some interactive elements may be smaller than 44px in certain views',
+                      ].map((item, i) => (
+                        <li key={i} className="flex items-start gap-2">
+                          <span className="w-1.5 h-1.5 rounded-full bg-amber-400 mt-1.5 shrink-0" />
+                          <span className="text-[13px] text-gray-400">{item}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                  <div className="p-4 rounded-xl bg-gray-50/60 border border-gray-100">
+                    <p className="font-semibold text-gray-800 text-[14px] mb-1">Remediation Timeline</p>
+                    <p className="text-[13px] text-gray-400 leading-relaxed">
+                      We are actively working to address these limitations. Our remediation targets are:
+                      prefers-reduced-motion support (Q3 2026), improved screen reader compatibility
+                      (Q3 2026), and full WCAG 2.1 AA conformance (Q4 2026). We prioritize accessibility
+                      fixes alongside safety-critical updates.
+                    </p>
+                  </div>
+                  <div className="p-4 rounded-xl bg-blue-50/30 border border-blue-100/40">
+                    <div className="flex items-center gap-2">
+                      <Mail className="w-4 h-4 text-blue-500" />
+                      <div>
+                        <p className="font-semibold text-gray-800 text-[14px]">Contact for Accessibility Issues</p>
+                        <p className="text-[13px] text-gray-400 mt-0.5">
+                          If you encounter accessibility barriers while using ClearPath AI, please contact us at{' '}
+                          <a href="mailto:accessibility@clearpath-ai.org" className="text-blue-600 hover:text-blue-500 font-medium">accessibility@clearpath-ai.org</a>.
+                          We take accessibility feedback seriously and aim to respond within 2 business days.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        </section>
+
+        {/* Section 15: Modifications to Terms */}
         <section id="modifications" className="py-6">
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
             <motion.div
@@ -582,7 +1035,7 @@ export default function TermsPage() {
                   <RefreshCw className="w-5 h-5 text-teal-600" />
                 </div>
                 <div>
-                  <span className="text-[11px] font-bold text-teal-600 tracking-wider uppercase">Section 9</span>
+                  <span className="text-[11px] font-bold text-teal-600 tracking-wider uppercase">Section 15</span>
                   <h2 className="text-xl font-extrabold text-gray-900 tracking-tight mt-0.5">Modifications to Terms</h2>
                 </div>
               </div>
@@ -611,7 +1064,7 @@ export default function TermsPage() {
           </div>
         </section>
 
-        {/* Section 10: Contact Information */}
+        {/* Section 16: Contact Information */}
         <section id="contact-info" className="py-6">
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
             <motion.div
@@ -626,28 +1079,42 @@ export default function TermsPage() {
                   <Mail className="w-5 h-5 text-blue-600" />
                 </div>
                 <div>
-                  <span className="text-[11px] font-bold text-blue-600 tracking-wider uppercase">Section 10</span>
+                  <span className="text-[11px] font-bold text-blue-600 tracking-wider uppercase">Section 16</span>
                   <h2 className="text-xl font-extrabold text-gray-900 tracking-tight mt-0.5">Contact Information</h2>
                 </div>
               </div>
-              <div className="space-y-4 text-[15px] text-gray-500 leading-relaxed max-w-lg mx-auto">
+              <div className="space-y-3 text-[15px] text-gray-500 leading-relaxed max-w-lg mx-auto">
                 <p>
                   For questions about these Terms, please contact us:
                 </p>
-                <div className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-blue-50/60 border border-blue-100">
-                  <Mail className="w-4 h-4 text-blue-500" />
-                  <a
-                    href="mailto:team@clearpath-ai.org"
-                    className="text-[14px] font-semibold text-blue-600 hover:text-blue-500 transition-colors"
-                  >
-                    team@clearpath-ai.org
-                  </a>
+                <div className="space-y-2">
+                  <div className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-blue-50/60 border border-blue-100">
+                    <Mail className="w-4 h-4 text-blue-500" />
+                    <a
+                      href="mailto:team@clearpath-ai.org"
+                      className="text-[14px] font-semibold text-blue-600 hover:text-blue-500 transition-colors"
+                    >
+                      team@clearpath-ai.org
+                    </a>
+                  </div>
+                  <div className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-violet-50/60 border border-violet-100">
+                    <Gavel className="w-4 h-4 text-violet-500" />
+                    <a
+                      href="mailto:legal@clearpath-ai.org"
+                      className="text-[14px] font-semibold text-violet-600 hover:text-violet-500 transition-colors"
+                    >
+                      legal@clearpath-ai.org
+                    </a>
+                    <span className="text-[11px] text-gray-400">(Legal)</span>
+                  </div>
                 </div>
                 <p className="text-[13px] text-gray-400 mt-4">
                   For privacy-related inquiries, please also review our{' '}
                   <Link href="/privacy" className="text-blue-500 hover:text-blue-400 font-medium transition-colors">
                     Privacy Policy
                   </Link>.
+                  For accessibility concerns, contact{' '}
+                  <a href="mailto:accessibility@clearpath-ai.org" className="text-blue-500 hover:text-blue-400 font-medium">accessibility@clearpath-ai.org</a>.
                 </p>
               </div>
             </motion.div>

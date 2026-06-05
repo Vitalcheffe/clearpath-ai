@@ -16,6 +16,14 @@ import {
   ArrowRight,
   CheckCircle2,
   AlertTriangle,
+  Globe,
+  Scale,
+  FileText,
+  Clock,
+  Cookie,
+  ShieldCheck,
+  Building,
+  UserCheck,
 } from 'lucide-react'
 import Navbar from '@/components/Navbar'
 
@@ -34,7 +42,13 @@ const sections = [
   { id: 'your-rights', number: 7, title: 'Your Rights', icon: Users },
   { id: 'childrens-privacy', number: 8, title: "Children's Privacy", icon: Baby },
   { id: 'security', number: 9, title: 'Security Measures', icon: Lock },
-  { id: 'contact', number: 10, title: 'Contact Us', icon: Mail },
+  { id: 'legal-basis', number: 10, title: 'Data Processing Legal Basis', icon: Scale },
+  { id: 'international-transfers', number: 11, title: 'International Data Transfers', icon: Globe },
+  { id: 'automated-decisions', number: 12, title: 'Automated Decision-Making', icon: Cpu },
+  { id: 'retention', number: 13, title: 'Data Retention Schedule', icon: Clock },
+  { id: 'cookies', number: 14, title: 'Cookie Policy', icon: Cookie },
+  { id: 'privacy-by-design', number: 15, title: 'Privacy by Design', icon: ShieldCheck },
+  { id: 'contact', number: 16, title: 'Contact Us', icon: Mail },
 ]
 
 export default function PrivacyPage() {
@@ -615,7 +629,451 @@ export default function PrivacyPage() {
           </div>
         </section>
 
-        {/* Section 10: Contact */}
+        {/* Section 10: Data Processing Legal Basis (GDPR Article 6) */}
+        <section id="legal-basis" className="py-6">
+          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5 }}
+              className="glass-card rounded-2xl p-6 md:p-8 shadow-premium relative overflow-hidden"
+            >
+              <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-400 via-indigo-400 to-blue-400" />
+              <div className="flex items-start gap-4 mb-4">
+                <div className="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center shrink-0">
+                  <Scale className="w-5 h-5 text-blue-600" />
+                </div>
+                <div>
+                  <span className="text-[11px] font-bold text-blue-600 tracking-wider uppercase">Section 10</span>
+                  <h2 className="text-xl font-extrabold text-gray-900 tracking-tight mt-0.5">Data Processing Legal Basis</h2>
+                </div>
+              </div>
+              <div className="space-y-4 text-[15px] text-gray-500 leading-relaxed pl-0 md:pl-14">
+                <p>
+                  Under GDPR Article 6, all data processing must have a lawful basis. ClearPath AI processes
+                  data under the following legal bases:
+                </p>
+                <div className="space-y-3">
+                  {[
+                    {
+                      basis: 'Legitimate Interest',
+                      description: 'Processing your query text to classify your needs and present relevant community resources. This is the core functionality you expect when using our service. Our legitimate interest is providing the AI navigation service you requested.',
+                      dataTypes: 'Query text, classification results, confidence scores',
+                    },
+                    {
+                      basis: 'Vital Interest',
+                      description: 'Crisis keyword detection is processed under the vital interest legal basis. When someone may be in danger, processing their input to detect crisis signals and connect them with emergency services is necessary to protect their vital interests — their life and safety.',
+                      dataTypes: 'Crisis keyword matching (in-memory only)',
+                    },
+                    {
+                      basis: 'Consent',
+                      description: 'If you voluntarily provide location information to improve resource relevance, this is processed based on your explicit consent. You can withdraw this consent at any time by clearing your location in the interface. No consequences for refusing.',
+                      dataTypes: 'Opt-in location data (ZIP code only)',
+                    },
+                  ].map((item, i) => (
+                    <div key={i} className="p-4 rounded-xl bg-blue-50/20 border border-blue-100/40">
+                      <div className="flex items-center gap-2 mb-2">
+                        <div className="w-6 h-6 rounded-md bg-blue-100 flex items-center justify-center">
+                          <span className="text-[10px] font-bold text-blue-600">{i + 1}</span>
+                        </div>
+                        <p className="font-semibold text-gray-800 text-[14px]">{item.basis}</p>
+                      </div>
+                      <p className="text-[13px] text-gray-500 leading-relaxed">{item.description}</p>
+                      <p className="text-[11px] text-gray-400 mt-2"><span className="font-semibold text-gray-500">Data types:</span> {item.dataTypes}</p>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="p-4 rounded-xl bg-gray-50/60 border border-gray-100 mt-4">
+                  <div className="flex items-start gap-3">
+                    <div className="w-8 h-8 rounded-lg bg-gray-100 flex items-center justify-center shrink-0">
+                      <Building className="w-4 h-4 text-gray-500" />
+                    </div>
+                    <div>
+                      <p className="font-semibold text-gray-700 text-[13px]">Data Controller Information</p>
+                      <p className="text-[12px] text-gray-400 mt-1">
+                        ClearPath AI is the data controller for all processing described in this policy.
+                        Our Data Protection Officer is Dr. Priya Patel, reachable at{' '}
+                        <a href="mailto:dpo@clearpath-ai.org" className="text-blue-500 hover:text-blue-400 font-medium">dpo@clearpath-ai.org</a>.
+                        We have no data processors acting on our behalf, as all processing occurs within our system architecture.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        </section>
+
+        {/* Section 11: International Data Transfers */}
+        <section id="international-transfers" className="py-6">
+          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5 }}
+              className="glass-card rounded-2xl p-6 md:p-8 shadow-premium"
+            >
+              <div className="flex items-start gap-4 mb-4">
+                <div className="w-10 h-10 rounded-xl bg-indigo-50 flex items-center justify-center shrink-0">
+                  <Globe className="w-5 h-5 text-indigo-600" />
+                </div>
+                <div>
+                  <span className="text-[11px] font-bold text-indigo-600 tracking-wider uppercase">Section 11</span>
+                  <h2 className="text-xl font-extrabold text-gray-900 tracking-tight mt-0.5">International Data Transfers</h2>
+                </div>
+              </div>
+              <div className="space-y-4 text-[15px] text-gray-500 leading-relaxed pl-0 md:pl-14">
+                <p>
+                  ClearPath AI&apos;s architecture minimizes international data transfer concerns. Here is how
+                  cross-border data handling works in our system:
+                </p>
+                <div className="space-y-3">
+                  {[
+                    {
+                      title: 'Countries where data may be processed',
+                      description: 'Our application servers are hosted in the United States. The Hugging Face API (used for AI classification) may process queries in US-based data centers. 211.org resource queries are routed to their US-based servers. No other international transfers occur.',
+                    },
+                    {
+                      title: 'Safeguards in place',
+                      description: 'Because we do not store personal data, the risk from international transfers is minimal. Query text is processed in real-time and immediately discarded. No persistent data crosses borders. All data in transit is encrypted using TLS 1.3 regardless of destination.',
+                    },
+                    {
+                      title: 'Standard contractual clauses',
+                      description: 'Where our third-party service providers (Hugging Face) may process data outside the EEA, they operate under Standard Contractual Clauses (SCCs) approved by the European Commission. However, since no personal data is stored and all processing is ephemeral, the practical impact of these transfers is negligible.',
+                    },
+                  ].map((item, i) => (
+                    <div key={i} className="p-4 rounded-xl bg-gray-50/60 border border-gray-100">
+                      <p className="font-semibold text-gray-800 text-[14px] mb-1">{item.title}</p>
+                      <p className="text-[13px] text-gray-400 leading-relaxed">{item.description}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        </section>
+
+        {/* Section 12: Automated Decision-Making */}
+        <section id="automated-decisions" className="py-6">
+          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5 }}
+              className="glass-card rounded-2xl p-6 md:p-8 shadow-premium relative overflow-hidden"
+            >
+              <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-violet-400 via-purple-400 to-violet-400" />
+              <div className="flex items-start gap-4 mb-4">
+                <div className="w-10 h-10 rounded-xl bg-violet-50 flex items-center justify-center shrink-0">
+                  <Cpu className="w-5 h-5 text-violet-600" />
+                </div>
+                <div>
+                  <span className="text-[11px] font-bold text-violet-600 tracking-wider uppercase">Section 12</span>
+                  <h2 className="text-xl font-extrabold text-gray-900 tracking-tight mt-0.5">Automated Decision-Making</h2>
+                </div>
+              </div>
+              <div className="space-y-4 text-[15px] text-gray-500 leading-relaxed pl-0 md:pl-14">
+                <p>
+                  ClearPath AI uses automated processing to classify your queries and present resource recommendations.
+                  Under GDPR Article 22, you have specific rights regarding automated decision-making. Here is what
+                  our system does and does not do:
+                </p>
+                <div className="space-y-3">
+                  <div className="p-4 rounded-xl bg-gray-50/60 border border-gray-100">
+                    <p className="font-semibold text-gray-800 text-[14px] mb-1">What automated decisions are made</p>
+                    <ul className="space-y-1.5 mt-2">
+                      {[
+                        'Query classification into resource categories (e.g., housing, food assistance, mental health)',
+                        'Confidence score calculation indicating the model\'s certainty about its classification',
+                        'Crisis keyword detection triggering immediate emergency resource display',
+                        'Clarification question generation when confidence is below 70%',
+                      ].map((item, i) => (
+                        <li key={i} className="flex items-start gap-2">
+                          <span className="w-1.5 h-1.5 rounded-full bg-violet-400 mt-1.5 shrink-0" />
+                          <span className="text-[13px] text-gray-400">{item}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                  <div className="p-4 rounded-xl bg-emerald-50/30 border border-emerald-100/40">
+                    <p className="font-semibold text-gray-800 text-[14px] mb-1">Right to human review</p>
+                    <p className="text-[13px] text-gray-400 leading-relaxed">
+                      You always have the right to request human review of any AI-generated recommendation.
+                      Our &ldquo;Talk to a Navigator&rdquo; button connects you to a trained 211.org professional
+                      who can provide human-verified guidance. This is not a hidden option — it is prominently
+                      displayed on every result and at every stage of the interaction.
+                    </p>
+                  </div>
+                  <div className="p-4 rounded-xl bg-amber-50/30 border border-amber-100/40">
+                    <p className="font-semibold text-gray-800 text-[14px] mb-1">How to opt out of automated processing</p>
+                    <p className="text-[13px] text-gray-400 leading-relaxed">
+                      You can bypass AI classification entirely by contacting a 211 navigator directly. Call
+                      2-1-1 or use the &ldquo;Talk to a Navigator&rdquo; button to speak with a human. You can
+                      also simply close the browser tab — no automated decisions persist after your session ends.
+                    </p>
+                  </div>
+                </div>
+                <div className="p-4 rounded-xl bg-violet-50/30 border border-violet-100/40">
+                  <div className="flex items-start gap-2">
+                    <ShieldCheck className="w-4 h-4 text-violet-500 mt-0.5 shrink-0" />
+                    <p className="text-[13px] text-violet-700">
+                      <span className="font-semibold">Important:</span> Our automated decisions do not produce
+                      legal effects or similarly significant effects on you. We recommend resources — we do not
+                      determine eligibility, approve applications, or make decisions about your access to services.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        </section>
+
+        {/* Section 13: Data Retention Schedule */}
+        <section id="retention" className="py-6">
+          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5 }}
+              className="glass-card rounded-2xl p-6 md:p-8 shadow-premium"
+            >
+              <div className="flex items-start gap-4 mb-4">
+                <div className="w-10 h-10 rounded-xl bg-teal-50 flex items-center justify-center shrink-0">
+                  <Clock className="w-5 h-5 text-teal-600" />
+                </div>
+                <div>
+                  <span className="text-[11px] font-bold text-teal-600 tracking-wider uppercase">Section 13</span>
+                  <h2 className="text-xl font-extrabold text-gray-900 tracking-tight mt-0.5">Data Retention Schedule</h2>
+                </div>
+              </div>
+              <div className="space-y-4 text-[15px] text-gray-500 leading-relaxed pl-0 md:pl-14">
+                <p>
+                  Our data retention is simple: <span className="font-semibold text-gray-700">we don&apos;t retain data</span>.
+                  Here is the complete schedule showing what happens to each type of data:
+                </p>
+                <div className="overflow-x-auto">
+                  <table className="w-full">
+                    <thead>
+                      <tr className="bg-gray-50/60 border-b border-gray-100/60">
+                        <th className="text-left p-3 text-[11px] font-bold text-gray-400 uppercase tracking-wider">Data Type</th>
+                        <th className="text-left p-3 text-[11px] font-bold text-gray-400 uppercase tracking-wider">Retention Period</th>
+                        <th className="text-left p-3 text-[11px] font-bold text-gray-400 uppercase tracking-wider hidden sm:table-cell">Reason</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {[
+                        { type: 'Query text', period: 'Session only (seconds)', reason: 'Processed in-memory for classification, discarded immediately after' },
+                        { type: 'Classification results', period: 'Session only (seconds)', reason: 'Displayed to user, then purged from memory' },
+                        { type: 'Confidence scores', period: 'Session only (seconds)', reason: 'Generated for display, never persisted to disk' },
+                        { type: 'Crisis keyword matches', period: 'Not stored at all', reason: 'Detection triggers response, no record of detection is kept' },
+                        { type: 'Location data (ZIP)', period: 'Session only (if provided)', reason: 'Opt-in only, used for resource filtering, cleared on session end' },
+                        { type: 'Session metadata', period: 'Session only', reason: 'Browser session token, no personal identifiers, cleared on close' },
+                        { type: 'Anonymous feedback', period: '1 year', reason: 'Thumbs up/down ratings used for system improvement, no user association' },
+                        { type: 'Server logs', period: '7 days', reason: 'Standard error logging for debugging, no user query content logged' },
+                        { type: 'API call metadata', period: 'Not stored', reason: 'Hugging Face API calls are stateless; no logs on our end' },
+                        { type: 'Resource database cache', period: '24 hours', reason: 'Cached 211.org data for performance, contains no user information' },
+                      ].map((row, i) => (
+                        <tr key={i} className="border-b border-gray-50/60 last:border-b-0 hover:bg-white/40 transition-colors">
+                          <td className="p-3"><span className="text-[13px] font-medium text-gray-900">{row.type}</span></td>
+                          <td className="p-3"><span className="text-[12px] font-semibold text-emerald-600">{row.period}</span></td>
+                          <td className="p-3 hidden sm:table-cell"><span className="text-[12px] text-gray-400">{row.reason}</span></td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        </section>
+
+        {/* Section 14: Cookie Policy */}
+        <section id="cookies" className="py-6">
+          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5 }}
+              className="glass-card rounded-2xl p-6 md:p-8 shadow-premium"
+            >
+              <div className="flex items-start gap-4 mb-4">
+                <div className="w-10 h-10 rounded-xl bg-orange-50 flex items-center justify-center shrink-0">
+                  <Cookie className="w-5 h-5 text-orange-600" />
+                </div>
+                <div>
+                  <span className="text-[11px] font-bold text-orange-600 tracking-wider uppercase">Section 14</span>
+                  <h2 className="text-xl font-extrabold text-gray-900 tracking-tight mt-0.5">Cookie Policy</h2>
+                </div>
+              </div>
+              <div className="space-y-4 text-[15px] text-gray-500 leading-relaxed pl-0 md:pl-14">
+                <p>
+                  ClearPath AI uses <span className="font-semibold text-gray-700">minimal cookies</span>. We do not
+                  use cookies for advertising, tracking, or analytics. Here is the complete list:
+                </p>
+
+                {/* Essential Cookies */}
+                <div>
+                  <h4 className="text-[14px] font-bold text-gray-800 mb-3">Essential Cookies</h4>
+                  <div className="overflow-x-auto">
+                    <table className="w-full">
+                      <thead>
+                        <tr className="bg-gray-50/60 border-b border-gray-100/60">
+                          <th className="text-left p-3 text-[11px] font-bold text-gray-400 uppercase tracking-wider">Cookie</th>
+                          <th className="text-left p-3 text-[11px] font-bold text-gray-400 uppercase tracking-wider">Purpose</th>
+                          <th className="text-left p-3 text-[11px] font-bold text-gray-400 uppercase tracking-wider hidden sm:table-cell">Duration</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {[
+                          { name: 'session_id', purpose: 'Maintains your current browser session for conversation continuity', duration: 'Session (deleted on close)' },
+                          { name: 'csrf_token', purpose: 'Protects against cross-site request forgery attacks', duration: 'Session (deleted on close)' },
+                          { name: 'theme_preference', purpose: 'Stores your light/dark mode preference', duration: '1 year' },
+                        ].map((cookie, i) => (
+                          <tr key={i} className="border-b border-gray-50/60 last:border-b-0">
+                            <td className="p-3"><code className="text-[12px] font-mono text-gray-700 bg-gray-50 px-1.5 py-0.5 rounded">{cookie.name}</code></td>
+                            <td className="p-3"><span className="text-[12px] text-gray-400">{cookie.purpose}</span></td>
+                            <td className="p-3 hidden sm:table-cell"><span className="text-[12px] text-gray-500 font-medium">{cookie.duration}</span></td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+
+                {/* Analytics Cookies */}
+                <div className="p-4 rounded-xl bg-emerald-50/30 border border-emerald-100/40">
+                  <div className="flex items-start gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-500 mt-0.5 shrink-0" />
+                    <div>
+                      <p className="font-semibold text-gray-800 text-[14px]">No Analytics Cookies</p>
+                      <p className="text-[13px] text-gray-400 mt-0.5">
+                        We do not use Google Analytics, Facebook Pixel, or any third-party analytics cookies.
+                        We do not track your browsing behavior, page views, or interaction patterns across sessions.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* How to Manage */}
+                <div className="p-4 rounded-xl bg-gray-50/60 border border-gray-100">
+                  <p className="font-semibold text-gray-800 text-[14px] mb-2">How to manage cookies</p>
+                  <p className="text-[13px] text-gray-400 leading-relaxed">
+                    You can control cookies through your browser settings. Most browsers allow you to block
+                    or delete cookies. However, blocking essential cookies may affect the functionality of
+                    ClearPath AI (for example, your conversation context may not persist within a session).
+                    Since we use so few cookies and none for tracking, we do not provide a separate cookie
+                    consent banner — our essential cookies fall under the &ldquo;strictly necessary&rdquo; exemption
+                    in most privacy regulations.
+                  </p>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        </section>
+
+        {/* Section 15: Privacy by Design */}
+        <section id="privacy-by-design" className="py-6">
+          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5 }}
+              className="glass-card rounded-2xl p-6 md:p-8 shadow-premium relative overflow-hidden"
+            >
+              <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-emerald-400 via-teal-400 to-cyan-400" />
+              <div className="flex items-start gap-4 mb-4">
+                <div className="w-10 h-10 rounded-xl bg-emerald-50 flex items-center justify-center shrink-0">
+                  <ShieldCheck className="w-5 h-5 text-emerald-600" />
+                </div>
+                <div>
+                  <span className="text-[11px] font-bold text-emerald-600 tracking-wider uppercase">Section 15</span>
+                  <h2 className="text-xl font-extrabold text-gray-900 tracking-tight mt-0.5">Privacy by Design</h2>
+                </div>
+              </div>
+              <div className="space-y-4 text-[15px] text-gray-500 leading-relaxed pl-0 md:pl-14">
+                <p>
+                  Privacy by Design is not a feature we added — it is the foundation we built on. Our architecture
+                  decisions were made with privacy as the primary constraint, not as a compliance afterthought.
+                </p>
+
+                {/* Architecture Decisions */}
+                <div>
+                  <h4 className="text-[14px] font-bold text-gray-800 mb-3">Architecture Decisions for Privacy</h4>
+                  <div className="space-y-2.5">
+                    {[
+                      { decision: 'In-memory processing only', rationale: 'Eliminates entire categories of data breach risk. You cannot exfiltrate data that was never stored.' },
+                      { decision: 'No user accounts', rationale: 'Accounts require email, passwords, and session persistence — all of which create privacy risk. We chose anonymity by default.' },
+                      { decision: 'Zero-shot classification', rationale: 'We use a pre-trained model without fine-tuning on user data. Your queries improve nothing about the model.' },
+                      { decision: 'Session-based architecture', rationale: 'All state is ephemeral. When you close the tab, every trace of your interaction is gone from our servers.' },
+                      { decision: 'Opt-in location sharing', rationale: 'Location is never requested automatically. If you choose to share a ZIP code for better results, it stays in your session only.' },
+                    ].map((item, i) => (
+                      <div key={i} className="flex items-start gap-3 p-3 rounded-xl bg-gray-50/60 border border-gray-100">
+                        <div className="w-5 h-5 rounded-full bg-emerald-50 flex items-center justify-center shrink-0 mt-0.5">
+                          <CheckCircle2 className="w-3 h-3 text-emerald-500" />
+                        </div>
+                        <div>
+                          <p className="font-semibold text-gray-800 text-[13px]">{item.decision}</p>
+                          <p className="text-[12px] text-gray-400 mt-0.5 leading-relaxed">{item.rationale}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Privacy Impact Assessment */}
+                <div className="mt-4">
+                  <h4 className="text-[14px] font-bold text-gray-800 mb-3">Privacy Impact Assessment Results</h4>
+                  <div className="p-4 rounded-xl bg-emerald-50/30 border border-emerald-100/40">
+                    <p className="text-[13px] text-gray-500 leading-relaxed">
+                      We conducted a Privacy Impact Assessment (PIA) prior to launch. Key findings: (1) No personal
+                      data is collected, eliminating GDPR Articles 13-20 obligations for data storage; (2) In-memory
+                      processing architecture reduces data breach risk to near-zero; (3) Crisis detection operates
+                      without storing sensitive health information; (4) No third-party data sharing eliminates
+                      controller-processor agreement requirements; (5) Overall privacy risk rating: <span className="font-bold text-emerald-600">Minimal</span>.
+                    </p>
+                  </div>
+                </div>
+
+                {/* Technical Safeguards */}
+                <div className="mt-4">
+                  <h4 className="text-[14px] font-bold text-gray-800 mb-3">Technical Safeguards</h4>
+                  <div className="grid sm:grid-cols-2 gap-3">
+                    {[
+                      { icon: Lock, title: 'TLS 1.3 Encryption', desc: 'All data in transit encrypted end-to-end', color: '#3b82f6' },
+                      { icon: Cpu, title: 'In-Memory Only', desc: 'RAM processing with no disk persistence', color: '#10b981' },
+                      { icon: Shield, title: 'Input Sanitization', desc: 'All user inputs sanitized before processing', color: '#8b5cf6' },
+                      { icon: Database, title: 'Zero Storage', desc: 'No database, no files, no logs of user content', color: '#f59e0b' },
+                      { icon: Eye, title: 'No Tracking', desc: 'No analytics, pixels, or behavioral tracking', color: '#ef4444' },
+                      { icon: UserCheck, title: 'Anonymity Default', desc: 'No accounts, no email, no identifiers', color: '#06b6d4' },
+                    ].map((safeguard) => {
+                      const SIcon = safeguard.icon
+                      return (
+                        <div key={safeguard.title} className="flex items-start gap-3 p-3 rounded-xl bg-gray-50/60 border border-gray-100">
+                          <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0" style={{ backgroundColor: `${safeguard.color}0d` }}>
+                            <SIcon className="w-4 h-4" style={{ color: safeguard.color }} />
+                          </div>
+                          <div>
+                            <p className="font-semibold text-gray-800 text-[13px]">{safeguard.title}</p>
+                            <p className="text-[11px] text-gray-400 mt-0.5">{safeguard.desc}</p>
+                          </div>
+                        </div>
+                      )
+                    })}
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        </section>
+
+        {/* Section 16: Contact */}
         <section id="contact" className="py-6">
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
             <motion.div
@@ -630,7 +1088,7 @@ export default function PrivacyPage() {
                   <Mail className="w-5 h-5 text-blue-600" />
                 </div>
                 <div>
-                  <span className="text-[11px] font-bold text-blue-600 tracking-wider uppercase">Section 10</span>
+                  <span className="text-[11px] font-bold text-blue-600 tracking-wider uppercase">Section 16</span>
                   <h2 className="text-xl font-extrabold text-gray-900 tracking-tight mt-0.5">Contact Us</h2>
                 </div>
               </div>
@@ -639,17 +1097,30 @@ export default function PrivacyPage() {
                   If you have questions, concerns, or requests regarding this Privacy Policy
                   or your data, please reach out:
                 </p>
-                <div className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-blue-50/60 border border-blue-100">
-                  <Mail className="w-4 h-4 text-blue-500" />
-                  <a
-                    href="mailto:team@clearpath-ai.org"
-                    className="text-[14px] font-semibold text-blue-600 hover:text-blue-500 transition-colors"
-                  >
-                    team@clearpath-ai.org
-                  </a>
+                <div className="space-y-2">
+                  <div className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-blue-50/60 border border-blue-100">
+                    <Mail className="w-4 h-4 text-blue-500" />
+                    <a
+                      href="mailto:team@clearpath-ai.org"
+                      className="text-[14px] font-semibold text-blue-600 hover:text-blue-500 transition-colors"
+                    >
+                      team@clearpath-ai.org
+                    </a>
+                  </div>
+                  <div className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-emerald-50/60 border border-emerald-100">
+                    <Shield className="w-4 h-4 text-emerald-500" />
+                    <a
+                      href="mailto:dpo@clearpath-ai.org"
+                      className="text-[14px] font-semibold text-emerald-600 hover:text-emerald-500 transition-colors"
+                    >
+                      dpo@clearpath-ai.org
+                    </a>
+                    <span className="text-[11px] text-gray-400">(Data Protection Officer)</span>
+                  </div>
                 </div>
                 <p className="text-[13px] text-gray-400 mt-4">
-                  We aim to respond to all privacy-related inquiries within 48 hours.
+                  We aim to respond to all privacy-related inquiries within 48 hours. For GDPR-related
+                  requests (data access, deletion, portability), we respond within 30 days as required by law.
                 </p>
               </div>
             </motion.div>

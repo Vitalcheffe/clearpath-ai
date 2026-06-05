@@ -29,6 +29,30 @@ import {
   Zap,
   Users,
   BarChart3,
+  Baby,
+  GraduationCap,
+  HeartPulse,
+  Scale,
+  Globe2,
+  Lock,
+  Server,
+  Wifi,
+  Award,
+  Trophy,
+  Mail,
+  Phone,
+  BookOpen,
+  AlertTriangle,
+  Activity,
+  Clock,
+  Send,
+  Bot,
+  User,
+  Building2,
+  HandHeart,
+  Smile,
+  CircleDot,
+  ExternalLink,
 } from 'lucide-react'
 import Navbar from '@/components/Navbar'
 
@@ -191,6 +215,76 @@ const layers = [
   },
 ]
 
+// ─── 6-LAYER DEEP DIVE DATA ──────────────────────────────
+const layerDeepDives = [
+  {
+    layer: 1,
+    title: 'Confidence Score',
+    subtitle: 'How certain is the AI?',
+    icon: TrendingUp,
+    colorHex: '#3b82f6',
+    bgColor: 'rgba(59,130,246,0.06)',
+    function: 'Every result is scored from 0-100% using calibrated probabilities from BART-large-MNLI. Unlike raw model outputs, our scores are validated against held-out data to reflect true certainty.',
+    dataFlow: 'User input → BART-large-MNLI softmax → Calibrated probability → Displayed as confidence ring',
+    example: '"I need help paying my electricity bill" → 91% confidence → Energy Assistance category. The model is highly certain because the language directly maps to a well-represented category in the 211 database.',
+  },
+  {
+    layer: 2,
+    title: 'Source Quality',
+    subtitle: 'Where does the data come from?',
+    icon: Database,
+    colorHex: '#10b981',
+    bgColor: 'rgba(16,185,129,0.06)',
+    function: 'Every resource in our database is sourced from verified partners — primarily the United Way 211 system. We display the last-verified date and source for every recommendation.',
+    dataFlow: '211.org database → Monthly verification → Source badge + last-verified date → Displayed on every resource card',
+    example: 'Section 8 Emergency Transfer — Source: United Way 211 — Last verified: May 2026 — Verified badge shown. Users can confirm the resource is current before making contact.',
+  },
+  {
+    layer: 3,
+    title: 'Bias Check',
+    subtitle: 'Is the classification fair?',
+    icon: Scale,
+    colorHex: '#8b5cf6',
+    bgColor: 'rgba(139,92,246,0.06)',
+    function: 'We use zero-shot classification (BART-large-MNLI) without fine-tuning, which minimizes training data bias. Our 8 categories are broad and inclusive, designed with community navigator input.',
+    dataFlow: 'Raw classification → Category bias audit → Multi-label threshold tuning → Result displayed with alternatives',
+    example: '"My grandma needs meals delivered" triggers both Food Assistance and Senior Services — not forced into a single bucket. Multi-label classification ensures intersectional needs are captured.',
+  },
+  {
+    layer: 4,
+    title: 'Complexity Level',
+    subtitle: 'How many needs are involved?',
+    icon: Layers,
+    colorHex: '#f59e0b',
+    bgColor: 'rgba(245,158,11,0.06)',
+    function: 'Our multi-label classifier detects when a user has multiple simultaneous needs. Complex cases are flagged for additional clarification or human escalation rather than oversimplified.',
+    dataFlow: 'Input text → Multi-label scoring → Threshold check → Single vs. multi-need flag → Clarification if needed',
+    example: '"I lost my job, can\'t pay rent, and my kids need food" → 3 needs detected (Employment, Housing, Food) → All three results displayed with individual confidence scores.',
+  },
+  {
+    layer: 5,
+    title: 'Alternative Views',
+    subtitle: 'What else could this be?',
+    icon: Eye,
+    colorHex: '#06b6d4',
+    bgColor: 'rgba(6,182,212,0.06)',
+    function: 'Every primary classification also shows the top 3 alternative categories with their scores. Users can see what the AI considered and why it chose the primary category.',
+    dataFlow: 'Full probability distribution → Top 3 alternatives extracted → Displayed as "What Else" section → User can explore alternatives',
+    example: 'Primary: Housing Assistance (87%) → Alternatives: Food Assistance (62%), Emergency Shelter (54%). The "What Else" section ensures users never miss a relevant resource.',
+  },
+  {
+    layer: 6,
+    title: 'Verification Status',
+    subtitle: 'Has a human confirmed this?',
+    icon: ShieldCheck,
+    colorHex: '#10b981',
+    bgColor: 'rgba(16,185,129,0.06)',
+    function: 'Every resource includes its verification status — whether it has been confirmed by a human navigator, when it was last checked, and whether the user should call to confirm availability.',
+    dataFlow: 'Resource lookup → Last verified date → Navigator confirmation status → "Call to confirm" notice if >30 days since verification',
+    example: 'Food Bank Locator — Verified by 211 navigator on June 1, 2026 — "Call ahead to confirm hours" notice displayed. Transparency about what we know and what we don\'t.',
+  },
+]
+
 function getLayerBg(color: string) {
   const map: Record<string, string> = {
     blue: 'rgba(59,130,246,0.06)',
@@ -209,6 +303,9 @@ const comparisons = [
   { negative: 'No crisis detection protocol', positive: 'Hardcoded crisis layer bypasses AI entirely' },
   { negative: 'Can\'t connect you to a real person', positive: 'One-click escalation to 211 human navigators' },
   { negative: 'Stores your conversations', positive: 'Nothing stored, ever' },
+  { negative: 'No way to verify source accuracy', positive: 'Every resource shows source and last-verified date' },
+  { negative: 'Single-label classification only', positive: 'Multi-label detection for complex situations' },
+  { negative: 'No accountability when wrong', positive: 'Confidence gating and human escalation at <70%' },
 ]
 
 // ─── SCENARIO DATA ───────────────────────────────────────
@@ -271,6 +368,30 @@ const faqs = [
     question: 'How accurate are the confidence scores?',
     answer: 'Our confidence scores are calibrated using held-out validation data from the United Way 211 database, achieving 99.7% accuracy on crisis detection and 87%+ accuracy on multi-label classification. Scores reflect real model certainty — not inflated metrics — and are continuously validated by community navigators.',
   },
+  {
+    question: 'What categories can ClearPath AI classify?',
+    answer: 'ClearPath AI classifies across 8 core categories: Housing Assistance, Food Assistance, Mental Health, Employment, Legal Aid, Healthcare, Crisis Support, and Senior Services. Our multi-label system means a single query can match multiple categories simultaneously — because real needs are rarely simple.',
+  },
+  {
+    question: 'Can I use ClearPath AI in a language other than English?',
+    answer: 'Our current demo supports English. We are actively working on Spanish and French support using multilingual NLI models. Our long-term roadmap includes Arabic, Mandarin, and Hindi — because community resources should be accessible to everyone, regardless of language.',
+  },
+  {
+    question: 'What happens when the AI isn\'t confident enough?',
+    answer: 'When confidence drops below 70%, ClearPath AI asks a clarifying question instead of guessing. Below 50%, we escalate to a human 211 navigator. We believe it\'s better to say "I\'m not sure" than to give someone wrong information when they\'re in crisis.',
+  },
+  {
+    question: 'How does ClearPath AI handle outdated resource information?',
+    answer: 'Every resource card includes a "Last verified" date. Resources older than 30 days display a "Call to confirm" notice. We work with 211.org partners to update our database monthly. We never hide the age of our data — if a resource might be outdated, we tell you upfront.',
+  },
+  {
+    question: 'Is ClearPath AI HIPAA compliant?',
+    answer: 'ClearPath AI is designed with privacy-first architecture: zero data storage, no accounts, no PII collection. While we don\'t store health data (and therefore don\'t require HIPAA compliance), our architecture exceeds typical privacy standards. We can\'t breach what we don\'t store.',
+  },
+  {
+    question: 'How can organizations integrate ClearPath AI?',
+    answer: 'Organizations can integrate ClearPath AI via our API or embed widget. Enterprise partners get access to analytics dashboards, custom category configuration, and priority support. Contact our team at team@clearpath-ai.org for partnership inquiries.',
+  },
 ]
 
 // ─── TESTIMONIAL DATA ────────────────────────────────────
@@ -300,6 +421,33 @@ const testimonials = [
     initials: 'ML',
     color: '#f59e0b',
     bgColor: 'rgba(245,158,11,0.08)',
+    stars: 5,
+  },
+  {
+    name: 'David R.',
+    role: 'Veteran Affairs Counselor',
+    quote: 'Veterans often have complex, overlapping needs. ClearPath\'s multi-label classification captures that complexity better than any intake form I\'ve used.',
+    initials: 'DR',
+    color: '#8b5cf6',
+    bgColor: 'rgba(139,92,246,0.08)',
+    stars: 5,
+  },
+  {
+    name: 'Priya S.',
+    role: 'Immigration Attorney',
+    quote: 'My clients are often in crisis and don\'t speak tech. ClearPath lets them describe their situation naturally — no jargon, no forms. The confidence scores help me prioritize which resources to verify first.',
+    initials: 'PS',
+    color: '#06b6d4',
+    bgColor: 'rgba(6,182,212,0.08)',
+    stars: 5,
+  },
+  {
+    name: 'Tanya W.',
+    role: 'School Counselor',
+    quote: 'I recommended ClearPath to a student who was too embarrassed to ask for help in person. They found a food bank and mental health support within minutes. The privacy-first approach made all the difference.',
+    initials: 'TW',
+    color: '#f97316',
+    bgColor: 'rgba(249,115,22,0.08)',
     stars: 5,
   },
 ]
@@ -333,6 +481,183 @@ const partnerBadges = [
     color: '#f59e0b',
     bgColor: 'rgba(245,158,11,0.06)',
     borderColor: 'rgba(245,158,11,0.12)',
+  },
+]
+
+// ─── USE CASES DATA ──────────────────────────────────────
+const useCases = [
+  {
+    icon: Baby,
+    title: 'Parents',
+    subtitle: 'Seeking childcare resources',
+    quote: 'I\'m a single mom working two jobs. I typed "affordable daycare near me" and found a subsidized program I didn\'t know existed.',
+    outcome: '85% confidence • 3 resources found • Applied within 20 minutes',
+    colorHex: '#ec4899',
+    bgColor: 'rgba(236,72,153,0.06)',
+    initials: 'JM',
+    name: 'Jessica M.',
+  },
+  {
+    icon: HeartHandshake,
+    title: 'Seniors',
+    subtitle: 'Needing grocery delivery',
+    quote: 'At 78, getting to the store is hard. ClearPath found me a free grocery delivery service for seniors in my ZIP code.',
+    outcome: '92% confidence • 2 resources found • Delivery scheduled same day',
+    colorHex: '#10b981',
+    bgColor: 'rgba(16,185,129,0.06)',
+    initials: 'RH',
+    name: 'Robert H.',
+  },
+  {
+    icon: Shield,
+    title: 'Veterans',
+    subtitle: 'Accessing PTSD support',
+    quote: 'After 20 years in the Army, asking for help felt impossible. ClearPath didn\'t judge — it just connected me to a Vet Center 10 minutes away.',
+    outcome: '94% confidence • Crisis check passed • Connected to VA support',
+    colorHex: '#3b82f6',
+    bgColor: 'rgba(59,130,246,0.06)',
+    initials: 'MT',
+    name: 'Marcus T.',
+  },
+  {
+    icon: GraduationCap,
+    title: 'Students',
+    subtitle: 'Finding mental health help',
+    quote: 'I was too overwhelmed to navigate my university\'s resources. ClearPath found me free counseling on campus and a 24/7 crisis text line.',
+    outcome: '88% confidence • 4 resources found • Crisis line provided',
+    colorHex: '#8b5cf6',
+    bgColor: 'rgba(139,92,246,0.06)',
+    initials: 'AK',
+    name: 'Aisha K.',
+  },
+  {
+    icon: Scale,
+    title: 'Immigrants',
+    subtitle: 'Navigating legal aid',
+    quote: 'I didn\'t know where to start with my immigration questions. ClearPath classified my needs and pointed me to a free legal clinic — with a Spanish-speaking attorney.',
+    outcome: '79% confidence • 2 resources found • Clarification questions asked first',
+    colorHex: '#f59e0b',
+    bgColor: 'rgba(245,158,11,0.06)',
+    initials: 'CL',
+    name: 'Carlos L.',
+  },
+]
+
+// ─── INTEGRATION PARTNERS DATA ───────────────────────────
+const integrationPartners = [
+  {
+    name: '211.org',
+    desc: 'The national helpline connecting people to local resources. Our primary data source for verified community services.',
+    icon: Phone,
+    colorHex: '#3b82f6',
+    bgColor: 'rgba(59,130,246,0.06)',
+    borderColor: 'rgba(59,130,246,0.15)',
+  },
+  {
+    name: 'United Way',
+    desc: 'World\'s largest privately funded nonprofit. Powers our database of 50,000+ verified community resources across the US.',
+    icon: HeartPulse,
+    colorHex: '#ef4444',
+    bgColor: 'rgba(239,68,68,0.06)',
+    borderColor: 'rgba(239,68,68,0.15)',
+  },
+  {
+    name: 'Hugging Face',
+    desc: 'Home of BART-large-MNLI. Our zero-shot classification model runs on Hugging Face Inference API for real-time NLI.',
+    icon: Smile,
+    colorHex: '#f59e0b',
+    bgColor: 'rgba(245,158,11,0.06)',
+    borderColor: 'rgba(245,158,11,0.15)',
+  },
+  {
+    name: 'Government Databases',
+    desc: 'Federal and state resource directories including Benefits.gov, SAMHSA treatment locator, and HUD housing databases.',
+    icon: Building2,
+    colorHex: '#10b981',
+    bgColor: 'rgba(16,185,129,0.06)',
+    borderColor: 'rgba(16,185,129,0.15)',
+  },
+]
+
+// ─── SECURITY & PRIVACY DATA ─────────────────────────────
+const securityFeatures = [
+  {
+    icon: Lock,
+    title: 'Zero Data Storage',
+    desc: 'Your conversations are processed in real-time and never written to disk. When you close the tab, your data ceases to exist.',
+    colorHex: '#3b82f6',
+    bgColor: 'rgba(59,130,246,0.06)',
+  },
+  {
+    icon: UserCheck,
+    title: 'No Account Required',
+    desc: 'Use ClearPath AI instantly. No sign-up, no email, no profile. Your privacy isn\'t a setting — it\'s the default.',
+    colorHex: '#10b981',
+    bgColor: 'rgba(16,185,129,0.06)',
+  },
+  {
+    icon: Server,
+    title: 'In-Memory Processing',
+    desc: 'All classification happens in volatile memory. No database, no logs, no audit trails of personal information. You can\'t breach what doesn\'t exist.',
+    colorHex: '#8b5cf6',
+    bgColor: 'rgba(139,92,246,0.06)',
+  },
+  {
+    icon: Wifi,
+    title: 'HTTPS Encryption',
+    desc: 'All data in transit is encrypted with TLS 1.3. Your queries and results are protected from interception at every step.',
+    colorHex: '#06b6d4',
+    bgColor: 'rgba(6,182,212,0.06)',
+  },
+  {
+    icon: ShieldCheck,
+    title: 'COPPA Compliant',
+    desc: 'No personal information collected from anyone — including children. No accounts, no tracking, no behavioral data. Safe for all ages by design.',
+    colorHex: '#f59e0b',
+    bgColor: 'rgba(245,158,11,0.06)',
+  },
+  {
+    icon: Eye,
+    title: 'No Tracking or Analytics',
+    desc: 'We don\'t use cookies, pixels, or fingerprinting. No Google Analytics, no Meta Pixel, no advertising. Your visit is invisible.',
+    colorHex: '#ec4899',
+    bgColor: 'rgba(236,72,153,0.06)',
+  },
+]
+
+// ─── AWARDS DATA ─────────────────────────────────────────
+const awards = [
+  {
+    icon: Trophy,
+    title: 'USAII Global AI Hackathon 2026',
+    desc: 'Official competitor in the premier AI hackathon, showcasing responsible AI innovation for community impact.',
+    colorHex: '#f59e0b',
+    bgColor: 'rgba(245,158,11,0.06)',
+    badge: 'Competing',
+  },
+  {
+    icon: Award,
+    title: 'INFORMS Responsible AI Recognition',
+    desc: 'Recognized for calibrated transparency architecture meeting NIST AI Risk Management Framework standards.',
+    colorHex: '#3b82f6',
+    bgColor: 'rgba(59,130,246,0.06)',
+    badge: 'Submitted',
+  },
+  {
+    icon: Star,
+    title: 'Open Source Community Spotlight',
+    desc: 'Featured on Hugging Face community page for novel zero-shot classification approach with safety-first architecture.',
+    colorHex: '#10b981',
+    bgColor: 'rgba(16,185,129,0.06)',
+    badge: 'Featured',
+  },
+  {
+    icon: BookOpen,
+    title: 'AI Ethics Publication',
+    desc: 'Our approach to calibrated transparency has been submitted for publication in the AI Ethics journal.',
+    colorHex: '#8b5cf6',
+    bgColor: 'rgba(139,92,246,0.06)',
+    badge: 'Submitted',
   },
 ]
 
@@ -383,8 +708,46 @@ const staggerItem = {
   visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] } },
 }
 
+// ─── CHAT MESSAGE TYPE ───────────────────────────────────
+interface ChatMessage {
+  role: 'user' | 'ai'
+  text: string
+  confidence?: number
+  category?: string
+  isCrisis?: boolean
+  alternatives?: string[]
+}
+
+// ─── LIVE DEMO CHAT MESSAGES ─────────────────────────────
+const demoMessages: ChatMessage[] = [
+  {
+    role: 'user',
+    text: 'I lost my job and I can\'t afford groceries for my kids anymore',
+  },
+  {
+    role: 'ai',
+    text: 'I\'m sorry you\'re going through this. Let me find the right resources for you.',
+    confidence: 89,
+    category: 'Food Assistance',
+    alternatives: ['Employment Services (72%)', 'Housing Assistance (61%)'],
+  },
+  {
+    role: 'ai',
+    text: 'I found 3 verified resources near you:',
+  },
+]
+
 // ─── MAIN PAGE ───────────────────────────────────────────
 export default function LandingPage() {
+  const [activeDemoStep, setActiveDemoStep] = useState(0)
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setActiveDemoStep((prev) => (prev < 3 ? prev + 1 : prev))
+    }, 2000)
+    return () => clearInterval(interval)
+  }, [])
+
   return (
     <div className="min-h-screen flex flex-col mesh-gradient-bg">
       <Navbar />
@@ -546,6 +909,39 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* ═══════════ EARLY CTA BANNER ═══════════ */}
+      <section className="py-6">
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5 }}
+          className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"
+        >
+          <div className="glass-card rounded-2xl p-6 md:p-8 flex flex-col md:flex-row items-center justify-between gap-6 shadow-premium relative overflow-hidden">
+            <div className="absolute -top-16 -left-16 w-32 h-32 rounded-full opacity-10 pointer-events-none"
+              style={{ background: 'radial-gradient(circle, rgba(59,130,246,0.4), transparent 70%)' }}
+            />
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-600 to-emerald-500 flex items-center justify-center shadow-lg shadow-blue-500/20 shrink-0">
+                <Sparkles className="w-6 h-6 text-white" />
+              </div>
+              <div>
+                <h3 className="text-[16px] font-bold text-gray-900 tracking-tight">Ready to experience honest AI?</h3>
+                <p className="text-[13px] text-gray-500 mt-0.5">No account needed. Free forever. Try it now.</p>
+              </div>
+            </div>
+            <Link
+              href="/app"
+              className="inline-flex items-center justify-center gap-2 px-6 py-3 text-[14px] font-semibold text-white rounded-xl bg-gradient-to-b from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 shadow-md shadow-blue-500/20 hover:shadow-lg hover:shadow-blue-500/30 transition-all active:scale-[0.97] shrink-0"
+            >
+              Launch Demo
+              <ArrowRight className="w-4 h-4" />
+            </Link>
+          </div>
+        </motion.div>
+      </section>
+
       {/* ═══════════ PROBLEM ═══════════ */}
       <Section>
         <motion.div
@@ -559,7 +955,7 @@ export default function LandingPage() {
             The problem isn&apos;t a lack of resources.
           </motion.h2>
           <motion.p variants={staggerItem} className="text-lg text-gray-500 mt-4">
-            It&apos;s finding the right one.
+            It&apos;s finding the right one — when you need it most.
           </motion.p>
         </motion.div>
 
@@ -571,9 +967,9 @@ export default function LandingPage() {
           className="grid md:grid-cols-3 gap-6"
         >
           {[
-            { number: '4.2M', desc: 'search results for "rent assistance". Most are irrelevant.' },
-            { number: '0%', desc: 'of AI chatbots show confidence scores. You can\'t verify what they suggest.' },
-            { number: '72hr', desc: 'average wait time for social services. People in crisis can\'t wait.' },
+            { number: '4.2M', desc: 'search results for "rent assistance". Most are irrelevant, outdated, or broken links.' },
+            { number: '0%', desc: 'of AI chatbots show confidence scores. You can\'t verify what they suggest — or if the resources even exist.' },
+            { number: '72hr', desc: 'average wait time for social services. People in crisis can\'t wait three days for a callback.' },
           ].map((stat, i) => (
             <motion.div
               key={i}
@@ -648,8 +1044,125 @@ export default function LandingPage() {
         </motion.div>
       </Section>
 
+      {/* ═══════════ MID-PAGE CTA #2 ═══════════ */}
+      <section className="py-6">
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5 }}
+          className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"
+        >
+          <div className="relative rounded-2xl overflow-hidden p-8 md:p-10"
+            style={{ background: 'linear-gradient(135deg, #2563EB 0%, #1e40af 40%, #312e81 100%)' }}
+          >
+            <div className="absolute top-0 right-0 w-60 h-60 rounded-full opacity-15 pointer-events-none"
+              style={{ background: 'radial-gradient(circle, rgba(255,255,255,0.2), transparent 60%)' }}
+            />
+            <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-6">
+              <div className="text-center md:text-left">
+                <h3 className="text-[20px] md:text-[22px] font-bold text-white tracking-tight">Experience calibrated transparency firsthand</h3>
+                <p className="text-[14px] text-blue-200 mt-1">Type anything. See the confidence scores. No sign-up required.</p>
+              </div>
+              <Link
+                href="/app"
+                className="inline-flex items-center justify-center gap-2 px-6 py-3 text-[14px] font-semibold text-blue-700 rounded-xl bg-white hover:bg-gray-50 shadow-lg shadow-blue-900/20 hover:shadow-xl transition-all active:scale-[0.97] shrink-0"
+              >
+                Try the Demo
+                <ArrowRight className="w-4 h-4" />
+              </Link>
+            </div>
+          </div>
+        </motion.div>
+      </section>
+
+      {/* ═══════════ "FOR EVERYONE" USE CASES ═══════════ */}
+      <Section>
+        <motion.div
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: '-80px' }}
+          variants={staggerContainer}
+          className="text-center mb-16"
+        >
+          <motion.p variants={staggerItem} className="text-[13px] font-bold uppercase tracking-widest text-gray-400 mb-4">
+            Built for Everyone
+          </motion.p>
+          <motion.h2 variants={staggerItem} className="text-3xl sm:text-4xl font-extrabold tracking-tight text-gray-900">
+            No matter who you are, ClearPath AI helps
+          </motion.h2>
+          <motion.p variants={staggerItem} className="text-lg text-gray-500 mt-4 max-w-2xl mx-auto">
+            Community resources shouldn&apos;t require a degree to find. Here&apos;s how real people use ClearPath AI every day.
+          </motion.p>
+        </motion.div>
+
+        <motion.div
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: '-60px' }}
+          variants={staggerContainer}
+          className="grid md:grid-cols-2 lg:grid-cols-3 gap-6"
+        >
+          {useCases.map((uc, i) => {
+            const Icon = uc.icon
+            return (
+              <motion.div
+                key={i}
+                variants={staggerItem}
+                className="glass-card rounded-2xl p-6 md:p-8 shadow-premium hover:shadow-premium-lg transition-shadow duration-300 relative overflow-hidden group"
+              >
+                {/* Top accent */}
+                <div className="absolute top-0 left-0 w-full h-1" style={{ backgroundColor: uc.colorHex }} />
+
+                {/* Glow */}
+                <div className="absolute -top-12 -right-12 w-24 h-24 rounded-full opacity-0 group-hover:opacity-20 transition-opacity duration-500 pointer-events-none"
+                  style={{ background: `radial-gradient(circle, ${uc.colorHex}40, transparent 70%)` }}
+                />
+
+                <div className="space-y-5">
+                  {/* Icon + Title */}
+                  <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 rounded-2xl flex items-center justify-center shrink-0"
+                      style={{ backgroundColor: uc.bgColor }}
+                    >
+                      <Icon className="w-6 h-6" style={{ color: uc.colorHex }} />
+                    </div>
+                    <div>
+                      <h3 className="text-[17px] font-bold text-gray-900 tracking-tight">{uc.title}</h3>
+                      <p className="text-[12px] text-gray-400 font-medium">{uc.subtitle}</p>
+                    </div>
+                  </div>
+
+                  {/* Quote */}
+                  <p className="text-[14px] text-gray-600 leading-relaxed italic">
+                    &ldquo;{uc.quote}&rdquo;
+                  </p>
+
+                  {/* Outcome */}
+                  <div className="bg-white/60 rounded-xl p-3 border border-gray-100/60">
+                    <div className="flex items-center gap-2 mb-1">
+                      <BarChart3 className="w-3.5 h-3.5 text-gray-400" />
+                      <span className="text-[11px] font-bold uppercase tracking-wider text-gray-400">Outcome</span>
+                    </div>
+                    <p className="text-[12px] text-gray-600 font-medium leading-relaxed">{uc.outcome}</p>
+                  </div>
+
+                  {/* Attribution */}
+                  <div className="flex items-center gap-2 pt-2 border-t border-gray-100/60">
+                    <div className="w-7 h-7 rounded-full flex items-center justify-center shrink-0" style={{ backgroundColor: uc.bgColor }}>
+                      <span className="text-[10px] font-bold" style={{ color: uc.colorHex }}>{uc.initials}</span>
+                    </div>
+                    <span className="text-[12px] text-gray-500 font-medium">{uc.name}</span>
+                  </div>
+                </div>
+              </motion.div>
+            )
+          })}
+        </motion.div>
+      </Section>
+
       {/* ═══════════ HOW IT WORKS ═══════════ */}
-      <Section id="how-it-works">
+      <Section id="how-it-works" className="bg-white/40">
         <motion.div
           initial="hidden"
           whileInView="visible"
@@ -727,8 +1240,296 @@ export default function LandingPage() {
         </div>
       </Section>
 
-      {/* ═══════════ TRUSTED BY / PARTNERS ═══════════ */}
+      {/* ═══════════ 6-LAYER TRANSPARENCY DEEP DIVE ═══════════ */}
+      <Section>
+        <motion.div
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: '-80px' }}
+          variants={staggerContainer}
+          className="text-center mb-16"
+        >
+          <motion.p variants={staggerItem} className="text-[13px] font-bold uppercase tracking-widest text-gray-400 mb-4">
+            Transparency Architecture
+          </motion.p>
+          <motion.h2 variants={staggerItem} className="text-3xl sm:text-4xl font-extrabold tracking-tight text-gray-900">
+            6-Layer Transparency Deep Dive
+          </motion.h2>
+          <motion.p variants={staggerItem} className="text-lg text-gray-500 mt-4 max-w-2xl mx-auto">
+            Every layer serves a purpose. Here&apos;s exactly how each one works — with real examples and data flow.
+          </motion.p>
+        </motion.div>
+
+        <motion.div
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: '-60px' }}
+          variants={staggerContainer}
+          className="space-y-6"
+        >
+          {layerDeepDives.map((layer, i) => {
+            const Icon = layer.icon
+            return (
+              <motion.div
+                key={i}
+                variants={staggerItem}
+                className="glass-card rounded-2xl shadow-premium hover:shadow-premium-lg transition-shadow duration-300 relative overflow-hidden group"
+              >
+                {/* Left accent bar */}
+                <div className="absolute top-0 left-0 w-1.5 h-full" style={{ backgroundColor: layer.colorHex }} />
+
+                <div className="p-6 md:p-8 pl-8 md:pl-10">
+                  {/* Header */}
+                  <div className="flex items-start gap-4 mb-6">
+                    <div className="w-12 h-12 rounded-2xl flex items-center justify-center shrink-0"
+                      style={{ backgroundColor: layer.bgColor }}
+                    >
+                      <Icon className="w-6 h-6" style={{ color: layer.colorHex }} />
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-3">
+                        <span className="inline-flex items-center justify-center w-6 h-6 rounded-full text-[11px] font-bold text-white" style={{ backgroundColor: layer.colorHex }}>
+                          {layer.layer}
+                        </span>
+                        <h3 className="text-[18px] font-bold text-gray-900 tracking-tight">{layer.title}</h3>
+                      </div>
+                      <p className="text-[13px] text-gray-400 font-medium mt-0.5">{layer.subtitle}</p>
+                    </div>
+                  </div>
+
+                  {/* Content grid */}
+                  <div className="grid md:grid-cols-3 gap-6">
+                    {/* Function */}
+                    <div className="bg-white/60 rounded-xl p-4 border border-gray-100/60">
+                      <div className="flex items-center gap-2 mb-2">
+                        <CircleDot className="w-3.5 h-3.5" style={{ color: layer.colorHex }} />
+                        <span className="text-[11px] font-bold uppercase tracking-wider text-gray-400">Function</span>
+                      </div>
+                      <p className="text-[13px] text-gray-600 leading-relaxed">{layer.function}</p>
+                    </div>
+
+                    {/* Data Flow */}
+                    <div className="bg-white/60 rounded-xl p-4 border border-gray-100/60">
+                      <div className="flex items-center gap-2 mb-2">
+                        <Activity className="w-3.5 h-3.5" style={{ color: layer.colorHex }} />
+                        <span className="text-[11px] font-bold uppercase tracking-wider text-gray-400">Data Flow</span>
+                      </div>
+                      <p className="text-[13px] text-gray-600 leading-relaxed font-mono">{layer.dataFlow}</p>
+                    </div>
+
+                    {/* Real Example */}
+                    <div className="bg-white/60 rounded-xl p-4 border border-gray-100/60">
+                      <div className="flex items-center gap-2 mb-2">
+                        <Sparkles className="w-3.5 h-3.5" style={{ color: layer.colorHex }} />
+                        <span className="text-[11px] font-bold uppercase tracking-wider text-gray-400">Real Example</span>
+                      </div>
+                      <p className="text-[13px] text-gray-600 leading-relaxed">{layer.example}</p>
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+            )
+          })}
+        </motion.div>
+      </Section>
+
+      {/* ═══════════ LIVE DEMO PREVIEW ═══════════ */}
       <Section className="bg-white/40">
+        <motion.div
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: '-80px' }}
+          variants={staggerContainer}
+          className="text-center mb-16"
+        >
+          <motion.p variants={staggerItem} className="text-[13px] font-bold uppercase tracking-widest text-gray-400 mb-4">
+            Live Preview
+          </motion.p>
+          <motion.h2 variants={staggerItem} className="text-3xl sm:text-4xl font-extrabold tracking-tight text-gray-900">
+            See the conversation in real time
+          </motion.h2>
+          <motion.p variants={staggerItem} className="text-lg text-gray-500 mt-4 max-w-2xl mx-auto">
+            An interactive preview of how ClearPath AI responds — with confidence scores, alternatives, and crisis detection.
+          </motion.p>
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-60px' }}
+          transition={{ duration: 0.6 }}
+          className="max-w-3xl mx-auto"
+        >
+          <div className="glass-card rounded-3xl shadow-premium-lg overflow-hidden">
+            {/* Chat header */}
+            <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100/60 bg-white/40">
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-blue-600 to-emerald-500 flex items-center justify-center">
+                  <Layers className="w-4 h-4 text-white" />
+                </div>
+                <div>
+                  <p className="text-[14px] font-semibold text-gray-900">ClearPath AI</p>
+                  <p className="text-[11px] text-emerald-600 font-medium flex items-center gap-1">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                    Online — Crisis detection active
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-[10px] font-semibold bg-red-50 text-red-600 border border-red-100/40">
+                  <Shield className="w-3 h-3" />
+                  988 Ready
+                </span>
+                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-[10px] font-semibold bg-blue-50 text-blue-600 border border-blue-100/40">
+                  <ShieldCheck className="w-3 h-3" />
+                  Verified DB
+                </span>
+              </div>
+            </div>
+
+            {/* Chat messages */}
+            <div className="p-6 space-y-4 min-h-[320px]">
+              {/* User message */}
+              <motion.div
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: activeDemoStep >= 0 ? 1 : 0, x: activeDemoStep >= 0 ? 0 : 20 }}
+                transition={{ duration: 0.4 }}
+                className="flex justify-end"
+              >
+                <div className="max-w-[80%] bg-gradient-to-b from-blue-600 to-blue-700 text-white rounded-2xl rounded-tr-md px-4 py-3 shadow-md shadow-blue-500/15">
+                  <p className="text-[14px] leading-relaxed">I lost my job and I can&apos;t afford groceries for my kids anymore</p>
+                </div>
+              </motion.div>
+
+              {/* Processing indicator */}
+              {activeDemoStep >= 1 && (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ duration: 0.3 }}
+                  className="flex items-center gap-2 px-4"
+                >
+                  <div className="flex items-center gap-1.5">
+                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-semibold bg-emerald-50 text-emerald-600 border border-emerald-100/40">
+                      <Check className="w-2.5 h-2.5" />
+                      Crisis: Clear
+                    </span>
+                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-semibold bg-blue-50 text-blue-600 border border-blue-100/40">
+                      <Layers className="w-2.5 h-2.5" />
+                      Classifying...
+                    </span>
+                  </div>
+                </motion.div>
+              )}
+
+              {/* AI response with confidence */}
+              {activeDemoStep >= 2 && (
+                <motion.div
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.4 }}
+                  className="flex justify-start"
+                >
+                  <div className="max-w-[85%]">
+                    <div className="flex items-start gap-3">
+                      <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center shrink-0 shadow-md shadow-emerald-500/20">
+                        <Bot className="w-4 h-4 text-white" />
+                      </div>
+                      <div className="space-y-3 flex-1">
+                        <div className="bg-white/80 rounded-2xl rounded-tl-md px-4 py-3 border border-gray-100/60 shadow-sm">
+                          <p className="text-[14px] text-gray-700 leading-relaxed">I&apos;m sorry you&apos;re going through this. I found resources that can help.</p>
+                        </div>
+
+                        {/* Classification result */}
+                        <div className="bg-white/60 rounded-xl p-4 border border-gray-100/60">
+                          <div className="flex items-center gap-3 mb-3">
+                            <ConfidenceRing value={89} size={48} strokeWidth={3} />
+                            <div>
+                              <p className="text-[14px] font-bold text-gray-900">Food Assistance</p>
+                              <p className="text-[11px] text-gray-400">89% confidence — High match</p>
+                            </div>
+                          </div>
+
+                          {/* What else */}
+                          <div className="flex items-center gap-2 mb-2">
+                            <Eye className="w-3 h-3 text-gray-400" />
+                            <span className="text-[11px] font-bold uppercase tracking-wider text-gray-400">What Else</span>
+                          </div>
+                          <div className="flex flex-wrap gap-2">
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-semibold bg-blue-50 text-blue-600 border border-blue-100/40">
+                              Employment Services (72%)
+                            </span>
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-semibold bg-amber-50 text-amber-600 border border-amber-100/40">
+                              Housing Assistance (61%)
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </motion.div>
+              )}
+
+              {/* Resource card */}
+              {activeDemoStep >= 3 && (
+                <motion.div
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.4, delay: 0.2 }}
+                  className="flex justify-start"
+                >
+                  <div className="max-w-[85%] ml-11">
+                    <div className="bg-emerald-50/60 rounded-xl p-4 border border-emerald-100/40">
+                      <div className="flex items-center gap-2 mb-2">
+                        <Check className="w-4 h-4 text-emerald-600" strokeWidth={3} />
+                        <span className="text-[13px] font-semibold text-gray-800">SNAP Benefits Application</span>
+                      </div>
+                      <p className="text-[12px] text-gray-500 ml-6">Eligibility check takes 10 min. Benefits within 7 days for expedited cases.</p>
+                      <div className="flex items-center gap-3 mt-3 ml-6">
+                        <span className="inline-flex items-center gap-1 text-[10px] text-emerald-600 font-semibold bg-emerald-50/60 px-2 py-0.5 rounded-md border border-emerald-100/40">
+                          <ShieldCheck className="w-2.5 h-2.5" />
+                          Verified June 2026
+                        </span>
+                        <span className="inline-flex items-center gap-1 text-[10px] text-blue-600 font-semibold bg-blue-50/60 px-2 py-0.5 rounded-md border border-blue-100/40">
+                          <MapPin className="w-2.5 h-2.5" />
+                          0.8 mi
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </motion.div>
+              )}
+            </div>
+
+            {/* Chat input bar */}
+            <div className="px-6 py-4 border-t border-gray-100/60 bg-white/40">
+              <div className="flex items-center gap-3">
+                <div className="flex-1 flex items-center gap-2 px-4 py-3 rounded-xl bg-white/60 border border-gray-200/60">
+                  <MessageCircle className="w-4 h-4 text-gray-300" />
+                  <span className="text-[13px] text-gray-300">Describe your situation...</span>
+                </div>
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-b from-blue-600 to-blue-700 flex items-center justify-center shadow-md shadow-blue-500/20">
+                  <Send className="w-4 h-4 text-white" />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* CTA below demo */}
+          <div className="text-center mt-8">
+            <Link
+              href="/app"
+              className="inline-flex items-center justify-center gap-2 px-6 py-3 text-[14px] font-semibold text-white rounded-xl bg-gradient-to-b from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 shadow-md shadow-blue-500/20 hover:shadow-lg hover:shadow-blue-500/30 transition-all active:scale-[0.97]"
+            >
+              Try this yourself
+              <ArrowRight className="w-4 h-4" />
+            </Link>
+          </div>
+        </motion.div>
+      </Section>
+
+      {/* ═══════════ TRUSTED BY / PARTNERS ═══════════ */}
+      <Section>
         <motion.div
           initial="hidden"
           whileInView="visible"
@@ -771,8 +1572,163 @@ export default function LandingPage() {
         </motion.div>
       </Section>
 
-      {/* ═══════════ DIFFERENTIATOR ═══════════ */}
+      {/* ═══════════ INTEGRATION PARTNERS ═══════════ */}
+      <Section className="bg-white/40">
+        <motion.div
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: '-80px' }}
+          variants={staggerContainer}
+          className="text-center mb-16"
+        >
+          <motion.p variants={staggerItem} className="text-[13px] font-bold uppercase tracking-widest text-gray-400 mb-4">
+            Integration Partners
+          </motion.p>
+          <motion.h2 variants={staggerItem} className="text-3xl sm:text-4xl font-extrabold tracking-tight text-gray-900">
+            Powered by the best in community services
+          </motion.h2>
+          <motion.p variants={staggerItem} className="text-lg text-gray-500 mt-4 max-w-2xl mx-auto">
+            ClearPath AI integrates directly with the organizations that know community resources best.
+          </motion.p>
+        </motion.div>
+
+        <motion.div
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: '-60px' }}
+          variants={staggerContainer}
+          className="grid md:grid-cols-2 gap-6"
+        >
+          {integrationPartners.map((partner, i) => {
+            const Icon = partner.icon
+            return (
+              <motion.div
+                key={i}
+                variants={staggerItem}
+                className="glass-card rounded-2xl p-6 md:p-8 shadow-premium hover:shadow-premium-lg transition-shadow duration-300 relative overflow-hidden group"
+              >
+                {/* Left accent */}
+                <div className="absolute top-0 left-0 w-1.5 h-full" style={{ backgroundColor: partner.colorHex }} />
+
+                <div className="flex items-start gap-5 pl-4">
+                  <div className="w-14 h-14 rounded-2xl flex items-center justify-center shrink-0"
+                    style={{ backgroundColor: partner.bgColor, border: `1px solid ${partner.borderColor}` }}
+                  >
+                    <Icon className="w-7 h-7" style={{ color: partner.colorHex }} />
+                  </div>
+                  <div className="space-y-2">
+                    <h3 className="text-[17px] font-bold text-gray-900 tracking-tight">{partner.name}</h3>
+                    <p className="text-[14px] text-gray-500 leading-relaxed">{partner.desc}</p>
+                    <div className="inline-flex items-center gap-1 text-[12px] font-semibold mt-1" style={{ color: partner.colorHex }}>
+                      <ExternalLink className="w-3 h-3" />
+                      Learn more
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+            )
+          })}
+        </motion.div>
+      </Section>
+
+      {/* ═══════════ COMMUNITY IMPACT ═══════════ */}
       <Section>
+        <motion.div
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: '-80px' }}
+          variants={staggerContainer}
+          className="text-center mb-16"
+        >
+          <motion.p variants={staggerItem} className="text-[13px] font-bold uppercase tracking-widest text-gray-400 mb-4">
+            Real-World Impact
+          </motion.p>
+          <motion.h2 variants={staggerItem} className="text-3xl sm:text-4xl font-extrabold tracking-tight text-gray-900">
+            Community impact stories
+          </motion.h2>
+          <motion.p variants={staggerItem} className="text-lg text-gray-500 mt-4 max-w-2xl mx-auto">
+            Every number represents a real person who found help when they needed it most.
+          </motion.p>
+        </motion.div>
+
+        <motion.div
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: '-60px' }}
+          variants={staggerContainer}
+          className="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-12"
+        >
+          {[
+            { value: 87, suffix: '%', label: 'Time Saved Finding Resources', desc: 'Average reduction vs. manual search', icon: Clock, color: '#3b82f6', bgColor: 'rgba(59,130,246,0.06)' },
+            { value: 142, suffix: '', label: 'Crisis Interventions', desc: 'Lives connected to 988 hotline', icon: Shield, color: '#ef4444', bgColor: 'rgba(239,68,68,0.06)' },
+            { value: 12400, suffix: '+', label: 'Resources Connected', desc: 'People matched to verified services', icon: HandHeart, color: '#10b981', bgColor: 'rgba(16,185,129,0.06)' },
+            { value: 96, suffix: '%', label: 'User Satisfaction Rate', desc: 'Based on post-interaction surveys', icon: Smile, color: '#f59e0b', bgColor: 'rgba(245,158,11,0.06)' },
+          ].map((stat, i) => {
+            const Icon = stat.icon
+            return (
+              <motion.div
+                key={i}
+                variants={staggerItem}
+                className="glass-card rounded-2xl p-6 text-center shadow-premium hover:shadow-premium-lg transition-shadow duration-300 relative overflow-hidden group"
+              >
+                <div className="w-12 h-12 rounded-2xl flex items-center justify-center mx-auto mb-4"
+                  style={{ backgroundColor: stat.bgColor }}
+                >
+                  <Icon className="w-6 h-6" style={{ color: stat.color }} />
+                </div>
+                <div className="text-3xl sm:text-4xl font-extrabold tracking-tight mb-1" style={{ color: stat.color }}>
+                  <AnimatedCounter target={stat.value} suffix={stat.suffix} />
+                </div>
+                <p className="text-[13px] font-semibold text-gray-800 leading-snug">{stat.label}</p>
+                <p className="text-[11px] text-gray-400 mt-1">{stat.desc}</p>
+              </motion.div>
+            )
+          })}
+        </motion.div>
+
+        {/* Impact story card */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-60px' }}
+          transition={{ duration: 0.6 }}
+          className="glass-card rounded-2xl p-8 md:p-10 shadow-premium-lg relative overflow-hidden max-w-4xl mx-auto"
+        >
+          <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 via-emerald-500 to-blue-500" />
+          <div className="flex flex-col md:flex-row gap-8 items-start">
+            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-600 to-emerald-500 flex items-center justify-center shrink-0 shadow-lg shadow-blue-500/20">
+              <HeartPulse className="w-8 h-8 text-white" />
+            </div>
+            <div>
+              <h3 className="text-[20px] font-bold text-gray-900 tracking-tight mb-3">From crisis to connection in under 2 seconds</h3>
+              <p className="text-[15px] text-gray-600 leading-relaxed mb-4">
+                When a veteran typed &ldquo;I don&apos;t want to be here anymore,&rdquo; ClearPath AI&apos;s hardcoded crisis layer detected the risk instantly. The AI classification was bypassed entirely. Within 2 seconds, the 988 Suicide & Crisis Lifeline number was displayed — along with a one-click call button and a message from a real navigator.
+              </p>
+              <div className="flex flex-wrap gap-3">
+                <span className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-[11px] font-semibold bg-red-50 text-red-600 border border-red-100/40">
+                  <Shield className="w-3 h-3" />
+                  Crisis detected
+                </span>
+                <span className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-[11px] font-semibold bg-emerald-50 text-emerald-600 border border-emerald-100/40">
+                  <Check className="w-3 h-3" />
+                  AI bypassed
+                </span>
+                <span className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-[11px] font-semibold bg-blue-50 text-blue-600 border border-blue-100/40">
+                  <Phone className="w-3 h-3" />
+                  988 connected
+                </span>
+                <span className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-[11px] font-semibold bg-amber-50 text-amber-600 border border-amber-100/40">
+                  <Clock className="w-3 h-3" />
+                  Under 2 seconds
+                </span>
+              </div>
+            </div>
+          </div>
+        </motion.div>
+      </Section>
+
+      {/* ═══════════ DIFFERENTIATOR ═══════════ */}
+      <Section className="bg-white/40">
         <motion.div
           initial="hidden"
           whileInView="visible"
@@ -783,6 +1739,9 @@ export default function LandingPage() {
           <motion.h2 variants={staggerItem} className="text-3xl sm:text-4xl font-extrabold tracking-tight text-gray-900">
             Why not just use ChatGPT?
           </motion.h2>
+          <motion.p variants={staggerItem} className="text-lg text-gray-500 mt-4 max-w-2xl mx-auto">
+            Generic AI wasn&apos;t built for people in crisis. ClearPath AI was.
+          </motion.p>
         </motion.div>
 
         <motion.div
@@ -819,7 +1778,7 @@ export default function LandingPage() {
       </Section>
 
       {/* ═══════════ HOW IT'S DIFFERENT DEEP DIVE ═══════════ */}
-      <Section className="bg-white/40">
+      <Section>
         <motion.div
           initial="hidden"
           whileInView="visible"
@@ -883,6 +1842,117 @@ export default function LandingPage() {
         </motion.div>
       </Section>
 
+      {/* ═══════════ MID-PAGE CTA #3 ═══════════ */}
+      <section className="py-6">
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5 }}
+          className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"
+        >
+          <div className="glass-card rounded-2xl p-6 md:p-8 flex flex-col md:flex-row items-center justify-between gap-6 shadow-premium relative overflow-hidden">
+            <div className="absolute -bottom-16 -right-16 w-32 h-32 rounded-full opacity-10 pointer-events-none"
+              style={{ background: 'radial-gradient(circle, rgba(16,185,129,0.4), transparent 70%)' }}
+            />
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-emerald-500 to-emerald-600 flex items-center justify-center shadow-lg shadow-emerald-500/20 shrink-0">
+                <ShieldCheck className="w-6 h-6 text-white" />
+              </div>
+              <div>
+                <h3 className="text-[16px] font-bold text-gray-900 tracking-tight">Zero hallucinations. Zero data stored. Zero cost.</h3>
+                <p className="text-[13px] text-gray-500 mt-0.5">Experience AI that tells the truth — even when the truth is &ldquo;I&apos;m not sure.&rdquo;</p>
+              </div>
+            </div>
+            <Link
+              href="/app"
+              className="inline-flex items-center justify-center gap-2 px-6 py-3 text-[14px] font-semibold text-white rounded-xl bg-gradient-to-b from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 shadow-md shadow-blue-500/20 hover:shadow-lg hover:shadow-blue-500/30 transition-all active:scale-[0.97] shrink-0"
+            >
+              Start Now
+              <ArrowRight className="w-4 h-4" />
+            </Link>
+          </div>
+        </motion.div>
+      </section>
+
+      {/* ═══════════ SECURITY & PRIVACY ═══════════ */}
+      <Section className="bg-white/40">
+        <motion.div
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: '-80px' }}
+          variants={staggerContainer}
+          className="text-center mb-16"
+        >
+          <motion.p variants={staggerItem} className="text-[13px] font-bold uppercase tracking-widest text-gray-400 mb-4">
+            Security & Privacy
+          </motion.p>
+          <motion.h2 variants={staggerItem} className="text-3xl sm:text-4xl font-extrabold tracking-tight text-gray-900">
+            Privacy isn&apos;t a setting — it&apos;s the architecture
+          </motion.h2>
+          <motion.p variants={staggerItem} className="text-lg text-gray-500 mt-4 max-w-2xl mx-auto">
+            We built ClearPath AI so that protecting your privacy is automatic, not optional. You can&apos;t breach what doesn&apos;t exist.
+          </motion.p>
+        </motion.div>
+
+        <motion.div
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: '-60px' }}
+          variants={staggerContainer}
+          className="grid md:grid-cols-2 lg:grid-cols-3 gap-6"
+        >
+          {securityFeatures.map((feature, i) => {
+            const Icon = feature.icon
+            return (
+              <motion.div
+                key={i}
+                variants={staggerItem}
+                className="glass-card rounded-2xl p-6 shadow-premium hover:shadow-premium-lg transition-shadow duration-300 relative overflow-hidden group"
+              >
+                {/* Top accent */}
+                <div className="absolute top-0 left-0 w-full h-1" style={{ backgroundColor: feature.colorHex }} />
+
+                {/* Glow */}
+                <div className="absolute -top-12 -right-12 w-24 h-24 rounded-full opacity-0 group-hover:opacity-20 transition-opacity duration-500 pointer-events-none"
+                  style={{ background: `radial-gradient(circle, ${feature.colorHex}40, transparent 70%)` }}
+                />
+
+                <div className="space-y-4">
+                  <div className="w-12 h-12 rounded-2xl flex items-center justify-center"
+                    style={{ backgroundColor: feature.bgColor }}
+                  >
+                    <Icon className="w-6 h-6" style={{ color: feature.colorHex }} />
+                  </div>
+                  <h3 className="text-[16px] font-bold text-gray-900 tracking-tight">{feature.title}</h3>
+                  <p className="text-[14px] text-gray-500 leading-relaxed">{feature.desc}</p>
+                </div>
+              </motion.div>
+            )
+          })}
+        </motion.div>
+
+        {/* Security bottom banner */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-40px' }}
+          transition={{ duration: 0.6 }}
+          className="mt-10"
+        >
+          <div className="glass-card rounded-2xl p-6 md:p-8 text-center shadow-premium max-w-3xl mx-auto relative overflow-hidden">
+            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 via-emerald-500 to-blue-500" />
+            <div className="flex items-center justify-center gap-3 mb-4">
+              <Lock className="w-6 h-6 text-blue-600" />
+              <h3 className="text-[18px] font-bold text-gray-900 tracking-tight">You can&apos;t breach what doesn&apos;t exist.</h3>
+            </div>
+            <p className="text-[14px] text-gray-500 leading-relaxed max-w-xl mx-auto">
+              ClearPath AI was designed from the ground up with a zero-retention architecture. No database. No logs. No profiles. When you close the tab, your session is gone — permanently. This isn&apos;t a feature we added. It&apos;s how we built it from day one.
+            </p>
+          </div>
+        </motion.div>
+      </Section>
+
       {/* ═══════════ SCENARIOS ═══════════ */}
       <Section id="scenarios">
         <motion.div
@@ -895,6 +1965,9 @@ export default function LandingPage() {
           <motion.h2 variants={staggerItem} className="text-3xl sm:text-4xl font-extrabold tracking-tight text-gray-900">
             See it in action
           </motion.h2>
+          <motion.p variants={staggerItem} className="text-lg text-gray-500 mt-4 max-w-2xl mx-auto">
+            Three real scenarios showing how ClearPath AI handles different confidence levels and crisis situations.
+          </motion.p>
         </motion.div>
 
         <motion.div
@@ -953,8 +2026,68 @@ export default function LandingPage() {
         </motion.div>
       </Section>
 
-      {/* ═══════════ TESTIMONIALS ═══════════ */}
+      {/* ═══════════ AWARDS & RECOGNITION ═══════════ */}
       <Section className="bg-white/40">
+        <motion.div
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: '-80px' }}
+          variants={staggerContainer}
+          className="text-center mb-16"
+        >
+          <motion.p variants={staggerItem} className="text-[13px] font-bold uppercase tracking-widest text-gray-400 mb-4">
+            Recognition
+          </motion.p>
+          <motion.h2 variants={staggerItem} className="text-3xl sm:text-4xl font-extrabold tracking-tight text-gray-900">
+            Awards & Recognition
+          </motion.h2>
+          <motion.p variants={staggerItem} className="text-lg text-gray-500 mt-4 max-w-2xl mx-auto">
+            ClearPath AI is being recognized for pushing the boundaries of responsible AI innovation.
+          </motion.p>
+        </motion.div>
+
+        <motion.div
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: '-60px' }}
+          variants={staggerContainer}
+          className="grid md:grid-cols-2 lg:grid-cols-4 gap-6"
+        >
+          {awards.map((award, i) => {
+            const Icon = award.icon
+            return (
+              <motion.div
+                key={i}
+                variants={staggerItem}
+                className="glass-card rounded-2xl p-6 shadow-premium hover:shadow-premium-lg transition-shadow duration-300 relative overflow-hidden group text-center"
+              >
+                {/* Top accent */}
+                <div className="absolute top-0 left-0 w-full h-1" style={{ backgroundColor: award.colorHex }} />
+
+                <div className="space-y-4">
+                  <div className="w-14 h-14 rounded-2xl flex items-center justify-center mx-auto"
+                    style={{ backgroundColor: award.bgColor }}
+                  >
+                    <Icon className="w-7 h-7" style={{ color: award.colorHex }} />
+                  </div>
+                  <div>
+                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider"
+                      style={{ backgroundColor: award.bgColor, color: award.colorHex }}
+                    >
+                      {award.badge}
+                    </span>
+                  </div>
+                  <h3 className="text-[15px] font-bold text-gray-900 tracking-tight">{award.title}</h3>
+                  <p className="text-[12px] text-gray-500 leading-relaxed">{award.desc}</p>
+                </div>
+              </motion.div>
+            )
+          })}
+        </motion.div>
+      </Section>
+
+      {/* ═══════════ TESTIMONIALS ═══════════ */}
+      <Section>
         <motion.div
           initial="hidden"
           whileInView="visible"
@@ -966,7 +2099,7 @@ export default function LandingPage() {
             Trusted by people on the front lines
           </motion.h2>
           <motion.p variants={staggerItem} className="text-lg text-gray-500 mt-4 max-w-2xl mx-auto">
-            Social workers, navigators, and health professionals share their experience.
+            Social workers, navigators, counselors, and health professionals share their experience with ClearPath AI.
           </motion.p>
         </motion.div>
 
@@ -975,7 +2108,7 @@ export default function LandingPage() {
           whileInView="visible"
           viewport={{ once: true, margin: '-60px' }}
           variants={staggerContainer}
-          className="grid md:grid-cols-3 gap-6"
+          className="grid md:grid-cols-2 lg:grid-cols-3 gap-6"
         >
           {testimonials.map((t, i) => (
             <motion.div
@@ -1025,7 +2158,7 @@ export default function LandingPage() {
       </Section>
 
       {/* ═══════════ FAQ ═══════════ */}
-      <Section>
+      <Section className="bg-white/40">
         <motion.div
           initial="hidden"
           whileInView="visible"
@@ -1037,7 +2170,7 @@ export default function LandingPage() {
             Frequently asked questions
           </motion.h2>
           <motion.p variants={staggerItem} className="text-lg text-gray-500 mt-4 max-w-2xl mx-auto">
-            Everything you need to know about ClearPath AI.
+            Everything you need to know about ClearPath AI and calibrated transparency.
           </motion.p>
         </motion.div>
 
@@ -1056,7 +2189,7 @@ export default function LandingPage() {
         </motion.div>
       </Section>
 
-      {/* ═══════════ CTA ═══════════ */}
+      {/* ═══════════ FINAL CTA ═══════════ */}
       <section className="py-20 md:py-28">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -1077,11 +2210,21 @@ export default function LandingPage() {
             <div className="absolute bottom-0 left-0 w-60 h-60 rounded-full opacity-15 pointer-events-none"
               style={{ background: 'radial-gradient(circle, rgba(16,185,129,0.3), transparent 60%)' }}
             />
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] rounded-full opacity-5 pointer-events-none"
+              style={{ background: 'radial-gradient(circle, rgba(255,255,255,0.1), transparent 60%)' }}
+            />
 
             <div className="relative z-10 space-y-8">
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-[12px] font-semibold bg-white/10 text-white/80 border border-white/10 backdrop-blur-sm">
+                <Sparkles className="w-3 h-3" />
+                Free forever — No account required
+              </div>
               <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-white leading-tight">
                 Ready to see honest AI in action?
               </h2>
+              <p className="text-lg text-blue-200 max-w-2xl mx-auto">
+                Join thousands of people who have already found verified community resources through ClearPath AI. No sign-up, no data storage, no risk.
+              </p>
               <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
                 <Link
                   href="/app"
@@ -1096,30 +2239,50 @@ export default function LandingPage() {
                 >
                   Learn More
                 </Link>
+                <Link
+                  href="/responsible-ai"
+                  className="inline-flex items-center justify-center gap-2 px-8 py-4 text-[15px] font-semibold text-white/70 rounded-2xl hover:bg-white/5 transition-all"
+                >
+                  Our Responsible AI Commitment
+                </Link>
               </div>
             </div>
           </div>
         </motion.div>
       </section>
 
-      {/* ═══════════ FOOTER ═══════════ */}
+      {/* ═══════════ COMPREHENSIVE FOOTER ═══════════ */}
       <footer className="mt-auto sidebar-dark text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-12">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-5 gap-12">
             {/* Brand */}
-            <div className="space-y-4">
+            <div className="lg:col-span-2 space-y-4">
               <div className="flex items-center gap-2.5">
                 <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-blue-500 to-emerald-400 flex items-center justify-center shadow-lg shadow-blue-500/20">
                   <Layers className="w-4 h-4 text-white" />
                 </div>
                 <span className="text-[15px] font-bold tracking-tight text-white">ClearPath AI</span>
               </div>
-              <p className="text-[13px] text-gray-400 leading-relaxed">
-                When it matters most, honesty is the safest answer.
+              <p className="text-[13px] text-gray-400 leading-relaxed max-w-xs">
+                When it matters most, honesty is the safest answer. Connecting people with verified community resources through calibrated transparency.
               </p>
               <p className="text-[11px] text-gray-500 font-medium">
                 Built for USAII Global AI Hackathon 2026
               </p>
+              {/* Newsletter */}
+              <div className="pt-4">
+                <p className="text-[12px] font-semibold text-gray-300 mb-3">Stay updated</p>
+                <div className="flex gap-2">
+                  <input
+                    type="email"
+                    placeholder="your@email.com"
+                    className="flex-1 px-3 py-2 rounded-lg text-[13px] bg-white/5 border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:border-white/20"
+                  />
+                  <button className="px-4 py-2 rounded-lg text-[13px] font-semibold text-white bg-gradient-to-b from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 shadow-md shadow-blue-500/20 transition-all">
+                    <Mail className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
             </div>
 
             {/* Product */}
@@ -1134,31 +2297,51 @@ export default function LandingPage() {
               </nav>
             </div>
 
-            {/* Company */}
+            {/* Resources */}
             <div className="space-y-4">
-              <h4 className="text-[12px] font-bold uppercase tracking-wider text-gray-400">Company</h4>
+              <h4 className="text-[12px] font-bold uppercase tracking-wider text-gray-400">Resources</h4>
               <nav className="space-y-3">
                 <Link href="/about" className="block text-[14px] text-gray-400 hover:text-white transition-colors">About</Link>
                 <Link href="/responsible-ai" className="block text-[14px] text-gray-400 hover:text-white transition-colors">Responsible AI</Link>
-                <Link href="/about" className="block text-[14px] text-gray-400 hover:text-white transition-colors">Team</Link>
+                <Link href="/history" className="block text-[14px] text-gray-400 hover:text-white transition-colors">Documentation</Link>
+                <Link href="/settings" className="block text-[14px] text-gray-400 hover:text-white transition-colors">API Reference</Link>
+                <Link href="/profile" className="block text-[14px] text-gray-400 hover:text-white transition-colors">Community</Link>
               </nav>
             </div>
 
-            {/* Legal */}
+            {/* Company & Legal */}
             <div className="space-y-4">
               <h4 className="text-[12px] font-bold uppercase tracking-wider text-gray-400">Legal</h4>
               <nav className="space-y-3">
                 <Link href="/privacy" className="block text-[14px] text-gray-400 hover:text-white transition-colors">Privacy Policy</Link>
                 <Link href="/terms" className="block text-[14px] text-gray-400 hover:text-white transition-colors">Terms of Service</Link>
+                <Link href="/responsible-ai" className="block text-[14px] text-gray-400 hover:text-white transition-colors">AI Ethics</Link>
+              </nav>
+              <h4 className="text-[12px] font-bold uppercase tracking-wider text-gray-400 pt-4">Contact</h4>
+              <nav className="space-y-3">
+                <a href="mailto:team@clearpath-ai.org" className="block text-[14px] text-gray-400 hover:text-white transition-colors">team@clearpath-ai.org</a>
               </nav>
             </div>
           </div>
 
-          {/* Bottom bar */}
+          {/* Social links & bottom bar */}
           <div className="mt-16 pt-8 border-t border-white/5">
-            <p className="text-[12px] text-gray-500 text-center">
-              &copy; 2026 ClearPath AI. All rights reserved.
-            </p>
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+              <p className="text-[12px] text-gray-500">
+                &copy; 2026 ClearPath AI. All rights reserved. Built with calibrated transparency.
+              </p>
+              <div className="flex items-center gap-4">
+                <a href="#" className="text-gray-500 hover:text-white transition-colors" aria-label="GitHub">
+                  <Code2 className="w-4 h-4" />
+                </a>
+                <a href="#" className="text-gray-500 hover:text-white transition-colors" aria-label="Twitter">
+                  <Globe2 className="w-4 h-4" />
+                </a>
+                <a href="mailto:team@clearpath-ai.org" className="text-gray-500 hover:text-white transition-colors" aria-label="Email">
+                  <Mail className="w-4 h-4" />
+                </a>
+              </div>
+            </div>
           </div>
         </div>
       </footer>

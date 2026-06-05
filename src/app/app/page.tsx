@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect, useCallback, ReactNode } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+import Link from 'next/link'
 import {
   Layers,
   Shield,
@@ -36,6 +37,16 @@ import {
   PanelLeft,
   Play,
   HomeIcon,
+  Paperclip,
+  ThumbsUp,
+  ThumbsDown,
+  Copy,
+  Share2,
+  Download,
+  Settings,
+  User,
+  CheckCircle,
+  ChevronUp,
 } from 'lucide-react'
 
 // ─── TYPES ───────────────────────────────────────────────
@@ -1319,6 +1330,8 @@ function Sidebar({
               <div className="space-y-0.5">
                 {todayConversations.map((conv) => {
                   const confDot = conv.starterId === 'crisis' ? 'bg-red-500' : conv.starterId === 'stress' ? 'bg-amber-500' : 'bg-emerald-500'
+                  const confBadge = conv.starterId === 'crisis' ? 'bg-red-500/20 text-red-300' : conv.starterId === 'stress' ? 'bg-amber-500/20 text-amber-300' : 'bg-emerald-500/20 text-emerald-300'
+                  const confValue = conv.starterId === 'crisis' ? '!' : conv.starterId === 'stress' ? '43' : conv.starterId === 'job' ? '87' : conv.starterId === 'senior' ? '94' : '91'
                   return (
                     <motion.button
                       key={conv.id}
@@ -1333,9 +1346,14 @@ function Sidebar({
                       <div className="flex items-center gap-2.5">
                         <span className={`w-2 h-2 rounded-full shrink-0 ${confDot}`} />
                         <div className="min-w-0 flex-1">
-                          <p className={`text-[13px] font-medium truncate ${
-                            activeConversationId === conv.id ? 'text-white' : 'text-gray-300 group-hover:text-white'
-                          }`}>{conv.title}</p>
+                          <div className="flex items-center gap-1.5">
+                            <p className={`text-[13px] font-medium truncate ${
+                              activeConversationId === conv.id ? 'text-white' : 'text-gray-300 group-hover:text-white'
+                            }`}>{conv.title}</p>
+                            <span className={`shrink-0 text-[9px] font-bold px-1.5 py-0.5 rounded ${confBadge}`}>
+                              {confValue}
+                            </span>
+                          </div>
                           <p className="text-[11px] text-gray-600 truncate mt-0.5">{conv.preview}</p>
                         </div>
                         <span className="text-[10px] text-gray-600 shrink-0">{conv.timestamp}</span>
@@ -1355,6 +1373,8 @@ function Sidebar({
               <div className="space-y-0.5">
                 {previousConversations.map((conv) => {
                   const confDot = conv.starterId === 'crisis' ? 'bg-red-500' : conv.starterId === 'stress' ? 'bg-amber-500' : 'bg-emerald-500'
+                  const confBadge = conv.starterId === 'crisis' ? 'bg-red-500/20 text-red-300' : conv.starterId === 'stress' ? 'bg-amber-500/20 text-amber-300' : 'bg-emerald-500/20 text-emerald-300'
+                  const confValue = conv.starterId === 'job-snap' ? '94' : conv.starterId === 'veteran-housing' ? '92' : '83'
                   return (
                     <motion.button
                       key={conv.id}
@@ -1369,9 +1389,14 @@ function Sidebar({
                       <div className="flex items-center gap-2.5">
                         <span className={`w-2 h-2 rounded-full shrink-0 ${confDot}`} />
                         <div className="min-w-0 flex-1">
-                          <p className={`text-[13px] font-medium truncate ${
-                            activeConversationId === conv.id ? 'text-white' : 'text-gray-300 group-hover:text-white'
-                          }`}>{conv.title}</p>
+                          <div className="flex items-center gap-1.5">
+                            <p className={`text-[13px] font-medium truncate ${
+                              activeConversationId === conv.id ? 'text-white' : 'text-gray-300 group-hover:text-white'
+                            }`}>{conv.title}</p>
+                            <span className={`shrink-0 text-[9px] font-bold px-1.5 py-0.5 rounded ${confBadge}`}>
+                              {confValue}
+                            </span>
+                          </div>
                           <p className="text-[11px] text-gray-600 truncate mt-0.5">{conv.preview}</p>
                         </div>
                         <span className="text-[10px] text-gray-600 shrink-0">{conv.timestamp}</span>
@@ -1404,6 +1429,82 @@ function Sidebar({
   )
 }
 
+// ─── MESSAGE ACTION BUTTONS ───────────────────────────────
+function MessageActionButtons({ messageIndex, onCopy, onFeedback, onViewDetails, showDetails }: {
+  messageIndex: number
+  onCopy: (idx: number) => void
+  onFeedback: (idx: number, type: 'up' | 'down') => void
+  onViewDetails: (idx: number) => void
+  showDetails: boolean
+}) {
+  const [copied, setCopied] = useState(false)
+  const [feedback, setFeedback] = useState<'up' | 'down' | null>(null)
+
+  const handleCopy = () => {
+    onCopy(messageIndex)
+    setCopied(true)
+    setTimeout(() => setCopied(false), 2000)
+  }
+
+  const handleFeedback = (type: 'up' | 'down') => {
+    setFeedback(feedback === type ? null : type)
+    onFeedback(messageIndex, type)
+  }
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 4 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: 0.5, duration: 0.3 }}
+      className="flex items-center gap-1 mt-3 -ml-1"
+    >
+      <button
+        onClick={handleCopy}
+        className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-[11px] font-medium text-gray-400 hover:text-gray-600 hover:bg-gray-100/80 transition-all duration-200"
+      >
+        {copied ? (
+          <CheckCircle className="w-3.5 h-3.5 text-emerald-500" />
+        ) : (
+          <Copy className="w-3.5 h-3.5" />
+        )}
+        {copied ? 'Copied' : 'Copy'}
+      </button>
+      <button
+        onClick={() => handleFeedback('up')}
+        className={`flex items-center gap-1 px-2 py-1.5 rounded-lg text-[11px] font-medium transition-all duration-200 ${
+          feedback === 'up'
+            ? 'text-emerald-600 bg-emerald-50/80'
+            : 'text-gray-400 hover:text-gray-600 hover:bg-gray-100/80'
+        }`}
+      >
+        <ThumbsUp className="w-3.5 h-3.5" />
+      </button>
+      <button
+        onClick={() => handleFeedback('down')}
+        className={`flex items-center gap-1 px-2 py-1.5 rounded-lg text-[11px] font-medium transition-all duration-200 ${
+          feedback === 'down'
+            ? 'text-amber-600 bg-amber-50/80'
+            : 'text-gray-400 hover:text-gray-600 hover:bg-gray-100/80'
+        }`}
+      >
+        <ThumbsDown className="w-3.5 h-3.5" />
+      </button>
+      <div className="w-px h-4 bg-gray-200/60 mx-1" />
+      <button
+        onClick={() => onViewDetails(messageIndex)}
+        className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-[11px] font-medium transition-all duration-200 ${
+          showDetails
+            ? 'text-blue-600 bg-blue-50/80'
+            : 'text-gray-400 hover:text-gray-600 hover:bg-gray-100/80'
+        }`}
+      >
+        <Eye className="w-3.5 h-3.5" />
+        {showDetails ? 'Hide details' : 'View details'}
+      </button>
+    </motion.div>
+  )
+}
+
 // ─── MAIN ─────────────────────────────────────────────────
 export default function Home() {
   const [messages, setMessages] = useState<Array<{
@@ -1421,7 +1522,7 @@ export default function Home() {
     clarifyReason?: string
     transparencyItems?: string[]
   }>>([])
-  const [suggestions, setSuggestions] = useState(starters)
+  const [suggestions, setSuggestions] = useState<Array<{ id: string; label: string; description?: string; icon?: string }>>(starters)
   const [isTyping, setIsTyping] = useState(false)
   const chatRef = useRef<HTMLDivElement>(null)
   const [headerScrolled, setHeaderScrolled] = useState(false)
@@ -1430,6 +1531,11 @@ export default function Home() {
   const [showHowItWorks, setShowHowItWorks] = useState(false)
   const [showDemoScenarios, setShowDemoScenarios] = useState(false)
   const [activeNav, setActiveNav] = useState<'home' | 'how-it-works' | 'demo-scenarios' | null>(null)
+  const [showModelSelector, setShowModelSelector] = useState(false)
+  const [showExportMenu, setShowExportMenu] = useState(false)
+  const [inputText, setInputText] = useState('')
+  const [expandedTransparency, setExpandedTransparency] = useState<Set<number>>(new Set())
+  const textareaRef = useRef<HTMLTextAreaElement>(null)
 
   const scrollToBottom = useCallback(() => {
     setTimeout(() => {
@@ -1522,6 +1628,36 @@ export default function Home() {
 
   const hasMessages = messages.length > 0
 
+  const handleCopyMessage = useCallback((idx: number) => {
+    const msg = messages[idx]
+    if (!msg) return
+    const textToCopy = msg.categories
+      ? msg.categories.map(c => `${c.label} (${c.confidence}%): ${c.resources.map(r => r.name).join(', ')}`).join('\n')
+      : msg.text
+    navigator.clipboard.writeText(textToCopy).catch(() => {})
+  }, [messages])
+
+  const handleFeedback = useCallback((_idx: number, _type: 'up' | 'down') => {
+    // UI only — feedback not stored per privacy policy
+  }, [])
+
+  const handleViewDetails = useCallback((idx: number) => {
+    setExpandedTransparency(prev => {
+      const next = new Set(prev)
+      if (next.has(idx)) next.delete(idx)
+      else next.add(idx)
+      return next
+    })
+  }, [])
+
+  const handleTextareaInput = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setInputText(e.target.value)
+    if (textareaRef.current) {
+      textareaRef.current.style.height = 'auto'
+      textareaRef.current.style.height = Math.min(textareaRef.current.scrollHeight, 120) + 'px'
+    }
+  }, [])
+
   return (
     <div className="h-screen flex overflow-hidden relative">
       {/* Animated mesh gradient background */}
@@ -1571,8 +1707,8 @@ export default function Home() {
           headerScrolled ? 'border-gray-200/40 shadow-[0_1px_12px_rgba(0,0,0,0.06)]' : 'border-gray-100/20'
         }`}
       >
-        <div className="max-w-[820px] mx-auto px-6 h-14 flex items-center justify-between">
-          <div className="flex items-center gap-3">
+        <div className="max-w-[820px] mx-auto px-4 sm:px-6 h-14 flex items-center justify-between">
+          <div className="flex items-center gap-2 sm:gap-3">
             {/* Sidebar toggle */}
             <motion.button
               whileHover={{ scale: 1.05 }}
@@ -1582,25 +1718,130 @@ export default function Home() {
             >
               {sidebarOpen ? <PanelLeftClose className="w-4 h-4" /> : <PanelLeft className="w-4 h-4" />}
             </motion.button>
-            <div className="w-8 h-8 rounded-xl ai-avatar-orb flex items-center justify-center shadow-md shadow-gray-900/15">
-              <Layers className="w-4 h-4 text-white" />
+
+            {/* Model Selector */}
+            <div className="relative">
+              <button
+                onClick={() => setShowModelSelector(!showModelSelector)}
+                className="flex items-center gap-2 px-2.5 py-1.5 rounded-lg hover:bg-gray-100/80 transition-colors"
+              >
+                <div className="w-6 h-6 rounded-lg ai-avatar-orb flex items-center justify-center shadow-sm shadow-gray-900/15">
+                  <Layers className="w-3 h-3 text-white" />
+                </div>
+                <span className="text-[13px] font-bold text-gray-900 tracking-tight hidden sm:inline">ClearPath AI v1.0</span>
+                <ChevronDown className={`w-3 h-3 text-gray-400 transition-transform duration-200 ${showModelSelector ? 'rotate-180' : ''}`} />
+              </button>
+              <AnimatePresence>
+                {showModelSelector && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -4, scale: 0.98 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: -4, scale: 0.98 }}
+                    transition={{ duration: 0.15 }}
+                    className="absolute top-full left-0 mt-1.5 w-72 bg-white rounded-xl border border-gray-100/60 shadow-lg shadow-gray-900/8 z-50 overflow-hidden"
+                    onClick={() => setShowModelSelector(false)}
+                  >
+                    <div className="p-2">
+                      <div className="px-3 py-2.5 rounded-lg bg-gray-50/80 flex items-start gap-3">
+                        <div className="w-8 h-8 rounded-lg ai-avatar-orb flex items-center justify-center shrink-0 shadow-sm shadow-gray-900/15 mt-0.5">
+                          <Layers className="w-3.5 h-3.5 text-white" />
+                        </div>
+                        <div>
+                          <p className="text-[13px] font-semibold text-gray-900">ClearPath AI v1.0</p>
+                          <p className="text-[11px] text-gray-400 mt-0.5">BART-large-MNLI · Zero-shot classification</p>
+                          <div className="flex items-center gap-1.5 mt-1.5">
+                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                            <span className="text-[10px] text-emerald-600 font-semibold">Online</span>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="mt-1.5 px-3 py-2.5 rounded-lg hover:bg-gray-50/60 transition-colors opacity-50 cursor-not-allowed">
+                        <p className="text-[13px] font-medium text-gray-400">ClearPath AI v1.1</p>
+                        <p className="text-[11px] text-gray-300 mt-0.5">Multi-modal support · Coming soon</p>
+                      </div>
+                      <div className="mt-1.5 px-3 py-2.5 rounded-lg hover:bg-gray-50/60 transition-colors opacity-50 cursor-not-allowed">
+                        <p className="text-[13px] font-medium text-gray-400">ClearPath AI Pro</p>
+                        <p className="text-[11px] text-gray-300 mt-0.5">Fine-tuned model · Priority access</p>
+                      </div>
+                    </div>
+                    <div className="px-3 py-2 border-t border-gray-100/40">
+                      <p className="text-[10px] text-gray-400 font-medium">8 service categories · 6-layer pipeline · Hardcoded crisis detection</p>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
-            <span className="text-[15px] font-bold text-gray-900 tracking-tight">ClearPath AI</span>
-            <span className="text-[10px] font-semibold text-amber-600 bg-amber-50/80 px-2 py-0.5 rounded-md border border-amber-200/40 ml-1">DEMO</span>
-            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shadow-sm shadow-emerald-500/30" />
+
+            <span className="text-[10px] font-semibold text-amber-600 bg-amber-50/80 px-2 py-0.5 rounded-md border border-amber-200/40">DEMO</span>
           </div>
-          <div className="flex items-center gap-2">
+
+          <div className="flex items-center gap-1 sm:gap-2">
+            {/* Share button */}
+            <button className="w-8 h-8 rounded-lg flex items-center justify-center hover:bg-gray-100/80 transition-colors text-gray-400 hover:text-gray-600">
+              <Share2 className="w-4 h-4" />
+            </button>
+
+            {/* Export dropdown */}
+            <div className="relative">
+              <button
+                onClick={() => setShowExportMenu(!showExportMenu)}
+                className="w-8 h-8 rounded-lg flex items-center justify-center hover:bg-gray-100/80 transition-colors text-gray-400 hover:text-gray-600"
+              >
+                <Download className="w-4 h-4" />
+              </button>
+              <AnimatePresence>
+                {showExportMenu && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -4, scale: 0.98 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: -4, scale: 0.98 }}
+                    transition={{ duration: 0.15 }}
+                    className="absolute top-full right-0 mt-1.5 w-44 bg-white rounded-xl border border-gray-100/60 shadow-lg shadow-gray-900/8 z-50 overflow-hidden"
+                    onClick={() => setShowExportMenu(false)}
+                  >
+                    <div className="p-1.5">
+                      <button className="w-full text-left px-3 py-2 rounded-lg text-[13px] font-medium text-gray-700 hover:bg-gray-50/80 transition-colors flex items-center gap-2.5">
+                        <Download className="w-3.5 h-3.5 text-gray-400" />
+                        Export as PDF
+                      </button>
+                      <button className="w-full text-left px-3 py-2 rounded-lg text-[13px] font-medium text-gray-700 hover:bg-gray-50/80 transition-colors flex items-center gap-2.5">
+                        <Download className="w-3.5 h-3.5 text-gray-400" />
+                        Export as Text
+                      </button>
+                      <button className="w-full text-left px-3 py-2 rounded-lg text-[13px] font-medium text-gray-700 hover:bg-gray-50/80 transition-colors flex items-center gap-2.5">
+                        <Download className="w-3.5 h-3.5 text-gray-400" />
+                        Export as JSON
+                      </button>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+
+            {/* New conversation */}
             {hasMessages && (
               <motion.button
                 initial={{ opacity: 0, scale: 0.8 }}
                 animate={{ opacity: 1, scale: 1 }}
                 onClick={reset}
-                className="h-8 px-3 flex items-center gap-1.5 rounded-lg hover:bg-gray-100/80 transition-colors text-gray-400 hover:text-gray-600"
+                className="h-8 px-2.5 flex items-center gap-1.5 rounded-lg hover:bg-gray-100/80 transition-colors text-gray-400 hover:text-gray-600"
               >
                 <RotateCcw className="w-3.5 h-3.5" />
-                <span className="text-[12px] font-medium">New</span>
+                <span className="text-[12px] font-medium hidden sm:inline">New</span>
               </motion.button>
             )}
+
+            <div className="w-px h-5 bg-gray-200/60 mx-0.5 hidden sm:block" />
+
+            {/* Settings */}
+            <Link href="/settings" className="w-8 h-8 rounded-lg flex items-center justify-center hover:bg-gray-100/80 transition-colors text-gray-400 hover:text-gray-600">
+              <Settings className="w-4 h-4" />
+            </Link>
+
+            {/* Profile */}
+            <Link href="/profile" className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-emerald-500 flex items-center justify-center text-white text-[11px] font-bold shadow-sm shadow-gray-900/10 hover:shadow-md hover:shadow-gray-900/15 transition-shadow">
+              AK
+            </Link>
           </div>
         </div>
       </div>
@@ -1800,6 +2041,41 @@ export default function Home() {
                         {msg.categories && msg.categories.length > 0 && !msg.isCrisis && !msg.isClarify && msg.stepId && (
                           <TransparencyPanel items={getTransparencyItems(chatSteps[msg.stepId])} />
                         )}
+
+                        {/* Expanded transparency panel from action buttons */}
+                        {expandedTransparency.has(i) && msg.stepId && !msg.isCrisis && !msg.isClarify && (
+                          <motion.div
+                            initial={{ opacity: 0, height: 0 }}
+                            animate={{ opacity: 1, height: 'auto' }}
+                            exit={{ opacity: 0, height: 0 }}
+                            transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+                            className="overflow-hidden"
+                          >
+                            <div className="mt-3 p-4 rounded-xl bg-gray-50/60 border border-gray-100/40">
+                              <div className="flex items-center gap-2 mb-3">
+                                <Eye className="w-3.5 h-3.5 text-blue-500" />
+                                <p className="text-[11px] font-bold text-gray-500 uppercase tracking-wider">Transparency Details</p>
+                              </div>
+                              <div className="space-y-2">
+                                {getTransparencyItems(chatSteps[msg.stepId]).map((item, idx) => (
+                                  <div key={idx} className="flex gap-2 text-[12px] text-gray-500 leading-relaxed">
+                                    <span className="w-1.5 h-1.5 rounded-full bg-gray-300 shrink-0 mt-[7px]" />
+                                    {item}
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          </motion.div>
+                        )}
+
+                        {/* Message Action Buttons */}
+                        <MessageActionButtons
+                          messageIndex={i}
+                          onCopy={handleCopyMessage}
+                          onFeedback={handleFeedback}
+                          onViewDetails={handleViewDetails}
+                          showDetails={expandedTransparency.has(i)}
+                        />
                       </div>
                     </div>
                   )}
@@ -1864,19 +2140,68 @@ export default function Home() {
 
       {/* ─── INPUT BAR ─── */}
       <div className="shrink-0 border-t border-gray-100/40 relative z-10 input-bar-glass">
-        <div className="max-w-[820px] mx-auto px-6 py-3">
-          <div className="flex items-center gap-3 glass-card rounded-2xl px-5 py-3.5 border border-gray-100/30 focus-within:border-gray-200/60 transition-all duration-300 relative overflow-hidden input-focus-ring">
-            {/* Animated gradient border on focus */}
-            <input
-              type="text"
-              placeholder={hasMessages ? 'Choose a response above' : 'Describe what you need...'}
-              className="flex-1 bg-transparent text-[14px] outline-none text-gray-900 placeholder:text-gray-300 font-medium relative z-10"
-              disabled
-            />
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-gray-900 to-gray-800 flex items-center justify-center shrink-0 shadow-sm shadow-gray-900/10 relative z-10">
-              <Send className="w-3.5 h-3.5 text-white" />
+        <div className="max-w-[820px] mx-auto px-4 sm:px-6 py-3">
+          <div className="glass-card rounded-2xl border border-gray-100/30 focus-within:border-gray-200/60 transition-all duration-300 relative overflow-hidden input-focus-ring">
+            <div className="flex items-end gap-2 px-4 pt-3 pb-2">
+              {/* Attach button */}
+              <button className="w-8 h-8 rounded-lg flex items-center justify-center text-gray-400 hover:text-gray-600 hover:bg-gray-100/80 transition-all duration-200 shrink-0 mb-0.5">
+                <Paperclip className="w-4 h-4" />
+              </button>
+              {/* Auto-resize textarea */}
+              <textarea
+                ref={textareaRef}
+                value={inputText}
+                onChange={handleTextareaInput}
+                placeholder={hasMessages ? 'Ask a follow-up question...' : 'Describe what you need help with...'}
+                className="flex-1 bg-transparent text-[14px] outline-none text-gray-900 placeholder:text-gray-300 font-medium resize-none min-h-[24px] max-h-[120px] leading-relaxed"
+                rows={1}
+              />
+              {/* Send button */}
+              <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-gray-900 to-gray-800 flex items-center justify-center shrink-0 shadow-sm shadow-gray-900/10 cursor-pointer hover:shadow-md hover:shadow-gray-900/15 transition-shadow mb-0.5">
+                <Send className="w-3.5 h-3.5 text-white" />
+              </div>
+            </div>
+            {/* Bottom row: hints + char count */}
+            <div className="flex items-center justify-between px-4 pb-2.5">
+              <p className="text-[10px] text-gray-300 font-medium">
+                <kbd className="px-1 py-0.5 rounded bg-gray-100/60 text-gray-400 text-[9px] font-semibold">Shift</kbd>
+                {' + '}
+                <kbd className="px-1 py-0.5 rounded bg-gray-100/60 text-gray-400 text-[9px] font-semibold">Enter</kbd>
+                {' for new line'}
+              </p>
+              <p className={`text-[10px] font-medium transition-colors duration-200 ${
+                inputText.length > 450 ? 'text-amber-500' : inputText.length > 0 ? 'text-gray-300' : 'text-gray-200'
+              }`}>
+                {inputText.length > 0 ? `${inputText.length}/500` : ''}
+              </p>
             </div>
           </div>
+
+          {/* Suggested follow-up chips */}
+          {!hasMessages && (
+            <div className="flex flex-wrap gap-2 mt-3 justify-center">
+              {[
+                'I need housing help',
+                'Mental health support',
+                'Food assistance',
+                'Legal aid',
+                'Senior services',
+              ].map((chip, i) => (
+                <motion.button
+                  key={i}
+                  initial={{ opacity: 0, y: 6 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.8 + i * 0.05, duration: 0.3 }}
+                  onClick={() => setInputText(chip)}
+                  className="px-3.5 py-1.5 rounded-full text-[12px] font-medium text-gray-500 bg-white/60 border border-gray-100/40 hover:text-gray-700 hover:bg-white/80 hover:border-gray-200/60 transition-all duration-200 backdrop-blur-sm"
+                  style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.03)' }}
+                >
+                  {chip}
+                </motion.button>
+              ))}
+            </div>
+          )}
+
           <p className="text-[11px] text-gray-300 text-center mt-2.5 flex items-center justify-center gap-2 font-medium">
             <span className="inline-block w-1.5 h-1.5 rounded-full bg-emerald-400 shadow-sm shadow-emerald-400/30" />
             ClearPath AI · Demo Mode — Verified resources · Calibrated confidence · BART-large-MNLI

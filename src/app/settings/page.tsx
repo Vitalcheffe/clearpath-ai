@@ -22,11 +22,36 @@ import {
   Layers,
   User,
   Check,
+  Key,
+  Smartphone,
+  Monitor,
+  Palette,
+  Type,
+  Zap,
+  Code,
+  Webhook,
+  Bug,
+  Clock,
+  Wifi,
+  Cookie,
+  FileJson,
+  FileText,
+  FileDown,
+  HardDrive,
+  Volume2,
+  RefreshCw,
+  AlignLeft,
+  AlignJustify,
+  ArrowLeftRight,
+  Timer,
+  Mail,
+  BadgeCheck,
+  HelpCircle,
 } from 'lucide-react'
 import Navbar from '@/components/Navbar'
 
 // ─── TYPES ──────────────────────────────────────────────
-type SectionKey = 'general' | 'privacy' | 'notifications' | 'accessibility' | 'data'
+type SectionKey = 'general' | 'privacy' | 'notifications' | 'accessibility' | 'appearance' | 'account' | 'data' | 'advanced'
 
 interface SettingsSection {
   key: SectionKey
@@ -39,9 +64,12 @@ interface SettingsSection {
 const sections: SettingsSection[] = [
   { key: 'general', label: 'General', icon: Settings, description: 'Language, theme, location, and confidence preferences' },
   { key: 'privacy', label: 'Privacy & Security', icon: Shield, description: 'Data retention, crisis detection, and usage sharing' },
+  { key: 'account', label: 'Account', icon: User, description: 'Email, password, 2FA, and connected accounts' },
   { key: 'notifications', label: 'Notifications', icon: Bell, description: 'Email, resource updates, and weekly summary' },
   { key: 'accessibility', label: 'Accessibility', icon: Eye, description: 'Display, motion, and screen reader options' },
+  { key: 'appearance', label: 'Appearance', icon: Palette, description: 'Font size, density, sidebar, and animations' },
   { key: 'data', label: 'Data & Storage', icon: Database, description: 'Storage info, export, and cache management' },
+  { key: 'advanced', label: 'Advanced', icon: Code, description: 'Developer mode, API keys, and debug logging' },
 ]
 
 // ─── ANIMATION VARIANTS ─────────────────────────────────
@@ -169,11 +197,23 @@ export default function SettingsPage() {
   const [theme, setTheme] = useState<'light' | 'dark'>('light')
   const [zipCode, setZipCode] = useState('')
   const [confidenceThreshold, setConfidenceThreshold] = useState(70)
+  const [defaultCategory, setDefaultCategory] = useState('All')
+  const [autoClarification, setAutoClarification] = useState(true)
+  const [distanceUnit, setDistanceUnit] = useState<'miles' | 'km'>('miles')
+  const [notificationSound, setNotificationSound] = useState(true)
 
   // Privacy state
   const [dataRetention, setDataRetention] = useState(true)
   const [shareUsage, setShareUsage] = useState(false)
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
+  const [sessionTimeout, setSessionTimeout] = useState('30')
+  const [ipMasking, setIpMasking] = useState(false)
+  const [doNotTrack, setDoNotTrack] = useState(false)
+  const [blockThirdPartyCookies, setBlockThirdPartyCookies] = useState(true)
+
+  // Account state
+  const [twoFactor, setTwoFactor] = useState(false)
+  const [showPasswordChange, setShowPasswordChange] = useState(false)
 
   // Notifications state
   const [emailNotifs, setEmailNotifs] = useState(true)
@@ -186,6 +226,20 @@ export default function SettingsPage() {
   const [highContrast, setHighContrast] = useState(false)
   const [screenReader, setScreenReader] = useState(false)
   const [reducedMotion, setReducedMotion] = useState(false)
+
+  // Appearance state
+  const [fontSize, setFontSize] = useState<'normal' | 'large' | 'xl'>('normal')
+  const [density, setDensity] = useState<'compact' | 'comfortable' | 'spacious'>('comfortable')
+  const [sidebarPosition, setSidebarPosition] = useState<'left' | 'right'>('left')
+  const [animationSpeed, setAnimationSpeed] = useState<'slow' | 'normal' | 'fast'>('normal')
+
+  // Data state
+  const [autoDelete, setAutoDelete] = useState<'never' | '30' | '90'>('never')
+  const [downloadFormat, setDownloadFormat] = useState<'json' | 'csv' | 'pdf'>('json')
+
+  // Advanced state
+  const [developerMode, setDeveloperMode] = useState(false)
+  const [debugLogging, setDebugLogging] = useState(false)
 
   const getConfidenceLabel = (val: number): string => {
     if (val <= 50) return 'Low'
@@ -241,7 +295,6 @@ export default function SettingsPage() {
             variants={staggerContainer}
             className="flex flex-col md:flex-row gap-6"
           >
-
             {/* ──── LEFT SIDEBAR ──── */}
             <motion.div variants={staggerItem} className="md:w-[220px] shrink-0">
               <nav className="glass-card rounded-2xl p-3 shadow-premium">
@@ -416,6 +469,44 @@ export default function SettingsPage() {
                             </div>
                           </SettingRow>
 
+                          {/* Default Category */}
+                          <SettingRow
+                            icon={Layers}
+                            iconColor="#8b5cf6"
+                            iconBg="rgba(139,92,246,0.06)"
+                            title="Default category preference"
+                            description="Pre-select a category when starting new conversations"
+                          >
+                            <select
+                              value={defaultCategory}
+                              onChange={(e) => setDefaultCategory(e.target.value)}
+                              className="appearance-none bg-white border border-gray-200 rounded-xl px-4 py-2 text-[13px] font-medium text-gray-900 pr-9 shadow-sm hover:border-gray-300 focus:border-blue-400 focus:ring-2 focus:ring-blue-500/10 focus:outline-none transition-all cursor-pointer"
+                              style={{
+                                backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%239ca3af' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E")`,
+                                backgroundRepeat: 'no-repeat',
+                                backgroundPosition: 'right 10px center',
+                              }}
+                            >
+                              <option>All</option>
+                              <option>Housing</option>
+                              <option>Food</option>
+                              <option>Mental Health</option>
+                              <option>Legal</option>
+                              <option>Employment</option>
+                            </select>
+                          </SettingRow>
+
+                          {/* Auto-clarification */}
+                          <SettingRow
+                            icon={HelpCircle}
+                            iconColor="#10b981"
+                            iconBg="rgba(16,185,129,0.06)"
+                            title="Auto-clarification"
+                            description="Automatically ask follow-up questions when confidence is below threshold"
+                          >
+                            <ToggleSwitch checked={autoClarification} onChange={setAutoClarification} />
+                          </SettingRow>
+
                           {/* Default Location */}
                           <SettingRow
                             icon={MapPin}
@@ -432,6 +523,45 @@ export default function SettingsPage() {
                               maxLength={5}
                               className="w-28 bg-white border border-gray-200 rounded-xl px-4 py-2 text-[13px] font-medium text-gray-900 placeholder:text-gray-400 shadow-sm hover:border-gray-300 focus:border-blue-400 focus:ring-2 focus:ring-blue-500/10 focus:outline-none transition-all"
                             />
+                          </SettingRow>
+
+                          {/* Distance Unit */}
+                          <SettingRow
+                            icon={MapPin}
+                            iconColor="#3b82f6"
+                            iconBg="rgba(59,130,246,0.06)"
+                            title="Resource distance unit"
+                            description="Choose miles or kilometers for displaying resource distances"
+                          >
+                            <div className="flex items-center gap-1 p-1 bg-gray-100 rounded-xl">
+                              <button
+                                onClick={() => setDistanceUnit('miles')}
+                                className={`px-3 py-1.5 rounded-lg text-[12px] font-semibold transition-all ${
+                                  distanceUnit === 'miles' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700'
+                                }`}
+                              >
+                                Miles
+                              </button>
+                              <button
+                                onClick={() => setDistanceUnit('km')}
+                                className={`px-3 py-1.5 rounded-lg text-[12px] font-semibold transition-all ${
+                                  distanceUnit === 'km' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700'
+                                }`}
+                              >
+                                km
+                              </button>
+                            </div>
+                          </SettingRow>
+
+                          {/* Notification Sound */}
+                          <SettingRow
+                            icon={Volume2}
+                            iconColor="#f59e0b"
+                            iconBg="rgba(245,158,11,0.06)"
+                            title="Notification sound"
+                            description="Play a sound when new notifications arrive"
+                          >
+                            <ToggleSwitch checked={notificationSound} onChange={setNotificationSound} />
                           </SettingRow>
 
                           {/* Confidence Threshold */}
@@ -475,10 +605,7 @@ export default function SettingsPage() {
                                   High
                                 </button>
                               </div>
-                              <span
-                                className="text-[12px] font-bold"
-                                style={{ color: confidenceColor }}
-                              >
+                              <span className="text-[12px] font-bold" style={{ color: confidenceColor }}>
                                 {getConfidencePercent(confidenceThreshold)} threshold
                               </span>
                             </div>
@@ -510,7 +637,6 @@ export default function SettingsPage() {
                       {/* ══════════ PRIVACY & SECURITY SECTION ══════════ */}
                       {activeSection === 'privacy' && (
                         <>
-                          {/* Data Retention */}
                           <SettingRow
                             icon={Lock}
                             iconColor="#3b82f6"
@@ -521,7 +647,6 @@ export default function SettingsPage() {
                             <ToggleSwitch checked={dataRetention} onChange={setDataRetention} />
                           </SettingRow>
 
-                          {/* Crisis Detection */}
                           <SettingRow
                             icon={Shield}
                             iconColor="#ef4444"
@@ -534,7 +659,6 @@ export default function SettingsPage() {
                             <ToggleSwitch checked={true} onChange={() => {}} disabled />
                           </SettingRow>
 
-                          {/* Share Usage Data */}
                           <SettingRow
                             icon={Layers}
                             iconColor="#8b5cf6"
@@ -543,6 +667,64 @@ export default function SettingsPage() {
                             description="Help us improve ClearPath AI by sharing anonymized usage patterns. No personal data is ever shared."
                           >
                             <ToggleSwitch checked={shareUsage} onChange={setShareUsage} />
+                          </SettingRow>
+
+                          {/* Session Timeout */}
+                          <SettingRow
+                            icon={Timer}
+                            iconColor="#f59e0b"
+                            iconBg="rgba(245,158,11,0.06)"
+                            title="Session timeout"
+                            description="Automatically log out after a period of inactivity"
+                          >
+                            <select
+                              value={sessionTimeout}
+                              onChange={(e) => setSessionTimeout(e.target.value)}
+                              className="appearance-none bg-white border border-gray-200 rounded-xl px-4 py-2 text-[13px] font-medium text-gray-900 pr-9 shadow-sm hover:border-gray-300 focus:outline-none transition-all cursor-pointer"
+                              style={{
+                                backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%239ca3af' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E")`,
+                                backgroundRepeat: 'no-repeat',
+                                backgroundPosition: 'right 10px center',
+                              }}
+                            >
+                              <option value="15">15 minutes</option>
+                              <option value="30">30 minutes</option>
+                              <option value="60">1 hour</option>
+                              <option value="never">Never</option>
+                            </select>
+                          </SettingRow>
+
+                          {/* IP Masking */}
+                          <SettingRow
+                            icon={Wifi}
+                            iconColor="#3b82f6"
+                            iconBg="rgba(59,130,246,0.06)"
+                            title="IP masking"
+                            description="Mask your IP address from analytics and logging systems"
+                          >
+                            <ToggleSwitch checked={ipMasking} onChange={setIpMasking} />
+                          </SettingRow>
+
+                          {/* Do Not Track */}
+                          <SettingRow
+                            icon={Eye}
+                            iconColor="#10b981"
+                            iconBg="rgba(16,185,129,0.06)"
+                            title="Do-not-track header"
+                            description="Send DNT headers to all third-party services and analytics"
+                          >
+                            <ToggleSwitch checked={doNotTrack} onChange={setDoNotTrack} />
+                          </SettingRow>
+
+                          {/* Block Third-Party Cookies */}
+                          <SettingRow
+                            icon={Cookie}
+                            iconColor="#f59e0b"
+                            iconBg="rgba(245,158,11,0.06)"
+                            title="Block third-party cookies"
+                            description="Prevent third-party services from setting tracking cookies in your browser"
+                          >
+                            <ToggleSwitch checked={blockThirdPartyCookies} onChange={setBlockThirdPartyCookies} />
                           </SettingRow>
 
                           {/* Delete All Data */}
@@ -567,8 +749,6 @@ export default function SettingsPage() {
                                   Delete all
                                 </button>
                               </div>
-
-                              {/* Confirmation overlay */}
                               <AnimatePresence>
                                 {showDeleteConfirm && (
                                   <motion.div
@@ -602,6 +782,107 @@ export default function SettingsPage() {
                               </AnimatePresence>
                             </div>
                           </motion.div>
+                        </>
+                      )}
+
+                      {/* ══════════ ACCOUNT SECTION ══════════ */}
+                      {activeSection === 'account' && (
+                        <>
+                          <SettingRow
+                            icon={Mail}
+                            iconColor="#3b82f6"
+                            iconBg="rgba(59,130,246,0.06)"
+                            title="Change email"
+                            description="Update the email address associated with your account"
+                          >
+                            <button className="px-4 py-2 text-[12px] font-semibold text-gray-600 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 shadow-sm transition-all">
+                              Change
+                            </button>
+                          </SettingRow>
+
+                          <SettingRow
+                            icon={Key}
+                            iconColor="#10b981"
+                            iconBg="rgba(16,185,129,0.06)"
+                            title="Change password"
+                            description="Update your account password. We recommend using a strong, unique password."
+                          >
+                            <button
+                              onClick={() => setShowPasswordChange(!showPasswordChange)}
+                              className="px-4 py-2 text-[12px] font-semibold text-gray-600 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 shadow-sm transition-all"
+                            >
+                              Change
+                            </button>
+                          </SettingRow>
+
+                          {/* Password change form */}
+                          <AnimatePresence>
+                            {showPasswordChange && (
+                              <motion.div
+                                initial={{ opacity: 0, height: 0 }}
+                                animate={{ opacity: 1, height: 'auto' }}
+                                exit={{ opacity: 0, height: 0 }}
+                                className="overflow-hidden px-5"
+                              >
+                                <div className="py-4 space-y-3 rounded-xl bg-white/40 p-4 mb-2">
+                                  <div>
+                                    <label className="text-[12px] font-semibold text-gray-700 mb-1.5 block">Current password</label>
+                                    <input type="password" placeholder="Enter current password" className="w-full px-4 py-2.5 rounded-xl text-[13px] bg-white border border-gray-200 outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-500/10 transition-all" />
+                                  </div>
+                                  <div>
+                                    <label className="text-[12px] font-semibold text-gray-700 mb-1.5 block">New password</label>
+                                    <input type="password" placeholder="Enter new password" className="w-full px-4 py-2.5 rounded-xl text-[13px] bg-white border border-gray-200 outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-500/10 transition-all" />
+                                  </div>
+                                  <div>
+                                    <label className="text-[12px] font-semibold text-gray-700 mb-1.5 block">Confirm new password</label>
+                                    <input type="password" placeholder="Confirm new password" className="w-full px-4 py-2.5 rounded-xl text-[13px] bg-white border border-gray-200 outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-500/10 transition-all" />
+                                  </div>
+                                  <div className="flex items-center gap-2 pt-2">
+                                    <button className="px-4 py-2 text-[12px] font-semibold text-white bg-gradient-to-b from-blue-600 to-blue-700 rounded-xl shadow-sm hover:shadow-md transition-all">
+                                      Update password
+                                    </button>
+                                    <button onClick={() => setShowPasswordChange(false)} className="px-4 py-2 text-[12px] font-semibold text-gray-500 hover:text-gray-700 rounded-xl hover:bg-gray-100/60 transition-all">
+                                      Cancel
+                                    </button>
+                                  </div>
+                                </div>
+                              </motion.div>
+                            )}
+                          </AnimatePresence>
+
+                          <SettingRow
+                            icon={Smartphone}
+                            iconColor="#8b5cf6"
+                            iconBg="rgba(139,92,246,0.06)"
+                            title="Two-factor authentication"
+                            description="Add an extra layer of security by requiring a code from your authenticator app"
+                          >
+                            <ToggleSwitch checked={twoFactor} onChange={setTwoFactor} />
+                          </SettingRow>
+
+                          <SettingRow
+                            icon={Monitor}
+                            iconColor="#f59e0b"
+                            iconBg="rgba(245,158,11,0.06)"
+                            title="Active sessions"
+                            description="Manage devices currently signed in to your account"
+                          >
+                            <button className="px-4 py-2 text-[12px] font-semibold text-gray-600 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 shadow-sm transition-all">
+                              Manage
+                            </button>
+                          </SettingRow>
+
+                          <SettingRow
+                            icon={Globe}
+                            iconColor="#10b981"
+                            iconBg="rgba(16,185,129,0.06)"
+                            title="Connected accounts"
+                            description="Manage Google, GitHub, and other third-party account connections"
+                          >
+                            <Link href="/profile" className="px-4 py-2 text-[12px] font-semibold text-gray-600 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 shadow-sm transition-all">
+                              View
+                            </Link>
+                          </SettingRow>
                         </>
                       )}
 
@@ -695,6 +976,108 @@ export default function SettingsPage() {
                         </>
                       )}
 
+                      {/* ══════════ APPEARANCE SECTION ══════════ */}
+                      {activeSection === 'appearance' && (
+                        <>
+                          {/* Font Size */}
+                          <SettingRow
+                            icon={Type}
+                            iconColor="#3b82f6"
+                            iconBg="rgba(59,130,246,0.06)"
+                            title="Font size"
+                            description="Adjust the base font size throughout the application"
+                          >
+                            <div className="flex items-center gap-1 p-1 bg-gray-100 rounded-xl">
+                              {(['normal', 'large', 'xl'] as const).map((size) => (
+                                <button
+                                  key={size}
+                                  onClick={() => setFontSize(size)}
+                                  className={`px-3 py-1.5 rounded-lg text-[12px] font-semibold transition-all ${
+                                    fontSize === size ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700'
+                                  }`}
+                                >
+                                  {size === 'normal' ? 'Default' : size === 'large' ? 'Large' : 'Extra Large'}
+                                </button>
+                              ))}
+                            </div>
+                          </SettingRow>
+
+                          {/* Density */}
+                          <SettingRow
+                            icon={AlignLeft}
+                            iconColor="#10b981"
+                            iconBg="rgba(16,185,129,0.06)"
+                            title="Density setting"
+                            description="Control the spacing and padding density of the interface"
+                          >
+                            <div className="flex items-center gap-1 p-1 bg-gray-100 rounded-xl">
+                              {(['compact', 'comfortable', 'spacious'] as const).map((d) => (
+                                <button
+                                  key={d}
+                                  onClick={() => setDensity(d)}
+                                  className={`px-2.5 py-1.5 rounded-lg text-[11px] font-semibold capitalize transition-all ${
+                                    density === d ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700'
+                                  }`}
+                                >
+                                  {d}
+                                </button>
+                              ))}
+                            </div>
+                          </SettingRow>
+
+                          {/* Sidebar Position */}
+                          <SettingRow
+                            icon={ArrowLeftRight}
+                            iconColor="#8b5cf6"
+                            iconBg="rgba(139,92,246,0.06)"
+                            title="Sidebar position"
+                            description="Choose which side of the screen the navigation sidebar appears on"
+                          >
+                            <div className="flex items-center gap-1 p-1 bg-gray-100 rounded-xl">
+                              <button
+                                onClick={() => setSidebarPosition('left')}
+                                className={`px-3 py-1.5 rounded-lg text-[12px] font-semibold transition-all ${
+                                  sidebarPosition === 'left' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700'
+                                }`}
+                              >
+                                Left
+                              </button>
+                              <button
+                                onClick={() => setSidebarPosition('right')}
+                                className={`px-3 py-1.5 rounded-lg text-[12px] font-semibold transition-all ${
+                                  sidebarPosition === 'right' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700'
+                                }`}
+                              >
+                                Right
+                              </button>
+                            </div>
+                          </SettingRow>
+
+                          {/* Animation Speed */}
+                          <SettingRow
+                            icon={Zap}
+                            iconColor="#f59e0b"
+                            iconBg="rgba(245,158,11,0.06)"
+                            title="Animation speed"
+                            description="Control the speed of transitions and animations throughout the app"
+                          >
+                            <div className="flex items-center gap-1 p-1 bg-gray-100 rounded-xl">
+                              {(['slow', 'normal', 'fast'] as const).map((speed) => (
+                                <button
+                                  key={speed}
+                                  onClick={() => setAnimationSpeed(speed)}
+                                  className={`px-2.5 py-1.5 rounded-lg text-[11px] font-semibold capitalize transition-all ${
+                                    animationSpeed === speed ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700'
+                                  }`}
+                                >
+                                  {speed}
+                                </button>
+                              ))}
+                            </div>
+                          </SettingRow>
+                        </>
+                      )}
+
                       {/* ══════════ DATA & STORAGE SECTION ══════════ */}
                       {activeSection === 'data' && (
                         <>
@@ -717,8 +1100,83 @@ export default function SettingsPage() {
                                 <span className="text-[10px] font-medium text-gray-400">0 MB used</span>
                                 <span className="text-[10px] font-medium text-gray-400">No storage limit</span>
                               </div>
+
+                              {/* Storage breakdown */}
+                              <div className="mt-4 pt-4 border-t border-gray-100/60">
+                                <h5 className="text-[12px] font-semibold text-gray-600 mb-3">Storage Breakdown</h5>
+                                <div className="space-y-2">
+                                  <div className="flex items-center justify-between">
+                                    <div className="flex items-center gap-2">
+                                      <div className="w-2 h-2 rounded-full bg-blue-400" />
+                                      <span className="text-[11px] text-gray-500">Conversations</span>
+                                    </div>
+                                    <span className="text-[11px] font-semibold text-gray-400">0 MB</span>
+                                  </div>
+                                  <div className="flex items-center justify-between">
+                                    <div className="flex items-center gap-2">
+                                      <div className="w-2 h-2 rounded-full bg-emerald-400" />
+                                      <span className="text-[11px] text-gray-500">Saved resources</span>
+                                    </div>
+                                    <span className="text-[11px] font-semibold text-gray-400">0 MB</span>
+                                  </div>
+                                  <div className="flex items-center justify-between">
+                                    <div className="flex items-center gap-2">
+                                      <div className="w-2 h-2 rounded-full bg-violet-400" />
+                                      <span className="text-[11px] text-gray-500">Cache</span>
+                                    </div>
+                                    <span className="text-[11px] font-semibold text-gray-400">0 MB</span>
+                                  </div>
+                                </div>
+                              </div>
                             </div>
                           </motion.div>
+
+                          {/* Auto-delete */}
+                          <SettingRow
+                            icon={Clock}
+                            iconColor="#8b5cf6"
+                            iconBg="rgba(139,92,246,0.06)"
+                            title="Auto-delete data"
+                            description="Automatically delete your data after a specified period"
+                          >
+                            <select
+                              value={autoDelete}
+                              onChange={(e) => setAutoDelete(e.target.value as 'never' | '30' | '90')}
+                              className="appearance-none bg-white border border-gray-200 rounded-xl px-4 py-2 text-[13px] font-medium text-gray-900 pr-9 shadow-sm hover:border-gray-300 focus:outline-none transition-all cursor-pointer"
+                              style={{
+                                backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%239ca3af' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E")`,
+                                backgroundRepeat: 'no-repeat',
+                                backgroundPosition: 'right 10px center',
+                              }}
+                            >
+                              <option value="never">Never</option>
+                              <option value="30">After 30 days</option>
+                              <option value="90">After 90 days</option>
+                            </select>
+                          </SettingRow>
+
+                          {/* Download format */}
+                          <SettingRow
+                            icon={FileDown}
+                            iconColor="#3b82f6"
+                            iconBg="rgba(59,130,246,0.06)"
+                            title="Download format"
+                            description="Choose the format for exporting your data"
+                          >
+                            <div className="flex items-center gap-1 p-1 bg-gray-100 rounded-xl">
+                              {(['json', 'csv', 'pdf'] as const).map((fmt) => (
+                                <button
+                                  key={fmt}
+                                  onClick={() => setDownloadFormat(fmt)}
+                                  className={`px-3 py-1.5 rounded-lg text-[11px] font-semibold uppercase transition-all ${
+                                    downloadFormat === fmt ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700'
+                                  }`}
+                                >
+                                  {fmt}
+                                </button>
+                              ))}
+                            </div>
+                          </SettingRow>
 
                           {/* Export Data */}
                           <SettingRow
@@ -765,6 +1223,124 @@ export default function SettingsPage() {
                               </p>
                             </div>
                           </motion.div>
+                        </>
+                      )}
+
+                      {/* ══════════ ADVANCED SECTION ══════════ */}
+                      {activeSection === 'advanced' && (
+                        <>
+                          {/* Developer Mode */}
+                          <SettingRow
+                            icon={Code}
+                            iconColor="#3b82f6"
+                            iconBg="rgba(59,130,246,0.06)"
+                            title="Developer mode"
+                            description="Enable developer tools, API access, and debug information in the interface"
+                          >
+                            <ToggleSwitch checked={developerMode} onChange={setDeveloperMode} />
+                          </SettingRow>
+
+                          {/* API Key Management */}
+                          <motion.div variants={staggerItem} className="px-5 py-4">
+                            <div className="rounded-xl bg-white/50 border border-gray-100/60 p-5">
+                              <div className="flex items-center gap-3 mb-4">
+                                <div className="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center">
+                                  <Key className="w-[18px] h-[18px] text-blue-500" />
+                                </div>
+                                <div>
+                                  <h4 className="text-[14px] font-semibold text-gray-900">API Key Management</h4>
+                                  <p className="text-[12px] text-gray-400 mt-0.5">Create and manage API keys for programmatic access</p>
+                                </div>
+                              </div>
+                              <div className="flex items-center gap-3 p-3 rounded-lg bg-gray-50/80 border border-gray-100/40">
+                                <div className="flex-1">
+                                  <p className="text-[12px] font-mono text-gray-500">cpk_****_****_****_****_demo</p>
+                                  <p className="text-[10px] text-gray-400 mt-0.5">Created: June 15, 2026</p>
+                                </div>
+                                <button className="px-3 py-1.5 text-[10px] font-semibold text-red-500 hover:text-red-600 rounded-lg hover:bg-red-50/60 transition-all">
+                                  Revoke
+                                </button>
+                              </div>
+                              <button className="mt-3 inline-flex items-center gap-1.5 px-4 py-2 text-[12px] font-semibold text-blue-600 bg-blue-50/60 border border-blue-100/60 rounded-xl hover:bg-blue-50 transition-all">
+                                <Key className="w-3.5 h-3.5" />
+                                Generate new key
+                              </button>
+                            </div>
+                          </motion.div>
+
+                          {/* Webhook Configuration */}
+                          <motion.div variants={staggerItem} className="px-5 py-2">
+                            <div className="rounded-xl bg-white/50 border border-gray-100/60 p-5">
+                              <div className="flex items-center gap-3 mb-4">
+                                <div className="w-10 h-10 rounded-xl bg-violet-50 flex items-center justify-center">
+                                  <Webhook className="w-[18px] h-[18px] text-violet-500" />
+                                </div>
+                                <div>
+                                  <h4 className="text-[14px] font-semibold text-gray-900">Webhook Configuration</h4>
+                                  <p className="text-[12px] text-gray-400 mt-0.5">Configure webhooks for real-time event notifications</p>
+                                </div>
+                              </div>
+                              <div className="space-y-3">
+                                <div>
+                                  <label className="text-[12px] font-semibold text-gray-700 mb-1.5 block">Endpoint URL</label>
+                                  <input
+                                    type="url"
+                                    placeholder="https://your-server.com/webhook"
+                                    className="w-full px-4 py-2.5 rounded-xl text-[13px] bg-white border border-gray-200 outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-500/10 transition-all"
+                                  />
+                                </div>
+                                <div>
+                                  <label className="text-[12px] font-semibold text-gray-700 mb-1.5 block">Events</label>
+                                  <div className="flex items-center gap-2 flex-wrap">
+                                    {['Conversation created', 'Resource found', 'Crisis detected', 'Confidence low'].map((event) => (
+                                      <span key={event} className="inline-flex items-center px-2.5 py-1 rounded-lg text-[10px] font-semibold bg-gray-50 border border-gray-200/60 text-gray-600">
+                                        {event}
+                                      </span>
+                                    ))}
+                                  </div>
+                                </div>
+                                <button className="px-4 py-2 text-[12px] font-semibold text-white bg-gradient-to-b from-violet-500 to-violet-600 rounded-xl shadow-sm hover:shadow-md transition-all">
+                                  Save webhook
+                                </button>
+                              </div>
+                            </div>
+                          </motion.div>
+
+                          {/* Debug Logging */}
+                          <SettingRow
+                            icon={Bug}
+                            iconColor="#f59e0b"
+                            iconBg="rgba(245,158,11,0.06)"
+                            title="Debug logging"
+                            description="Enable verbose logging to console for troubleshooting. This may impact performance."
+                          >
+                            <ToggleSwitch checked={debugLogging} onChange={setDebugLogging} />
+                          </SettingRow>
+
+                          {/* Debug info card */}
+                          <AnimatePresence>
+                            {debugLogging && (
+                              <motion.div
+                                initial={{ opacity: 0, height: 0 }}
+                                animate={{ opacity: 1, height: 'auto' }}
+                                exit={{ opacity: 0, height: 0 }}
+                                className="overflow-hidden px-5"
+                              >
+                                <div className="py-4">
+                                  <div className="rounded-xl bg-amber-50/40 border border-amber-100/40 p-4">
+                                    <p className="text-[12px] text-amber-700 font-medium">
+                                      Debug logging is enabled. Open your browser console to view detailed logs.
+                                    </p>
+                                    <div className="mt-2 text-[11px] font-mono text-amber-600/70 space-y-0.5">
+                                      <p>Version: 1.0.0-demo</p>
+                                      <p>Build: 2026.06.15</p>
+                                      <p>Environment: development</p>
+                                    </div>
+                                  </div>
+                                </div>
+                              </motion.div>
+                            )}
+                          </AnimatePresence>
                         </>
                       )}
                     </motion.div>
