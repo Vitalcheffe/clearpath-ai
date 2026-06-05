@@ -17,14 +17,21 @@ import {
   Crown,
   ChevronDown,
   Globe,
+  Quote,
+  BadgeCheck,
+  CreditCard,
+  XCircle,
+  ShieldCheck,
+  Sparkles,
 } from 'lucide-react'
 import Navbar from '@/components/Navbar'
 
 // ─── PRICING TIERS ───────────────────────────────────────
-const tiers = [
+const tiersBase = [
   {
     name: 'Free',
-    price: '$0',
+    priceMonthly: '$0',
+    priceAnnual: '$0',
     period: '/month',
     description: 'For everyone who needs help finding the right resources.',
     badge: 'Current plan',
@@ -52,7 +59,8 @@ const tiers = [
   },
   {
     name: 'Pro',
-    price: '$12',
+    priceMonthly: '$12',
+    priceAnnual: '$9',
     period: '/month',
     description: 'For power users who need faster, deeper resource navigation.',
     badge: 'Most Popular',
@@ -80,7 +88,8 @@ const tiers = [
   },
   {
     name: 'Enterprise',
-    price: 'Custom',
+    priceMonthly: 'Custom',
+    priceAnnual: 'Custom',
     period: '',
     description: 'For organizations that need tailored AI resource navigation.',
     badge: 'Contact us',
@@ -129,6 +138,78 @@ const faqs = [
     question: 'Is my data stored?',
     answer:
       'No. ClearPath AI does not store any conversation data, ever. Your searches and conversations are processed in real-time and immediately discarded. We believe that people seeking community resources deserve absolute privacy. This is true across all plans — Free, Pro, and Enterprise.',
+  },
+  {
+    question: 'What happens if I exceed the free tier limits?',
+    answer:
+      'The Free tier has no search limits — you get unlimited resource searches, crisis detection, confidence scores, and 211 navigator access forever. The Free tier doesn\'t limit how many searches you make. Upgrading to Pro unlocks advanced features like priority speed, saved history, advanced clarification, and eligibility pre-check — not more searches.',
+  },
+  {
+    question: 'Can I switch between plans?',
+    answer:
+      'Absolutely. You can upgrade or downgrade your plan at any time from your account settings. When upgrading, you\'ll get immediate access to Pro features and be charged a prorated amount for the remainder of your billing cycle. When downgrading, your Pro features remain active until the end of your current billing period.',
+  },
+  {
+    question: 'Do you offer discounts for nonprofits?',
+    answer:
+      'Yes! We offer a 50% discount on the Pro plan for verified nonprofit organizations. We believe in supporting the people who support communities. Contact our team with proof of your nonprofit status, and we\'ll apply the discount to your account within 24 hours. Enterprise plans for nonprofits also receive special pricing.',
+  },
+]
+
+// ─── DETAILED COMPARISON TABLE DATA ──────────────────────
+const comparisonSections = [
+  {
+    title: 'Core Features',
+    rows: [
+      { feature: 'Resource searches', free: 'Unlimited', pro: 'Unlimited', enterprise: 'Unlimited' },
+      { feature: 'Crisis detection', free: 'Always on', pro: 'Always on', enterprise: 'Always on' },
+      { feature: 'Confidence scores', free: '✓', pro: '✓', enterprise: '✓' },
+      { feature: '211 human navigator', free: '✓', pro: '✓', enterprise: '✓' },
+    ],
+  },
+  {
+    title: 'Advanced Features',
+    rows: [
+      { feature: 'Priority speed', free: '—', pro: '✓', enterprise: '✓' },
+      { feature: 'Saved history', free: '—', pro: '✓', enterprise: '✓' },
+      { feature: 'Advanced clarification', free: '—', pro: '✓', enterprise: '✓' },
+      { feature: 'Eligibility pre-check', free: '—', pro: '✓', enterprise: '✓' },
+    ],
+  },
+  {
+    title: 'Enterprise Features',
+    rows: [
+      { feature: 'API access', free: '—', pro: '—', enterprise: '✓' },
+      { feature: 'Custom databases', free: '—', pro: '—', enterprise: '✓' },
+      { feature: 'White-label', free: '—', pro: '—', enterprise: '✓' },
+      { feature: 'Account manager', free: '—', pro: '—', enterprise: '✓' },
+      { feature: 'SLA guarantee', free: '—', pro: '—', enterprise: '✓' },
+    ],
+  },
+]
+
+// ─── TESTIMONIALS DATA ───────────────────────────────────
+const testimonials = [
+  {
+    initials: 'MR',
+    name: 'Maria Rodriguez',
+    role: 'Nonprofit Director',
+    quote: 'The free tier gives us everything we need. Crisis detection alone is worth it.',
+    color: 'bg-emerald-100 text-emerald-700',
+  },
+  {
+    initials: 'JK',
+    name: 'James Kim',
+    role: 'Social Worker',
+    quote: "Pro's saved history means I can follow up with clients across sessions.",
+    color: 'bg-blue-100 text-blue-700',
+  },
+  {
+    initials: 'SP',
+    name: 'Sarah Patel',
+    role: 'Enterprise User',
+    quote: 'The API integration lets us embed ClearPath directly into our intake workflow.',
+    color: 'bg-amber-100 text-amber-700',
   },
 ]
 
@@ -196,6 +277,8 @@ function FAQItem({ question, answer, index }: { question: string; answer: string
 
 // ─── PRICING PAGE ────────────────────────────────────────
 export default function PricingPage() {
+  const [isAnnual, setIsAnnual] = useState(false)
+
   return (
     <div className="min-h-screen flex flex-col mesh-gradient-bg">
       <Navbar />
@@ -238,9 +321,63 @@ export default function PricingPage() {
         </div>
       </section>
 
-      {/* ═══════════ PRICING CARDS ═══════════ */}
+      {/* ═══════════ BILLING TOGGLE + PRICING CARDS ═══════════ */}
       <section className="py-8 md:py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          {/* Billing Toggle */}
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5 }}
+            className="flex items-center justify-center gap-4 mb-10"
+          >
+            <span
+              className={`text-[14px] font-semibold transition-colors duration-300 ${
+                !isAnnual ? 'text-gray-900' : 'text-gray-400'
+              }`}
+            >
+              Monthly
+            </span>
+            <button
+              onClick={() => setIsAnnual(!isAnnual)}
+              className="relative w-14 h-7 rounded-full transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:ring-offset-2 focus:ring-offset-transparent"
+              style={{
+                backgroundColor: isAnnual ? '#10b981' : '#e5e7eb',
+              }}
+              aria-label={`Switch to ${isAnnual ? 'monthly' : 'annual'} billing`}
+              role="switch"
+              aria-checked={isAnnual}
+            >
+              <motion.div
+                className="absolute top-0.5 left-0.5 w-6 h-6 bg-white rounded-full shadow-md"
+                animate={{ x: isAnnual ? 28 : 0 }}
+                transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+              />
+            </button>
+            <span
+              className={`text-[14px] font-semibold transition-colors duration-300 ${
+                isAnnual ? 'text-gray-900' : 'text-gray-400'
+              }`}
+            >
+              Annual
+            </span>
+            <AnimatePresence>
+              {isAnnual && (
+                <motion.span
+                  initial={{ opacity: 0, scale: 0.8, x: -8 }}
+                  animate={{ opacity: 1, scale: 1, x: 0 }}
+                  exit={{ opacity: 0, scale: 0.8, x: -8 }}
+                  transition={{ duration: 0.25 }}
+                  className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-[11px] font-bold bg-emerald-50 text-emerald-600 border border-emerald-200/60"
+                >
+                  <Sparkles className="w-3 h-3" />
+                  Save 20%
+                </motion.span>
+              )}
+            </AnimatePresence>
+          </motion.div>
+
           <motion.div
             initial="hidden"
             whileInView="visible"
@@ -248,9 +385,10 @@ export default function PricingPage() {
             variants={staggerContainer}
             className="grid lg:grid-cols-3 gap-6 lg:gap-8 items-start max-w-6xl mx-auto"
           >
-            {tiers.map((tier, i) => {
+            {tiersBase.map((tier, i) => {
               const Icon = tier.icon
               const isPro = tier.scale
+              const displayPrice = isAnnual ? tier.priceAnnual : tier.priceMonthly
 
               return (
                 <motion.div
@@ -317,11 +455,20 @@ export default function PricingPage() {
                       </div>
 
                       {/* Price */}
-                      <div className="flex items-baseline gap-1">
-                        {tier.price !== 'Custom' ? (
-                          <span className="text-5xl font-extrabold bg-gradient-to-r from-blue-600 via-emerald-500 to-blue-600 bg-clip-text text-transparent gradient-text-animate bg-[length:200%_200%]">
-                            {tier.price}
-                          </span>
+                      <div className="flex items-baseline gap-1 h-[60px]">
+                        {displayPrice !== 'Custom' ? (
+                          <AnimatePresence mode="wait">
+                            <motion.span
+                              key={displayPrice}
+                              initial={{ opacity: 0, y: 10, filter: 'blur(4px)' }}
+                              animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+                              exit={{ opacity: 0, y: -10, filter: 'blur(4px)' }}
+                              transition={{ duration: 0.3, ease: [0.25, 0.46, 0.45, 0.94] }}
+                              className="text-5xl font-extrabold bg-gradient-to-r from-blue-600 via-emerald-500 to-blue-600 bg-clip-text text-transparent gradient-text-animate bg-[length:200%_200%]"
+                            >
+                              {displayPrice}
+                            </motion.span>
+                          </AnimatePresence>
                         ) : (
                           <span className="text-5xl font-extrabold bg-gradient-to-r from-gray-500 via-gray-600 to-gray-500 bg-clip-text text-transparent gradient-text-animate bg-[length:200%_200%]">
                             Custom
@@ -329,6 +476,15 @@ export default function PricingPage() {
                         )}
                         {tier.period && (
                           <span className="text-[15px] text-gray-400 font-medium">{tier.period}</span>
+                        )}
+                        {isAnnual && tier.name === 'Pro' && (
+                          <motion.span
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            className="text-[12px] text-gray-400 font-medium line-through ml-1"
+                          >
+                            $12
+                          </motion.span>
                         )}
                       </div>
 
@@ -462,6 +618,113 @@ export default function PricingPage() {
         </div>
       </section>
 
+      {/* ═══════════ DETAILED FEATURE COMPARISON TABLE ═══════════ */}
+      <section className="py-12 md:py-20">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: '-40px' }}
+            transition={{ duration: 0.6 }}
+          >
+            <div className="text-center mb-10">
+              <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-gray-900">
+                Compare every feature
+              </h2>
+              <p className="text-[15px] text-gray-500 mt-3 max-w-xl mx-auto">
+                A detailed breakdown of what&apos;s included in each plan.
+              </p>
+            </div>
+
+            <div className="glass-card rounded-3xl shadow-premium overflow-hidden">
+              {/* Table Header */}
+              <div className="grid grid-cols-4 gap-0 border-b border-gray-100/60 bg-white/60">
+                <div className="p-5 md:p-6">
+                  <span className="text-[13px] font-semibold text-gray-400 uppercase tracking-wider">Features</span>
+                </div>
+                <div className="p-5 md:p-6 text-center">
+                  <span className="text-[14px] font-bold text-gray-900">Free</span>
+                </div>
+                <div className="p-5 md:p-6 text-center relative">
+                  <span className="text-[14px] font-bold text-blue-600">Pro</span>
+                  <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-blue-500 via-emerald-400 to-blue-500" />
+                </div>
+                <div className="p-5 md:p-6 text-center">
+                  <span className="text-[14px] font-bold text-gray-900">Enterprise</span>
+                </div>
+              </div>
+
+              {/* Table Body */}
+              {comparisonSections.map((section, sIdx) => (
+                <motion.div
+                  key={section.title}
+                  initial={{ opacity: 0, y: 12 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.4, delay: sIdx * 0.1 }}
+                >
+                  {/* Section Header */}
+                  <div className="grid grid-cols-4 gap-0 bg-gray-50/80 border-b border-gray-100/40">
+                    <div className="col-span-4 px-5 md:px-6 py-3">
+                      <span className="text-[12px] font-bold text-gray-500 uppercase tracking-wider">
+                        {section.title}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Section Rows */}
+                  {section.rows.map((row, rIdx) => (
+                    <div
+                      key={row.feature}
+                      className={`grid grid-cols-4 gap-0 border-b border-gray-50/80 hover:bg-white/60 transition-colors ${
+                        rIdx === section.rows.length - 1 ? 'border-b-0' : ''
+                      }`}
+                    >
+                      <div className="p-4 md:p-5 flex items-center">
+                        <span className="text-[13px] font-medium text-gray-700">{row.feature}</span>
+                      </div>
+                      <div className="p-4 md:p-5 flex items-center justify-center">
+                        {row.free === '✓' ? (
+                          <div className="w-5 h-5 rounded-full bg-emerald-50 flex items-center justify-center">
+                            <Check className="w-3 h-3 text-emerald-600" strokeWidth={3} />
+                          </div>
+                        ) : row.free === '—' ? (
+                          <span className="text-[14px] text-gray-300">—</span>
+                        ) : (
+                          <span className="text-[13px] font-medium text-gray-600">{row.free}</span>
+                        )}
+                      </div>
+                      <div className="p-4 md:p-5 flex items-center justify-center bg-blue-50/20">
+                        {row.pro === '✓' ? (
+                          <div className="w-5 h-5 rounded-full bg-emerald-50 flex items-center justify-center">
+                            <Check className="w-3 h-3 text-emerald-600" strokeWidth={3} />
+                          </div>
+                        ) : row.pro === '—' ? (
+                          <span className="text-[14px] text-gray-300">—</span>
+                        ) : (
+                          <span className="text-[13px] font-medium text-gray-600">{row.pro}</span>
+                        )}
+                      </div>
+                      <div className="p-4 md:p-5 flex items-center justify-center">
+                        {row.enterprise === '✓' ? (
+                          <div className="w-5 h-5 rounded-full bg-emerald-50 flex items-center justify-center">
+                            <Check className="w-3 h-3 text-emerald-600" strokeWidth={3} />
+                          </div>
+                        ) : row.enterprise === '—' ? (
+                          <span className="text-[14px] text-gray-300">—</span>
+                        ) : (
+                          <span className="text-[13px] font-medium text-gray-600">{row.enterprise}</span>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </motion.div>
+              ))}
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
       {/* ═══════════ FAQ ═══════════ */}
       <section className="py-12 md:py-20 bg-white/40">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -488,6 +751,147 @@ export default function PricingPage() {
               <FAQItem key={i} question={faq.question} answer={faq.answer} index={i} />
             ))}
           </div>
+        </div>
+      </section>
+
+      {/* ═══════════ TESTIMONIALS ═══════════ */}
+      <section className="py-12 md:py-20">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: '-40px' }}
+            transition={{ duration: 0.6 }}
+            className="text-center mb-12"
+          >
+            <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-gray-900">
+              Trusted by people who{' '}
+              <span className="bg-gradient-to-r from-blue-600 via-emerald-500 to-blue-600 bg-clip-text text-transparent gradient-text-animate bg-[length:200%_200%]">
+                make a difference
+              </span>
+            </h2>
+            <p className="text-[15px] text-gray-500 mt-3 max-w-xl mx-auto">
+              Hear from the social workers, nonprofit leaders, and organizations using ClearPath AI.
+            </p>
+          </motion.div>
+
+          <div className="grid sm:grid-cols-3 gap-6">
+            {testimonials.map((testimonial, i) => (
+              <motion.div
+                key={testimonial.name}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: i * 0.12 }}
+                className="glass-card rounded-3xl p-6 md:p-8 shadow-premium hover:shadow-premium-lg transition-shadow duration-300 relative overflow-hidden"
+              >
+                {/* Decorative quote */}
+                <div className="absolute top-4 right-4 opacity-[0.06] pointer-events-none">
+                  <Quote className="w-16 h-16" />
+                </div>
+
+                <div className="relative z-10 space-y-5">
+                  {/* Quote text */}
+                  <p className="text-[15px] text-gray-700 leading-relaxed font-medium">
+                    &ldquo;{testimonial.quote}&rdquo;
+                  </p>
+
+                  {/* Divider */}
+                  <div className="border-t border-gray-100/60" />
+
+                  {/* Author */}
+                  <div className="flex items-center gap-3">
+                    <div
+                      className={`w-10 h-10 rounded-full ${testimonial.color} flex items-center justify-center shrink-0`}
+                    >
+                      <span className="text-[12px] font-bold">{testimonial.initials}</span>
+                    </div>
+                    <div>
+                      <p className="text-[14px] font-semibold text-gray-900 tracking-tight">
+                        {testimonial.name}
+                      </p>
+                      <p className="text-[12px] text-gray-500">{testimonial.role}</p>
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ═══════════ MONEY-BACK GUARANTEE ═══════════ */}
+      <section className="py-12 md:py-20 bg-white/40">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: '-40px' }}
+            transition={{ duration: 0.6 }}
+            className="glass-card rounded-3xl shadow-premium p-8 md:p-12 relative overflow-hidden"
+          >
+            {/* Background accent */}
+            <div
+              className="absolute -top-20 -left-20 w-60 h-60 rounded-full opacity-10 pointer-events-none"
+              style={{
+                background: 'radial-gradient(circle, rgba(16,185,129,0.3), transparent 70%)',
+              }}
+            />
+
+            <div className="relative z-10 text-center space-y-6">
+              {/* Shield Icon */}
+              <motion.div
+                initial={{ scale: 0.8, opacity: 0 }}
+                whileInView={{ scale: 1, opacity: 1 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: 0.1 }}
+                className="mx-auto"
+              >
+                <div className="w-20 h-20 rounded-3xl bg-emerald-50 border border-emerald-100/60 flex items-center justify-center mx-auto shadow-lg shadow-emerald-500/10">
+                  <ShieldCheck className="w-10 h-10 text-emerald-600" />
+                </div>
+              </motion.div>
+
+              <div className="space-y-3">
+                <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-gray-900">
+                  30-Day Money-Back Guarantee
+                </h2>
+                <p className="text-[15px] text-gray-500 max-w-lg mx-auto leading-relaxed">
+                  If ClearPath Pro doesn&apos;t meet your expectations within the first 30 days, we&apos;ll
+                  refund your payment — no questions asked.
+                </p>
+              </div>
+
+              {/* Trust Badges */}
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-8 pt-4">
+                {[
+                  { icon: CreditCard, text: 'No credit card required to start', color: '#3b82f6' },
+                  { icon: XCircle, text: 'Cancel anytime', color: '#ef4444' },
+                  { icon: BadgeCheck, text: 'Zero risk', color: '#10b981' },
+                ].map((badge) => {
+                  const BIcon = badge.icon
+                  return (
+                    <motion.div
+                      key={badge.text}
+                      initial={{ opacity: 0, y: 8 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      viewport={{ once: true }}
+                      transition={{ duration: 0.4 }}
+                      className="flex items-center gap-2.5"
+                    >
+                      <div
+                        className="w-8 h-8 rounded-lg flex items-center justify-center"
+                        style={{ backgroundColor: `${badge.color}10` }}
+                      >
+                        <BIcon className="w-4 h-4" style={{ color: badge.color }} />
+                      </div>
+                      <span className="text-[13px] font-semibold text-gray-700">{badge.text}</span>
+                    </motion.div>
+                  )
+                })}
+              </div>
+            </div>
+          </motion.div>
         </div>
       </section>
 

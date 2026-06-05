@@ -19,6 +19,12 @@ import {
   Activity,
   HomeIcon,
   Plus,
+  Lightbulb,
+  Bookmark,
+  MapPin,
+  Calendar,
+  BarChart3,
+  Tag,
 } from 'lucide-react'
 import Navbar from '@/components/Navbar'
 
@@ -29,6 +35,76 @@ const recentConversations = [
   { id: '3', title: 'Housing clarification', timestamp: '2 days ago', confidence: 43, preview: 'I need help with my situation', scenario: 'stress' },
   { id: '4', title: 'Senior grocery delivery', timestamp: '3 days ago', confidence: 94, preview: "I'm 78 and need help...", scenario: 'senior' },
   { id: '5', title: 'Veteran PTSD support', timestamp: 'Last week', confidence: 91, preview: "I'm a veteran dealing with PTSD...", scenario: 'job' },
+]
+
+// ─── WEEKLY ACTIVITY DATA ───────────────────────────────
+const weeklyActivity = [
+  { day: 'Mon', value: 4 },
+  { day: 'Tue', value: 7 },
+  { day: 'Wed', value: 3 },
+  { day: 'Thu', value: 8 },
+  { day: 'Fri', value: 5 },
+  { day: 'Sat', value: 2 },
+  { day: 'Sun', value: 6 },
+]
+
+// ─── CATEGORY BREAKDOWN DATA ────────────────────────────
+const categoryBreakdown = [
+  { label: 'Housing', percentage: 38, colorHex: '#3b82f6', bgClass: 'bg-blue-500' },
+  { label: 'Food Assistance', percentage: 22, colorHex: '#f59e0b', bgClass: 'bg-amber-500' },
+  { label: 'Mental Health', percentage: 18, colorHex: '#8b5cf6', bgClass: 'bg-violet-500' },
+  { label: 'Legal Aid', percentage: 12, colorHex: '#06b6d4', bgClass: 'bg-cyan-500' },
+  { label: 'Employment', percentage: 10, colorHex: '#10b981', bgClass: 'bg-emerald-500' },
+]
+
+// ─── SAVED RESOURCES DATA ───────────────────────────────
+const savedResources = [
+  {
+    id: '1',
+    title: 'Section 8 Emergency Transfer',
+    category: 'Housing',
+    categoryColorHex: '#3b82f6',
+    categoryBg: 'rgba(59,130,246,0.08)',
+    status: '2 locations',
+    verifiedDate: 'May 2026',
+    icon: HomeIcon,
+  },
+  {
+    id: '2',
+    title: 'SNAP Benefits Application',
+    category: 'Food',
+    categoryColorHex: '#f59e0b',
+    categoryBg: 'rgba(245,158,11,0.08)',
+    status: 'Apply online',
+    verifiedDate: 'June 2026',
+    icon: Sparkles,
+  },
+  {
+    id: '3',
+    title: 'Veteran PTSD Counseling',
+    category: 'Mental Health',
+    categoryColorHex: '#8b5cf6',
+    categoryBg: 'rgba(139,92,246,0.08)',
+    status: '3 locations',
+    verifiedDate: 'April 2026',
+    icon: Shield,
+  },
+]
+
+// ─── QUICK TIPS DATA ────────────────────────────────────
+const quickTips = [
+  {
+    title: 'Be specific',
+    description: "The more detail you provide, the better we can classify your needs. Try: 'I lost my job and need help with rent and food.'",
+  },
+  {
+    title: 'Check confidence scores',
+    description: 'Higher confidence means a better match. If confidence is low, try rephrasing or use the clarification questions.',
+  },
+  {
+    title: 'Talk to a navigator',
+    description: 'When in doubt, a real person is always one click away. 211 navigators are available 24/7.',
+  },
 ]
 
 // ─── CONFIDENCE HELPERS ─────────────────────────────────
@@ -135,6 +211,9 @@ export default function DashboardPage() {
   const greeting = useMemo(() => getGreeting(), [])
   const [archOpen, setArchOpen] = useState(false)
 
+  const maxActivityValue = useMemo(() => Math.max(...weeklyActivity.map(d => d.value)), [])
+  const totalWeeklyConversations = useMemo(() => weeklyActivity.reduce((sum, d) => sum + d.value, 0), [])
+
   return (
     <div className="min-h-screen flex flex-col mesh-gradient-bg">
       <Navbar />
@@ -218,6 +297,70 @@ export default function DashboardPage() {
             })}
           </motion.section>
 
+          {/* ═══════════ WEEKLY ACTIVITY CHART ═══════════ */}
+          <motion.section
+            initial="hidden"
+            animate="visible"
+            variants={staggerContainer}
+            className="mb-10"
+          >
+            <motion.div
+              variants={staggerItem}
+              className="glass-card rounded-2xl p-6 shadow-premium relative overflow-hidden"
+            >
+              {/* Header */}
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
+                <div className="flex items-center gap-3">
+                  <div className="w-11 h-11 rounded-xl bg-blue-500/8 flex items-center justify-center">
+                    <BarChart3 className="w-5 h-5 text-blue-600" />
+                  </div>
+                  <div>
+                    <h2 className="text-[18px] font-bold tracking-tight text-gray-900">This Week&apos;s Activity</h2>
+                    <p className="text-[13px] text-gray-500 mt-0.5">{totalWeeklyConversations} conversations this week</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Bar chart */}
+              <div className="flex items-end justify-between gap-2 sm:gap-4 h-44 sm:h-52 px-2">
+                {weeklyActivity.map((item, i) => {
+                  const heightPercent = (item.value / maxActivityValue) * 100
+                  return (
+                    <motion.div
+                      key={item.day}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.5, delay: i * 0.07, ease: [0.25, 0.46, 0.45, 0.94] }}
+                      className="flex flex-col items-center gap-2 flex-1"
+                    >
+                      {/* Value label */}
+                      <span className="text-[11px] font-bold text-gray-500">{item.value}</span>
+
+                      {/* Bar */}
+                      <div className="w-full flex justify-center" style={{ height: '140px' }}>
+                        <div className="relative w-full max-w-[44px] h-full flex items-end">
+                          <motion.div
+                            initial={{ height: 0 }}
+                            animate={{ height: `${heightPercent}%` }}
+                            transition={{ duration: 0.7, delay: 0.3 + i * 0.07, ease: [0.25, 0.46, 0.45, 0.94] }}
+                            className="w-full rounded-t-lg"
+                            style={{
+                              background: 'linear-gradient(to top, #3b82f6, #60a5fa)',
+                              minHeight: '4px',
+                            }}
+                          />
+                        </div>
+                      </div>
+
+                      {/* Day label */}
+                      <span className="text-[12px] font-semibold text-gray-400">{item.day}</span>
+                    </motion.div>
+                  )
+                })}
+              </div>
+            </motion.div>
+          </motion.section>
+
           {/* ═══════════ QUICK ACTIONS ═══════════ */}
           <motion.section
             initial="hidden"
@@ -262,6 +405,57 @@ export default function DashboardPage() {
                 )
               })}
             </div>
+          </motion.section>
+
+          {/* ═══════════ CATEGORY BREAKDOWN ═══════════ */}
+          <motion.section
+            initial="hidden"
+            animate="visible"
+            variants={staggerContainer}
+            className="mb-10"
+          >
+            <motion.div
+              variants={staggerItem}
+              className="glass-card rounded-2xl p-6 shadow-premium"
+            >
+              {/* Header */}
+              <div className="flex items-center gap-3 mb-6">
+                <div className="w-11 h-11 rounded-xl bg-violet-500/8 flex items-center justify-center">
+                  <Tag className="w-5 h-5 text-violet-600" />
+                </div>
+                <div>
+                  <h2 className="text-[18px] font-bold tracking-tight text-gray-900">Resource Categories</h2>
+                  <p className="text-[13px] text-gray-500 mt-0.5">Distribution across conversation topics</p>
+                </div>
+              </div>
+
+              {/* Horizontal bars */}
+              <div className="space-y-4">
+                {categoryBreakdown.map((cat, i) => (
+                  <motion.div
+                    key={cat.label}
+                    initial={{ opacity: 0, x: -16 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.5, delay: i * 0.08, ease: [0.25, 0.46, 0.45, 0.94] }}
+                    className="space-y-1.5"
+                  >
+                    <div className="flex items-center justify-between">
+                      <span className="text-[14px] font-semibold text-gray-700">{cat.label}</span>
+                      <span className="text-[14px] font-bold" style={{ color: cat.colorHex }}>{cat.percentage}%</span>
+                    </div>
+                    <div className="w-full h-2.5 bg-gray-100/80 rounded-full overflow-hidden">
+                      <motion.div
+                        initial={{ width: 0 }}
+                        animate={{ width: `${cat.percentage}%` }}
+                        transition={{ duration: 0.8, delay: 0.2 + i * 0.1, ease: [0.25, 0.46, 0.45, 0.94] }}
+                        className="h-full rounded-full"
+                        style={{ backgroundColor: cat.colorHex }}
+                      />
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+            </motion.div>
           </motion.section>
 
           {/* ═══════════ RECENT CONVERSATIONS ═══════════ */}
@@ -362,6 +556,89 @@ export default function DashboardPage() {
             </div>
           </motion.section>
 
+          {/* ═══════════ SAVED RESOURCES ═══════════ */}
+          <motion.section
+            initial="hidden"
+            animate="visible"
+            variants={staggerContainer}
+            className="mb-10"
+          >
+            <motion.div
+              variants={staggerItem}
+              className="flex items-center justify-between mb-5"
+            >
+              <div className="flex items-center gap-2.5">
+                <Bookmark className="w-5 h-5 text-gray-700" />
+                <h2 className="text-[18px] font-bold tracking-tight text-gray-900">Saved Resources</h2>
+              </div>
+              <Link
+                href="/app"
+                className="inline-flex items-center gap-1.5 text-[13px] font-semibold text-gray-500 hover:text-gray-900 transition-colors"
+              >
+                View all
+                <ArrowRight className="w-3.5 h-3.5" />
+              </Link>
+            </motion.div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {savedResources.map((resource, i) => {
+                const Icon = resource.icon
+                return (
+                  <motion.div
+                    key={resource.id}
+                    variants={staggerItem}
+                  >
+                    <Link
+                      href="/app"
+                      className="block glass-card glass-card-hover rounded-2xl p-5 shadow-premium hover:shadow-premium-lg transition-all duration-300 group relative overflow-hidden"
+                    >
+                      <div className="space-y-4">
+                        {/* Icon + category badge */}
+                        <div className="flex items-start justify-between">
+                          <div
+                            className="w-11 h-11 rounded-xl flex items-center justify-center"
+                            style={{ backgroundColor: resource.categoryBg }}
+                          >
+                            <Icon className="w-5 h-5" style={{ color: resource.categoryColorHex }} />
+                          </div>
+                          <span
+                            className="inline-flex items-center px-2.5 py-1 rounded-lg text-[11px] font-bold uppercase tracking-wider"
+                            style={{ backgroundColor: resource.categoryBg, color: resource.categoryColorHex }}
+                          >
+                            {resource.category}
+                          </span>
+                        </div>
+
+                        {/* Title */}
+                        <h3 className="text-[15px] font-bold text-gray-900 tracking-tight leading-snug">
+                          {resource.title}
+                        </h3>
+
+                        {/* Status + verification */}
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-1.5 text-[12px] text-gray-500">
+                            <MapPin className="w-3.5 h-3.5" />
+                            {resource.status}
+                          </div>
+                          <div className="flex items-center gap-1.5 text-[12px] text-gray-400">
+                            <Calendar className="w-3.5 h-3.5" />
+                            Verified {resource.verifiedDate}
+                          </div>
+                        </div>
+
+                        {/* Arrow indicator */}
+                        <div className="flex items-center gap-1.5 text-[13px] font-semibold text-gray-400 group-hover:text-gray-700 transition-colors pt-1">
+                          View resource
+                          <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                        </div>
+                      </div>
+                    </Link>
+                  </motion.div>
+                )
+              })}
+            </div>
+          </motion.section>
+
           {/* ═══════════ 6-LAYER ARCHITECTURE SUMMARY (COLLAPSIBLE) ═══════════ */}
           <motion.section
             initial={{ opacity: 0, y: 20 }}
@@ -458,6 +735,40 @@ export default function DashboardPage() {
                 </motion.div>
               )}
             </AnimatePresence>
+          </motion.section>
+
+          {/* ═══════════ QUICK TIPS ═══════════ */}
+          <motion.section
+            initial="hidden"
+            animate="visible"
+            variants={staggerContainer}
+            className="mb-10"
+          >
+            <motion.div
+              variants={staggerItem}
+              className="flex items-center gap-2.5 mb-5"
+            >
+              <Lightbulb className="w-5 h-5 text-amber-500" />
+              <h2 className="text-[18px] font-bold tracking-tight text-gray-900">Quick Tips</h2>
+            </motion.div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              {quickTips.map((tip, i) => (
+                <motion.div
+                  key={tip.title}
+                  variants={staggerItem}
+                  className="glass-card glass-card-hover rounded-2xl p-5 shadow-premium hover:shadow-premium-lg transition-all duration-300 group"
+                >
+                  <div className="space-y-3">
+                    <div className="w-11 h-11 rounded-xl bg-amber-500/8 flex items-center justify-center">
+                      <Lightbulb className="w-5 h-5 text-amber-500" />
+                    </div>
+                    <h3 className="text-[15px] font-bold text-gray-900 tracking-tight">{tip.title}</h3>
+                    <p className="text-[13px] text-gray-500 leading-relaxed">{tip.description}</p>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
           </motion.section>
 
           {/* ═══════════ FOOTER SPACER + SAFETY BADGE ═══════════ */}

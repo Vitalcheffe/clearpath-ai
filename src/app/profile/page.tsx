@@ -20,6 +20,18 @@ import {
   ChevronRight,
   Calendar,
   Check,
+  Bookmark,
+  Home,
+  Utensils,
+  Heart,
+  Briefcase,
+  BarChart3,
+  Bell,
+  Zap,
+  Star,
+  ArrowRight,
+  Crown,
+  Sparkles,
 } from 'lucide-react'
 import Navbar from '@/components/Navbar'
 
@@ -83,6 +95,63 @@ const accountStats = [
   },
 ]
 
+const savedResources = [
+  {
+    id: '1',
+    title: 'Section 8 Emergency Transfer',
+    category: 'Housing',
+    categoryIcon: Home,
+    categoryColor: '#3b82f6',
+    categoryBg: 'rgba(59,130,246,0.06)',
+    confidence: 87,
+    verifiedDate: 'May 2026',
+    action: '2 locations near you',
+    actionIcon: MapPin,
+  },
+  {
+    id: '2',
+    title: 'SNAP Benefits Application',
+    category: 'Food',
+    categoryIcon: Utensils,
+    categoryColor: '#10b981',
+    categoryBg: 'rgba(16,185,129,0.06)',
+    confidence: 94,
+    verifiedDate: 'June 2026',
+    action: 'Apply online',
+    actionIcon: Zap,
+  },
+  {
+    id: '3',
+    title: '988 Crisis Lifeline',
+    category: 'Crisis',
+    categoryIcon: Heart,
+    categoryColor: '#ef4444',
+    categoryBg: 'rgba(239,68,68,0.06)',
+    confidence: 100,
+    verifiedDate: 'Available 24/7',
+    action: 'Phone & chat',
+    actionIcon: Phone,
+  },
+  {
+    id: '4',
+    title: 'Veteran Employment Program',
+    category: 'Employment',
+    categoryIcon: Briefcase,
+    categoryColor: '#f59e0b',
+    categoryBg: 'rgba(245,158,11,0.06)',
+    confidence: 78,
+    verifiedDate: 'April 2026',
+    action: 'Job training',
+    actionIcon: Star,
+  },
+]
+
+const searchCategories = [
+  { label: 'Housing', percent: 38, color: '#3b82f6' },
+  { label: 'Food', percent: 22, color: '#10b981' },
+  { label: 'Mental Health', percent: 18, color: '#8b5cf6' },
+]
+
 // ─── ANIMATION VARIANTS ─────────────────────────────────
 const fadeInUp = {
   hidden: { opacity: 0, y: 24 },
@@ -97,6 +166,21 @@ const staggerContainer = {
 const staggerItem = {
   hidden: { opacity: 0, y: 16 },
   visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] } },
+}
+
+// ─── CONFIDENCE COLOR HELPER ────────────────────────────
+function getConfidenceColor(confidence: number): string {
+  if (confidence >= 90) return '#10b981'
+  if (confidence >= 75) return '#3b82f6'
+  if (confidence >= 60) return '#f59e0b'
+  return '#ef4444'
+}
+
+function getConfidenceBg(confidence: number): string {
+  if (confidence >= 90) return 'rgba(16,185,129,0.06)'
+  if (confidence >= 75) return 'rgba(59,130,246,0.06)'
+  if (confidence >= 60) return 'rgba(245,158,11,0.06)'
+  return 'rgba(239,68,68,0.06)'
 }
 
 // ─── FORM FIELD COMPONENT ───────────────────────────────
@@ -135,6 +219,50 @@ function FormField({
   )
 }
 
+// ─── TOGGLE SWITCH COMPONENT ────────────────────────────
+function ToggleSwitch({
+  checked,
+  onChange,
+  disabled = false,
+}: {
+  checked: boolean
+  onChange: (val: boolean) => void
+  disabled?: boolean
+}) {
+  return (
+    <button
+      type="button"
+      role="switch"
+      aria-checked={checked}
+      disabled={disabled}
+      onClick={() => !disabled && onChange(!checked)}
+      className={`
+        relative inline-flex h-7 w-12 shrink-0 cursor-pointer rounded-full
+        transition-colors duration-200 ease-in-out
+        focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/40 focus-visible:ring-offset-2
+        ${disabled ? 'opacity-50 cursor-not-allowed' : ''}
+        ${checked
+          ? 'bg-gradient-to-b from-blue-500 to-blue-600 shadow-md shadow-blue-500/20'
+          : 'bg-gray-200'
+        }
+      `}
+    >
+      <span
+        className={`
+          pointer-events-none inline-block rounded-full bg-white shadow-md
+          transform transition-transform duration-200 ease-in-out
+          ${checked ? 'translate-x-[22px]' : 'translate-x-[3px]'}
+          mt-[3px]
+        `}
+        style={{
+          width: '22px',
+          height: '22px',
+        }}
+      />
+    </button>
+  )
+}
+
 // ─── MAIN PROFILE PAGE ─────────────────────────────────
 export default function ProfilePage() {
   const [isEditing, setIsEditing] = useState(false)
@@ -151,6 +279,12 @@ export default function ProfilePage() {
   const [origPhone, setOrigPhone] = useState(phone)
   const [origLocation, setOrigLocation] = useState(location)
   const [origLanguage, setOrigLanguage] = useState(language)
+
+  // Notification preferences state
+  const [emailNotifs, setEmailNotifs] = useState(true)
+  const [resourceUpdates, setResourceUpdates] = useState(true)
+  const [weeklySummary, setWeeklySummary] = useState(false)
+  const [newFeatures, setNewFeatures] = useState(false)
 
   const handleEdit = () => {
     setOrigName(fullName)
@@ -314,6 +448,156 @@ export default function ProfilePage() {
             })}
           </motion.section>
 
+          {/* ═══════════ SAVED RESOURCES SECTION ═══════════ */}
+          <motion.section
+            initial={{ opacity: 0, y: 24 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.12, ease: [0.25, 0.46, 0.45, 0.94] }}
+            className="mb-8"
+          >
+            <div className="glass-card rounded-2xl p-6 sm:p-8 shadow-premium relative overflow-hidden">
+              {/* Decorative glow */}
+              <div
+                className="absolute -top-24 -right-24 w-56 h-56 rounded-full opacity-15 pointer-events-none"
+                style={{ background: 'radial-gradient(circle, rgba(16,185,129,0.12), rgba(59,130,246,0.06), transparent 70%)' }}
+              />
+
+              {/* Section header */}
+              <div className="flex items-center justify-between mb-6 relative z-10">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-600 flex items-center justify-center shadow-md shadow-emerald-500/20">
+                    <Bookmark className="w-5 h-5 text-white" />
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <h2 className="text-[17px] font-bold tracking-tight text-gray-900">
+                        Saved Resources
+                      </h2>
+                      <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-emerald-100/80 text-[10px] font-bold text-emerald-700">
+                        4
+                      </span>
+                    </div>
+                    <p className="text-[12px] text-gray-400 mt-0.5">
+                      Resources you&apos;ve bookmarked for quick access
+                    </p>
+                  </div>
+                </div>
+                <Link
+                  href="/history"
+                  className="hidden sm:inline-flex items-center gap-1 text-[12px] font-semibold text-gray-400 hover:text-gray-700 transition-colors"
+                >
+                  View all
+                  <ChevronRight className="w-3.5 h-3.5" />
+                </Link>
+              </div>
+
+              {/* Resource cards grid */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 relative z-10">
+                {savedResources.map((resource, i) => {
+                  const CategoryIcon = resource.categoryIcon
+                  const ActionIcon = resource.actionIcon
+                  const confColor = getConfidenceColor(resource.confidence)
+                  const confBg = getConfidenceBg(resource.confidence)
+                  return (
+                    <motion.div
+                      key={resource.id}
+                      initial={{ opacity: 0, y: 16 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.5, delay: 0.2 + i * 0.08, ease: [0.25, 0.46, 0.45, 0.94] }}
+                      className="group rounded-xl border border-gray-100/60 bg-white/50 hover:bg-white/80 p-4 transition-all duration-300 hover:shadow-premium relative overflow-hidden"
+                    >
+                      {/* Hover glow */}
+                      <div
+                        className="absolute -top-8 -right-8 w-24 h-24 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
+                        style={{ background: `radial-gradient(circle, ${resource.categoryColor}10, transparent 70%)` }}
+                      />
+
+                      <div className="relative z-10 space-y-3">
+                        {/* Top: Icon + Title + Category badge */}
+                        <div className="flex items-start gap-3">
+                          <div
+                            className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0"
+                            style={{ backgroundColor: resource.categoryBg }}
+                          >
+                            <CategoryIcon className="w-4 h-4" style={{ color: resource.categoryColor }} />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <h3 className="text-[13px] font-semibold text-gray-900 leading-tight truncate">
+                              {resource.title}
+                            </h3>
+                            <span
+                              className="inline-flex items-center px-2 py-0.5 rounded-md text-[9px] font-bold uppercase tracking-wider mt-1"
+                              style={{
+                                backgroundColor: resource.categoryBg,
+                                color: resource.categoryColor,
+                                border: `1px solid ${resource.categoryColor}15`,
+                              }}
+                            >
+                              {resource.category}
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* Confidence bar */}
+                        <div className="space-y-1.5">
+                          <div className="flex items-center justify-between">
+                            <span className="text-[10px] font-semibold uppercase tracking-wider text-gray-400">Confidence</span>
+                            <span
+                              className="text-[12px] font-bold"
+                              style={{ color: confColor }}
+                            >
+                              {resource.confidence}%
+                            </span>
+                          </div>
+                          <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                            <motion.div
+                              className="h-full rounded-full"
+                              style={{ backgroundColor: confColor }}
+                              initial={{ width: 0 }}
+                              animate={{ width: `${resource.confidence}%` }}
+                              transition={{ duration: 0.8, delay: 0.4 + i * 0.1, ease: [0.25, 0.46, 0.45, 0.94] }}
+                            />
+                          </div>
+                        </div>
+
+                        {/* Bottom: Verified date + Action */}
+                        <div className="flex items-center justify-between pt-1 border-t border-gray-100/60">
+                          <div className="flex items-center gap-1.5">
+                            <div
+                              className="w-1.5 h-1.5 rounded-full"
+                              style={{ backgroundColor: confColor }}
+                            />
+                            <span className="text-[11px] text-gray-400 font-medium">
+                              {resource.verifiedDate}
+                            </span>
+                          </div>
+                          <button
+                            className="inline-flex items-center gap-1 text-[11px] font-semibold transition-colors group/btn"
+                            style={{ color: resource.categoryColor }}
+                          >
+                            <ActionIcon className="w-3 h-3" />
+                            {resource.action}
+                          </button>
+                        </div>
+                      </div>
+                    </motion.div>
+                  )
+                })}
+              </div>
+
+              {/* Mobile view all link */}
+              <div className="sm:hidden mt-4 pt-4 border-t border-gray-100/60 relative z-10">
+                <Link
+                  href="/history"
+                  className="inline-flex items-center gap-1.5 text-[13px] font-semibold text-emerald-600 hover:text-emerald-700 transition-colors"
+                >
+                  View all resources
+                  <ChevronRight className="w-3.5 h-3.5" />
+                </Link>
+              </div>
+            </div>
+          </motion.section>
+
           {/* ═══════════ PROFILE DETAILS CARD ═══════════ */}
           <motion.section
             initial={{ opacity: 0, y: 24 }}
@@ -432,6 +716,83 @@ export default function ProfilePage() {
             </div>
           </motion.section>
 
+          {/* ═══════════ USAGE ANALYTICS SECTION ═══════════ */}
+          <motion.section
+            initial={{ opacity: 0, y: 24 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.28, ease: [0.25, 0.46, 0.45, 0.94] }}
+            className="mb-8"
+          >
+            <div className="glass-card rounded-2xl shadow-premium relative overflow-hidden">
+              {/* Gradient border effect */}
+              <div className="absolute inset-0 rounded-2xl p-[1px] bg-gradient-to-br from-blue-500/20 via-emerald-500/10 to-violet-500/20 pointer-events-none" style={{ mask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)', maskComposite: 'exclude', WebkitMaskComposite: 'xor' }} />
+
+              {/* Accent top bar */}
+              <div className="h-1 bg-gradient-to-r from-blue-500 via-emerald-400 to-violet-500" />
+
+              <div className="p-6 sm:p-8 relative z-10">
+                {/* Section header */}
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-violet-600 flex items-center justify-center shadow-md shadow-blue-500/20">
+                    <BarChart3 className="w-5 h-5 text-white" />
+                  </div>
+                  <div>
+                    <h2 className="text-[17px] font-bold tracking-tight text-gray-900">
+                      Your Usage This Month
+                    </h2>
+                    <p className="text-[12px] text-gray-400 mt-0.5">
+                      Activity overview for June 2026
+                    </p>
+                  </div>
+                </div>
+
+                {/* Stats row */}
+                <div className="grid grid-cols-3 gap-3 sm:gap-4 mb-6">
+                  <div className="rounded-xl bg-blue-50/40 border border-blue-100/40 p-3 sm:p-4 text-center">
+                    <p className="text-xl sm:text-2xl font-extrabold tracking-tight text-blue-600">24</p>
+                    <p className="text-[10px] sm:text-[11px] font-medium text-blue-500/70 mt-0.5">Conversations</p>
+                  </div>
+                  <div className="rounded-xl bg-emerald-50/40 border border-emerald-100/40 p-3 sm:p-4 text-center">
+                    <p className="text-xl sm:text-2xl font-extrabold tracking-tight text-emerald-600">47</p>
+                    <p className="text-[10px] sm:text-[11px] font-medium text-emerald-500/70 mt-0.5">Resources found</p>
+                  </div>
+                  <div className="rounded-xl bg-violet-50/40 border border-violet-100/40 p-3 sm:p-4 text-center">
+                    <p className="text-xl sm:text-2xl font-extrabold tracking-tight text-violet-600">84%</p>
+                    <p className="text-[10px] sm:text-[11px] font-medium text-violet-500/70 mt-0.5">Avg confidence</p>
+                  </div>
+                </div>
+
+                {/* Most searched categories */}
+                <div className="rounded-xl bg-white/50 border border-gray-100/60 p-4 sm:p-5">
+                  <h3 className="text-[13px] font-semibold text-gray-700 mb-4">Most Searched Categories</h3>
+                  <div className="space-y-3">
+                    {searchCategories.map((cat, i) => (
+                      <div key={cat.label} className="space-y-1.5">
+                        <div className="flex items-center justify-between">
+                          <span className="text-[12px] font-medium text-gray-600">{cat.label}</span>
+                          <span className="text-[12px] font-bold" style={{ color: cat.color }}>{cat.percent}%</span>
+                        </div>
+                        <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
+                          <motion.div
+                            className="h-full rounded-full"
+                            style={{ backgroundColor: cat.color }}
+                            initial={{ width: 0 }}
+                            animate={{ width: `${cat.percent}%` }}
+                            transition={{ duration: 0.8, delay: 0.5 + i * 0.15, ease: [0.25, 0.46, 0.45, 0.94] }}
+                          />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="mt-3 pt-3 border-t border-gray-100/60 flex items-center justify-between">
+                    <span className="text-[11px] text-gray-400 font-medium">Other categories</span>
+                    <span className="text-[11px] font-semibold text-gray-500">22%</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </motion.section>
+
           {/* ═══════════ ACTIVITY TIMELINE ═══════════ */}
           <motion.section
             initial={{ opacity: 0, y: 24 }}
@@ -520,11 +881,239 @@ export default function ProfilePage() {
             </div>
           </motion.section>
 
+          {/* ═══════════ NOTIFICATION PREFERENCES ═══════════ */}
+          <motion.section
+            initial={{ opacity: 0, y: 24 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.36, ease: [0.25, 0.46, 0.45, 0.94] }}
+            className="mb-8"
+          >
+            <div className="glass-card rounded-2xl p-6 sm:p-8 shadow-premium relative overflow-hidden">
+              {/* Decorative glow */}
+              <div
+                className="absolute -top-16 -left-16 w-48 h-48 rounded-full opacity-10 pointer-events-none"
+                style={{ background: 'radial-gradient(circle, rgba(139,92,246,0.15), transparent 70%)' }}
+              />
+
+              {/* Section header */}
+              <div className="flex items-center justify-between mb-6 relative z-10">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-500 to-violet-600 flex items-center justify-center shadow-md shadow-violet-500/20">
+                    <Bell className="w-5 h-5 text-white" />
+                  </div>
+                  <div>
+                    <h2 className="text-[17px] font-bold tracking-tight text-gray-900">
+                      Quick Notification Settings
+                    </h2>
+                    <p className="text-[12px] text-gray-400 mt-0.5">
+                      Manage how you stay informed
+                    </p>
+                  </div>
+                </div>
+                <Link
+                  href="/settings"
+                  className="hidden sm:inline-flex items-center gap-1 text-[12px] font-semibold text-gray-400 hover:text-gray-700 transition-colors"
+                >
+                  View all settings
+                  <ChevronRight className="w-3.5 h-3.5" />
+                </Link>
+              </div>
+
+              {/* Toggle rows */}
+              <div className="space-y-1 relative z-10">
+                {/* Email notifications */}
+                <motion.div
+                  initial={{ opacity: 0, y: 12 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.4, delay: 0.42, ease: [0.25, 0.46, 0.45, 0.94] }}
+                  className="flex items-center justify-between gap-4 py-4 px-4 rounded-xl hover:bg-white/40 transition-colors duration-200"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="w-9 h-9 rounded-lg flex items-center justify-center" style={{ backgroundColor: 'rgba(59,130,246,0.06)' }}>
+                      <Mail className="w-4 h-4" style={{ color: '#3b82f6' }} />
+                    </div>
+                    <div>
+                      <h4 className="text-[13px] font-semibold text-gray-900">Email notifications</h4>
+                      <p className="text-[11px] text-gray-400 mt-0.5">Receive important updates via email</p>
+                    </div>
+                  </div>
+                  <ToggleSwitch checked={emailNotifs} onChange={setEmailNotifs} />
+                </motion.div>
+
+                {/* Resource updates */}
+                <motion.div
+                  initial={{ opacity: 0, y: 12 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.4, delay: 0.48, ease: [0.25, 0.46, 0.45, 0.94] }}
+                  className="flex items-center justify-between gap-4 py-4 px-4 rounded-xl hover:bg-white/40 transition-colors duration-200"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="w-9 h-9 rounded-lg flex items-center justify-center" style={{ backgroundColor: 'rgba(16,185,129,0.06)' }}>
+                      <Layers className="w-4 h-4" style={{ color: '#10b981' }} />
+                    </div>
+                    <div>
+                      <h4 className="text-[13px] font-semibold text-gray-900">Resource updates</h4>
+                      <p className="text-[11px] text-gray-400 mt-0.5">Get notified when saved resources change</p>
+                    </div>
+                  </div>
+                  <ToggleSwitch checked={resourceUpdates} onChange={setResourceUpdates} />
+                </motion.div>
+
+                {/* Weekly summary */}
+                <motion.div
+                  initial={{ opacity: 0, y: 12 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.4, delay: 0.54, ease: [0.25, 0.46, 0.45, 0.94] }}
+                  className="flex items-center justify-between gap-4 py-4 px-4 rounded-xl hover:bg-white/40 transition-colors duration-200"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="w-9 h-9 rounded-lg flex items-center justify-center" style={{ backgroundColor: 'rgba(245,158,11,0.06)' }}>
+                      <Calendar className="w-4 h-4" style={{ color: '#f59e0b' }} />
+                    </div>
+                    <div>
+                      <h4 className="text-[13px] font-semibold text-gray-900">Weekly summary</h4>
+                      <p className="text-[11px] text-gray-400 mt-0.5">Weekly digest of your activity</p>
+                    </div>
+                  </div>
+                  <ToggleSwitch checked={weeklySummary} onChange={setWeeklySummary} />
+                </motion.div>
+
+                {/* New features */}
+                <motion.div
+                  initial={{ opacity: 0, y: 12 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.4, delay: 0.6, ease: [0.25, 0.46, 0.45, 0.94] }}
+                  className="flex items-center justify-between gap-4 py-4 px-4 rounded-xl hover:bg-white/40 transition-colors duration-200"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="w-9 h-9 rounded-lg flex items-center justify-center" style={{ backgroundColor: 'rgba(139,92,246,0.06)' }}>
+                      <Sparkles className="w-4 h-4" style={{ color: '#8b5cf6' }} />
+                    </div>
+                    <div>
+                      <h4 className="text-[13px] font-semibold text-gray-900">New features</h4>
+                      <p className="text-[11px] text-gray-400 mt-0.5">Be the first to know about improvements</p>
+                    </div>
+                  </div>
+                  <ToggleSwitch checked={newFeatures} onChange={setNewFeatures} />
+                </motion.div>
+              </div>
+
+              {/* Mobile view all settings link */}
+              <div className="sm:hidden mt-4 pt-4 border-t border-gray-100/60 relative z-10">
+                <Link
+                  href="/settings"
+                  className="inline-flex items-center gap-1.5 text-[13px] font-semibold text-violet-600 hover:text-violet-700 transition-colors"
+                >
+                  View all settings
+                  <ChevronRight className="w-3.5 h-3.5" />
+                </Link>
+              </div>
+            </div>
+          </motion.section>
+
+          {/* ═══════════ ACCOUNT PLAN SECTION ═══════════ */}
+          <motion.section
+            initial={{ opacity: 0, y: 24 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.42, ease: [0.25, 0.46, 0.45, 0.94] }}
+            className="mb-8"
+          >
+            <div className="glass-card rounded-2xl shadow-premium relative overflow-hidden">
+              {/* Gradient border effect */}
+              <div className="absolute inset-0 rounded-2xl p-[1.5px] pointer-events-none" style={{ background: 'linear-gradient(135deg, rgba(37,99,235,0.25), rgba(16,185,129,0.15), rgba(139,92,246,0.2))', mask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)', maskComposite: 'exclude', WebkitMaskComposite: 'xor' }} />
+
+              <div className="p-6 sm:p-8 relative z-10">
+                {/* Section header */}
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center shadow-md shadow-amber-500/20">
+                    <Crown className="w-5 h-5 text-white" />
+                  </div>
+                  <div>
+                    <h2 className="text-[17px] font-bold tracking-tight text-gray-900">
+                      Account Plan
+                    </h2>
+                    <p className="text-[12px] text-gray-400 mt-0.5">
+                      Your current subscription
+                    </p>
+                  </div>
+                </div>
+
+                {/* Plan card */}
+                <div className="rounded-xl bg-gradient-to-br from-white/80 to-gray-50/40 border border-gray-100/60 p-5 sm:p-6">
+                  <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
+                    <div className="space-y-4">
+                      <div className="flex items-center gap-3">
+                        <h3 className="text-[18px] font-extrabold text-gray-900">Free Plan</h3>
+                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-lg text-[10px] font-bold uppercase tracking-wider bg-blue-50/80 text-blue-600 border border-blue-100/60">
+                          Current
+                        </span>
+                      </div>
+
+                      {/* Features list */}
+                      <div className="space-y-2.5">
+                        {[
+                          { label: 'Unlimited searches', included: true },
+                          { label: 'Crisis detection', included: true },
+                          { label: 'Confidence scores', included: true },
+                          { label: '211 access', included: true },
+                        ].map((feature) => (
+                          <div key={feature.label} className="flex items-center gap-2.5">
+                            <div className="w-5 h-5 rounded-full bg-emerald-50 flex items-center justify-center shrink-0">
+                              <Check className="w-3 h-3 text-emerald-600" strokeWidth={3} />
+                            </div>
+                            <span className="text-[13px] font-medium text-gray-700">{feature.label}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Upgrade CTA */}
+                    <Link
+                      href="/pricing"
+                      className="inline-flex items-center justify-center gap-2 px-6 py-3 text-[13px] font-semibold text-white rounded-xl bg-gradient-to-b from-amber-500 to-orange-600 hover:from-amber-400 hover:to-orange-500 shadow-md shadow-amber-500/20 hover:shadow-lg hover:shadow-amber-500/30 transition-all active:scale-[0.97] shrink-0 w-full sm:w-auto"
+                    >
+                      <Crown className="w-4 h-4" />
+                      Upgrade to Pro
+                    </Link>
+                  </div>
+
+                  {/* Pro features preview */}
+                  <div className="mt-5 pt-5 border-t border-gray-100/60">
+                    <p className="text-[11px] font-semibold uppercase tracking-wider text-gray-400 mb-3">
+                      Pro features you&apos;ll unlock
+                    </p>
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+                      {[
+                        { icon: Zap, label: 'Priority speed', desc: 'Faster AI responses' },
+                        { icon: Bookmark, label: 'Saved history', desc: 'Unlimited bookmarks' },
+                        { icon: Sparkles, label: 'Advanced clarification', desc: 'Smarter follow-ups' },
+                      ].map((pro) => {
+                        const ProIcon = pro.icon
+                        return (
+                          <div
+                            key={pro.label}
+                            className="flex items-center gap-2.5 px-3 py-2.5 rounded-lg bg-gray-50/60 border border-gray-100/40 opacity-60"
+                          >
+                            <ProIcon className="w-4 h-4 text-gray-400 shrink-0" />
+                            <div>
+                              <p className="text-[12px] font-semibold text-gray-500">{pro.label}</p>
+                              <p className="text-[10px] text-gray-400">{pro.desc}</p>
+                            </div>
+                          </div>
+                        )
+                      })}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </motion.section>
+
           {/* ═══════════ DANGER ZONE ═══════════ */}
           <motion.section
             initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.4, ease: [0.25, 0.46, 0.45, 0.94] }}
+            transition={{ duration: 0.6, delay: 0.48, ease: [0.25, 0.46, 0.45, 0.94] }}
             className="mb-8"
           >
             <div className="rounded-2xl border-2 border-red-200/60 bg-red-50/30 backdrop-blur-sm p-6 sm:p-8 relative overflow-hidden">
