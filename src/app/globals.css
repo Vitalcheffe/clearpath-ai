@@ -830,3 +830,37 @@ html {
   background-size: 400% 400%;
   animation: mesh-gradient-shift 20s ease-in-out infinite;
 }
+
+/* ═══ Landing Page Animations ═══ */
+@keyframes hero-float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+
+.hero-float {
+  animation: hero-float 6s ease-in-out infinite;
+}
+
+@keyframes gradient-text {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+.gradient-text-animate {
+  background-size: 200% 200%;
+  animation: gradient-text 4s ease-in-out infinite;
+}
+
+@keyframes fade-in-up {
+  0% { opacity: 0; transform: translateY(20px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+/* ═══ Comparison Column ═══ */
+.comparison-negative {
+  background: linear-gradient(135deg, rgba(239,68,68,0.03), rgba(255,255,255,0.8));
+}
+
+.comparison-positive {
+  background: linear-gradient(135deg, rgba(16,185,129,0.03), rgba(255,255,255,0.8));
+}
