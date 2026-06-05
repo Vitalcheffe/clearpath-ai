@@ -658,6 +658,8 @@ export default function LandingPage() {
                 <Link href="/#how-it-works" className="block text-[14px] text-gray-400 hover:text-white transition-colors">How It Works</Link>
                 <Link href="/app" className="block text-[14px] text-gray-400 hover:text-white transition-colors">Demo</Link>
                 <Link href="/#scenarios" className="block text-[14px] text-gray-400 hover:text-white transition-colors">Scenarios</Link>
+                <Link href="/pricing" className="block text-[14px] text-gray-400 hover:text-white transition-colors">Pricing</Link>
+                <Link href="/dashboard" className="block text-[14px] text-gray-400 hover:text-white transition-colors">Dashboard</Link>
               </nav>
             </div>
 
@@ -666,8 +668,8 @@ export default function LandingPage() {
               <h4 className="text-[12px] font-bold uppercase tracking-wider text-gray-400">Company</h4>
               <nav className="space-y-3">
                 <Link href="/about" className="block text-[14px] text-gray-400 hover:text-white transition-colors">About</Link>
-                <span className="block text-[14px] text-gray-400 hover:text-white transition-colors cursor-default">Responsible AI</span>
-                <span className="block text-[14px] text-gray-400 hover:text-white transition-colors cursor-default">Team</span>
+                <Link href="/responsible-ai" className="block text-[14px] text-gray-400 hover:text-white transition-colors">Responsible AI</Link>
+                <Link href="/about" className="block text-[14px] text-gray-400 hover:text-white transition-colors">Team</Link>
               </nav>
             </div>
 
@@ -675,8 +677,8 @@ export default function LandingPage() {
             <div className="space-y-4">
               <h4 className="text-[12px] font-bold uppercase tracking-wider text-gray-400">Legal</h4>
               <nav className="space-y-3">
-                <span className="block text-[14px] text-gray-600 cursor-default">Privacy <span className="text-[10px] text-gray-700 bg-gray-800 px-1.5 py-0.5 rounded-md ml-1">Coming soon</span></span>
-                <span className="block text-[14px] text-gray-600 cursor-default">Terms <span className="text-[10px] text-gray-700 bg-gray-800 px-1.5 py-0.5 rounded-md ml-1">Coming soon</span></span>
+                <Link href="/privacy" className="block text-[14px] text-gray-400 hover:text-white transition-colors">Privacy Policy</Link>
+                <Link href="/terms" className="block text-[14px] text-gray-400 hover:text-white transition-colors">Terms of Service</Link>
               </nav>
             </div>
           </div>
