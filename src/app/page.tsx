@@ -34,6 +34,8 @@ import {
   Info,
   PanelLeftClose,
   PanelLeft,
+  Play,
+  HomeIcon,
 } from 'lucide-react'
 
 // ─── TYPES ───────────────────────────────────────────────
@@ -980,6 +982,198 @@ function FloatingParticles() {
   )
 }
 
+// ─── HOW IT WORKS MODAL ───────────────────────────────────
+function HowItWorksModal({ onClose }: { onClose: () => void }) {
+  const layers = [
+    { step: 1, name: 'Free Text Input', description: 'You describe your situation in your own words. No categories, no forms, no keywords. Just tell us what you need.', color: '#3b82f6', bg: 'rgba(59,130,246,0.08)' },
+    { step: 2, name: 'Hardcoded Crisis Detection', description: 'Before any AI runs, we check for crisis keywords (suicide, self-harm, abuse). If detected, AI is bypassed entirely and you get immediate crisis resources. Zero AI hallucination risk.', color: '#ef4444', bg: 'rgba(239,68,68,0.08)' },
+    { step: 3, name: 'Multi-Label Classification', description: 'BART-large-MNLI zero-shot model classifies your text against 8 service categories simultaneously. Returns a percentage score for each — no hallucinated resources, only verified ones.', color: '#6366f1', bg: 'rgba(99,102,241,0.08)' },
+    { step: 4, name: 'Confidence-Gated Clarification', description: 'If the top score is below 70%, we ask a clarification question instead of guessing. This is active learning — your answer refines the classification. One question can boost confidence by 30-40%.', color: '#f59e0b', bg: 'rgba(245,158,11,0.08)' },
+    { step: 5, name: 'Transparent Display', description: 'Every result shows WHY it was matched, WHAT ELSE was considered, and HOW CONFIDENT we are. You see the reasoning, not just the answer.', color: '#10b981', bg: 'rgba(16,185,129,0.08)' },
+    { step: 6, name: 'Human Escalation', description: 'Talk to a Navigator is always one click away. Connect to 211.org human navigators who can verify eligibility and walk you through applications in real time.', color: '#3b82f6', bg: 'rgba(59,130,246,0.08)' },
+  ]
+
+  return (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.2 }}
+      className="fixed inset-0 z-50 flex items-center justify-center p-4"
+      onClick={onClose}
+    >
+      <div className="absolute inset-0 bg-black/50 backdrop-blur-sm modal-overlay-animate" />
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95, y: 10 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        exit={{ opacity: 0, scale: 0.95, y: 10 }}
+        transition={{ type: 'spring', stiffness: 400, damping: 25, delay: 0.05 }}
+        className="relative bg-white rounded-3xl max-w-[560px] w-full max-h-[85vh] overflow-y-auto shadow-premium-xl"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Close button */}
+        <button
+          onClick={onClose}
+          className="absolute top-4 right-4 w-8 h-8 rounded-xl flex items-center justify-center text-gray-400 hover:text-gray-600 hover:bg-gray-100/80 transition-all z-10"
+        >
+          <X className="w-4 h-4" />
+        </button>
+
+        <div className="p-8">
+          {/* Header */}
+          <div className="mb-8">
+            <h2 className="text-[24px] font-bold text-gray-900 tracking-tight leading-tight">How ClearPath AI Works</h2>
+            <p className="text-[14px] text-gray-400 mt-1.5 font-medium">6-Layer Architecture for Calibrated Transparency</p>
+          </div>
+
+          {/* Layers Timeline */}
+          <div className="space-y-0">
+            {layers.map((layer, i) => (
+              <div key={i} className={`flex gap-4 ${i < layers.length - 1 ? 'step-connector' : ''}`}>
+                <div className="shrink-0 flex flex-col items-center">
+                  <div
+                    className="w-8 h-8 rounded-full flex items-center justify-center text-[12px] font-bold text-white"
+                    style={{
+                      background: `linear-gradient(135deg, ${layer.color}, ${layer.color}dd)`,
+                      boxShadow: `0 2px 8px ${layer.color}30`,
+                    }}
+                  >
+                    {layer.step}
+                  </div>
+                </div>
+                <div className={`pb-6 flex-1 min-w-0 ${i < layers.length - 1 ? '' : 'pb-0'}`}>
+                  <h3 className="text-[15px] font-semibold text-gray-900 leading-tight">{layer.name}</h3>
+                  <p className="text-[13px] text-gray-500 leading-relaxed mt-1">{layer.description}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Footer */}
+          <div className="mt-8 pt-6 border-t border-gray-100/60">
+            <button
+              onClick={onClose}
+              className="w-full flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-gradient-to-r from-gray-900 to-gray-800 text-white text-[14px] font-semibold hover:from-gray-800 hover:to-gray-700 transition-all shadow-md shadow-gray-900/15 active:scale-[0.98]"
+            >
+              Try it yourself
+              <ArrowRight className="w-4 h-4" />
+            </button>
+          </div>
+        </div>
+      </motion.div>
+    </motion.div>
+  )
+}
+
+// ─── DEMO SCENARIOS MODAL ─────────────────────────────────
+function DemoScenariosModal({ onClose, onSelectScenario }: {
+  onClose: () => void
+  onSelectScenario: (id: string, label: string) => void
+}) {
+  const scenarios = [
+    {
+      id: 'job',
+      label: "I lost my job and can't pay rent. My kids need food.",
+      title: 'Multi-Need Classification',
+      description: 'Shows multi-label classification with calibrated confidence scores',
+      color: '#3b82f6',
+      bg: 'rgba(59,130,246,0.06)',
+      icon: <Layers className="w-5 h-5" />,
+    },
+    {
+      id: 'crisis',
+      label: "I can't take this anymore. I want it all to end.",
+      title: 'Crisis Detection',
+      description: 'Shows hardcoded crisis detection bypassing AI classification',
+      color: '#ef4444',
+      bg: 'rgba(239,68,68,0.06)',
+      icon: <Shield className="w-5 h-5" />,
+    },
+    {
+      id: 'stress',
+      label: 'I need help with my situation',
+      title: 'Low Confidence → Clarification',
+      description: 'Shows confidence-gated clarification with active learning',
+      color: '#f59e0b',
+      bg: 'rgba(245,158,11,0.06)',
+      icon: <HelpCircle className="w-5 h-5" />,
+    },
+  ]
+
+  return (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.2 }}
+      className="fixed inset-0 z-50 flex items-center justify-center p-4"
+      onClick={onClose}
+    >
+      <div className="absolute inset-0 bg-black/50 backdrop-blur-sm modal-overlay-animate" />
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95, y: 10 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        exit={{ opacity: 0, scale: 0.95, y: 10 }}
+        transition={{ type: 'spring', stiffness: 400, damping: 25, delay: 0.05 }}
+        className="relative bg-white rounded-3xl max-w-[560px] w-full max-h-[85vh] overflow-y-auto shadow-premium-xl"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Close button */}
+        <button
+          onClick={onClose}
+          className="absolute top-4 right-4 w-8 h-8 rounded-xl flex items-center justify-center text-gray-400 hover:text-gray-600 hover:bg-gray-100/80 transition-all z-10"
+        >
+          <X className="w-4 h-4" />
+        </button>
+
+        <div className="p-8">
+          {/* Header */}
+          <div className="mb-8">
+            <h2 className="text-[24px] font-bold text-gray-900 tracking-tight leading-tight">Demo Scenarios</h2>
+            <p className="text-[14px] text-gray-400 mt-1.5 font-medium">Explore how ClearPath AI handles different situations</p>
+          </div>
+
+          {/* Scenario Cards */}
+          <div className="space-y-3">
+            {scenarios.map((scenario, i) => (
+              <motion.button
+                key={i}
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.1 + i * 0.07, type: 'spring', stiffness: 400, damping: 28 }}
+                onClick={() => onSelectScenario(scenario.id, scenario.label)}
+                className="w-full text-left glass-card rounded-2xl p-5 border border-gray-100/40 group relative overflow-hidden gradient-border-hover"
+                style={{
+                  boxShadow: `0 2px 8px rgba(0,0,0,0.02), 0 4px 16px ${scenario.bg}`,
+                }}
+              >
+                <div className="flex items-start gap-4">
+                  <div
+                    className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 transition-transform duration-200 group-hover:scale-110"
+                    style={{
+                      backgroundColor: scenario.bg,
+                      color: scenario.color,
+                      boxShadow: `0 2px 8px ${scenario.color}15`,
+                    }}
+                  >
+                    {scenario.icon}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <h3 className="text-[14px] font-semibold text-gray-900 leading-tight">{scenario.title}</h3>
+                    <p className="text-[13px] text-gray-700 mt-1 font-medium leading-relaxed">&ldquo;{scenario.label}&rdquo;</p>
+                    <p className="text-[12px] text-gray-400 mt-1.5">{scenario.description}</p>
+                  </div>
+                  <ArrowRight className="w-4 h-4 text-gray-300 group-hover:text-gray-500 group-hover:translate-x-0.5 transition-all shrink-0 mt-1" />
+                </div>
+              </motion.button>
+            ))}
+          </div>
+        </div>
+      </motion.div>
+    </motion.div>
+  )
+}
+
 // ─── SIDEBAR ──────────────────────────────────────────────
 function Sidebar({
   isOpen,
@@ -987,12 +1181,20 @@ function Sidebar({
   activeConversationId,
   onConversationSelect,
   onNewSearch,
+  onNavHowItWorks,
+  onNavDemoScenarios,
+  onNavHome,
+  activeNav,
 }: {
   isOpen: boolean
   onToggle: () => void
   activeConversationId: string | null
   onConversationSelect: (conv: ConversationHistory) => void
   onNewSearch: () => void
+  onNavHowItWorks: () => void
+  onNavDemoScenarios: () => void
+  onNavHome: () => void
+  activeNav: 'home' | 'how-it-works' | 'demo-scenarios' | null
 }) {
   return (
     <>
@@ -1058,6 +1260,54 @@ function Sidebar({
             </motion.button>
           </div>
 
+          {/* Navigation Section */}
+          <div className="shrink-0 px-3 pb-2">
+            <div className="space-y-0.5">
+              <button
+                onClick={onNavHome}
+                className={`w-full text-left px-3 py-2 rounded-lg transition-all duration-200 group sidebar-item-hover flex items-center gap-2.5 text-[13px] font-medium ${
+                  activeNav === 'home'
+                    ? 'sidebar-item-active text-white'
+                    : 'text-gray-400 hover:text-white'
+                }`}
+              >
+                <HomeIcon className="w-4 h-4 shrink-0" />
+                Home
+                {activeNav === 'home' && (
+                  <span className="ml-auto w-1.5 h-1.5 rounded-full bg-emerald-400 nav-active-indicator" />
+                )}
+              </button>
+              <button
+                onClick={onNavHowItWorks}
+                className={`w-full text-left px-3 py-2 rounded-lg transition-all duration-200 group sidebar-item-hover flex items-center gap-2.5 text-[13px] font-medium ${
+                  activeNav === 'how-it-works'
+                    ? 'sidebar-item-active text-white'
+                    : 'text-gray-400 hover:text-white'
+                }`}
+              >
+                <Layers className="w-4 h-4 shrink-0" />
+                How It Works
+                {activeNav === 'how-it-works' && (
+                  <span className="ml-auto w-1.5 h-1.5 rounded-full bg-emerald-400 nav-active-indicator" />
+                )}
+              </button>
+              <button
+                onClick={onNavDemoScenarios}
+                className={`w-full text-left px-3 py-2 rounded-lg transition-all duration-200 group sidebar-item-hover flex items-center gap-2.5 text-[13px] font-medium ${
+                  activeNav === 'demo-scenarios'
+                    ? 'sidebar-item-active text-white'
+                    : 'text-gray-400 hover:text-white'
+                }`}
+              >
+                <Play className="w-4 h-4 shrink-0" />
+                Demo Scenarios
+                {activeNav === 'demo-scenarios' && (
+                  <span className="ml-auto w-1.5 h-1.5 rounded-full bg-emerald-400 nav-active-indicator" />
+                )}
+              </button>
+            </div>
+          </div>
+
           {/* Conversation List */}
           <div className="flex-1 overflow-y-auto sidebar-scrollbar px-3 pb-3">
             {/* Today */}
@@ -1067,31 +1317,32 @@ function Sidebar({
                 <span className="text-[11px] font-semibold text-gray-500 uppercase tracking-wider">Today</span>
               </div>
               <div className="space-y-0.5">
-                {todayConversations.map((conv) => (
-                  <motion.button
-                    key={conv.id}
-                    onClick={() => onConversationSelect(conv)}
-                    whileHover={{ x: 2 }}
-                    className={`w-full text-left px-3 py-2.5 rounded-lg transition-all duration-200 group sidebar-item-hover ${
-                      activeConversationId === conv.id
-                        ? 'sidebar-item-active'
-                        : ''
-                    }`}
-                  >
-                    <div className="flex items-center gap-2.5">
-                      <MessageSquare className={`w-3.5 h-3.5 shrink-0 ${
-                        activeConversationId === conv.id ? 'text-emerald-400' : 'text-gray-600 group-hover:text-gray-400'
-                      }`} />
-                      <div className="min-w-0 flex-1">
-                        <p className={`text-[13px] font-medium truncate ${
-                          activeConversationId === conv.id ? 'text-white' : 'text-gray-300 group-hover:text-white'
-                        }`}>{conv.title}</p>
-                        <p className="text-[11px] text-gray-600 truncate mt-0.5">{conv.preview}</p>
+                {todayConversations.map((conv) => {
+                  const confDot = conv.starterId === 'crisis' ? 'bg-red-500' : conv.starterId === 'stress' ? 'bg-amber-500' : 'bg-emerald-500'
+                  return (
+                    <motion.button
+                      key={conv.id}
+                      onClick={() => onConversationSelect(conv)}
+                      whileHover={{ x: 2 }}
+                      className={`w-full text-left px-3 py-2.5 rounded-lg transition-all duration-200 group sidebar-item-hover ${
+                        activeConversationId === conv.id
+                          ? 'sidebar-item-active'
+                          : ''
+                      }`}
+                    >
+                      <div className="flex items-center gap-2.5">
+                        <span className={`w-2 h-2 rounded-full shrink-0 ${confDot}`} />
+                        <div className="min-w-0 flex-1">
+                          <p className={`text-[13px] font-medium truncate ${
+                            activeConversationId === conv.id ? 'text-white' : 'text-gray-300 group-hover:text-white'
+                          }`}>{conv.title}</p>
+                          <p className="text-[11px] text-gray-600 truncate mt-0.5">{conv.preview}</p>
+                        </div>
+                        <span className="text-[10px] text-gray-600 shrink-0">{conv.timestamp}</span>
                       </div>
-                      <span className="text-[10px] text-gray-600 shrink-0">{conv.timestamp}</span>
-                    </div>
-                  </motion.button>
-                ))}
+                    </motion.button>
+                  )
+                })}
               </div>
             </div>
 
@@ -1102,31 +1353,32 @@ function Sidebar({
                 <span className="text-[11px] font-semibold text-gray-500 uppercase tracking-wider">Previous</span>
               </div>
               <div className="space-y-0.5">
-                {previousConversations.map((conv) => (
-                  <motion.button
-                    key={conv.id}
-                    onClick={() => onConversationSelect(conv)}
-                    whileHover={{ x: 2 }}
-                    className={`w-full text-left px-3 py-2.5 rounded-lg transition-all duration-200 group sidebar-item-hover ${
-                      activeConversationId === conv.id
-                        ? 'sidebar-item-active'
-                        : ''
-                    }`}
-                  >
-                    <div className="flex items-center gap-2.5">
-                      <MessageSquare className={`w-3.5 h-3.5 shrink-0 ${
-                        activeConversationId === conv.id ? 'text-emerald-400' : 'text-gray-600 group-hover:text-gray-400'
-                      }`} />
-                      <div className="min-w-0 flex-1">
-                        <p className={`text-[13px] font-medium truncate ${
-                          activeConversationId === conv.id ? 'text-white' : 'text-gray-300 group-hover:text-white'
-                        }`}>{conv.title}</p>
-                        <p className="text-[11px] text-gray-600 truncate mt-0.5">{conv.preview}</p>
+                {previousConversations.map((conv) => {
+                  const confDot = conv.starterId === 'crisis' ? 'bg-red-500' : conv.starterId === 'stress' ? 'bg-amber-500' : 'bg-emerald-500'
+                  return (
+                    <motion.button
+                      key={conv.id}
+                      onClick={() => onConversationSelect(conv)}
+                      whileHover={{ x: 2 }}
+                      className={`w-full text-left px-3 py-2.5 rounded-lg transition-all duration-200 group sidebar-item-hover ${
+                        activeConversationId === conv.id
+                          ? 'sidebar-item-active'
+                          : ''
+                      }`}
+                    >
+                      <div className="flex items-center gap-2.5">
+                        <span className={`w-2 h-2 rounded-full shrink-0 ${confDot}`} />
+                        <div className="min-w-0 flex-1">
+                          <p className={`text-[13px] font-medium truncate ${
+                            activeConversationId === conv.id ? 'text-white' : 'text-gray-300 group-hover:text-white'
+                          }`}>{conv.title}</p>
+                          <p className="text-[11px] text-gray-600 truncate mt-0.5">{conv.preview}</p>
+                        </div>
+                        <span className="text-[10px] text-gray-600 shrink-0">{conv.timestamp}</span>
                       </div>
-                      <span className="text-[10px] text-gray-600 shrink-0">{conv.timestamp}</span>
-                    </div>
-                  </motion.button>
-                ))}
+                    </motion.button>
+                  )
+                })}
               </div>
             </div>
           </div>
@@ -1137,12 +1389,14 @@ function Sidebar({
               <Info className="w-3.5 h-3.5" />
               About ClearPath AI
             </button>
+            {/* Model Status Badge */}
             <div className="flex items-center justify-center mt-2">
-              <span className="inline-flex items-center gap-1.5 text-[10px] text-gray-600 font-semibold px-2.5 py-1 rounded-md bg-white/[0.04] border border-white/[0.06]">
-                <Layers className="w-2.5 h-2.5" />
-                6-Layer Pipeline
+              <span className="inline-flex items-center gap-1.5 text-[10px] text-gray-500 font-semibold px-2.5 py-1.5 rounded-md bg-white/[0.04] border border-white/[0.06]">
+                <span className="w-2 h-2 rounded-full bg-emerald-400 shadow-sm shadow-emerald-400/30" />
+                <span className="text-gray-400">BART-large-MNLI</span>
               </span>
             </div>
+            <p className="text-center text-[9px] text-gray-600 mt-1 font-medium">Zero-shot · Online</p>
           </div>
         </div>
       </motion.aside>
@@ -1173,6 +1427,9 @@ export default function Home() {
   const [headerScrolled, setHeaderScrolled] = useState(false)
   const [sidebarOpen, setSidebarOpen] = useState(true)
   const [activeConversationId, setActiveConversationId] = useState<string | null>(null)
+  const [showHowItWorks, setShowHowItWorks] = useState(false)
+  const [showDemoScenarios, setShowDemoScenarios] = useState(false)
+  const [activeNav, setActiveNav] = useState<'home' | 'how-it-works' | 'demo-scenarios' | null>(null)
 
   const scrollToBottom = useCallback(() => {
     setTimeout(() => {
@@ -1234,6 +1491,21 @@ export default function Home() {
     setActiveConversationId(null)
   }
 
+  const handleNavHome = () => {
+    reset()
+    setActiveNav(null)
+  }
+
+  const handleNavHowItWorks = () => {
+    setActiveNav('how-it-works')
+    setShowHowItWorks(true)
+  }
+
+  const handleNavDemoScenarios = () => {
+    setActiveNav('demo-scenarios')
+    setShowDemoScenarios(true)
+  }
+
   const handleConversationSelect = useCallback((conv: ConversationHistory) => {
     setActiveConversationId(conv.id)
     setMessages([])
@@ -1264,7 +1536,32 @@ export default function Home() {
         activeConversationId={activeConversationId}
         onConversationSelect={handleConversationSelect}
         onNewSearch={reset}
+        onNavHowItWorks={handleNavHowItWorks}
+        onNavDemoScenarios={handleNavDemoScenarios}
+        onNavHome={handleNavHome}
+        activeNav={activeNav}
       />
+
+      {/* How It Works Modal */}
+      <AnimatePresence>
+        {showHowItWorks && (
+          <HowItWorksModal onClose={() => { setShowHowItWorks(false); setActiveNav(null) }} />
+        )}
+      </AnimatePresence>
+
+      {/* Demo Scenarios Modal */}
+      <AnimatePresence>
+        {showDemoScenarios && (
+          <DemoScenariosModal
+            onClose={() => { setShowDemoScenarios(false); setActiveNav(null) }}
+            onSelectScenario={(id, label) => {
+              setShowDemoScenarios(false)
+              setActiveNav(null)
+              handleSelect(id, label)
+            }}
+          />
+        )}
+      </AnimatePresence>
 
       {/* ─── MAIN AREA ─── */}
       <div className="flex-1 flex flex-col min-w-0 relative">
@@ -1289,6 +1586,7 @@ export default function Home() {
               <Layers className="w-4 h-4 text-white" />
             </div>
             <span className="text-[15px] font-bold text-gray-900 tracking-tight">ClearPath AI</span>
+            <span className="text-[10px] font-semibold text-amber-600 bg-amber-50/80 px-2 py-0.5 rounded-md border border-amber-200/40 ml-1">DEMO</span>
             <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shadow-sm shadow-emerald-500/30" />
           </div>
           <div className="flex items-center gap-2">
@@ -1581,7 +1879,7 @@ export default function Home() {
           </div>
           <p className="text-[11px] text-gray-300 text-center mt-2.5 flex items-center justify-center gap-2 font-medium">
             <span className="inline-block w-1.5 h-1.5 rounded-full bg-emerald-400 shadow-sm shadow-emerald-400/30" />
-            ClearPath AI — Verified resources · Calibrated confidence
+            ClearPath AI · Demo Mode — Verified resources · Calibrated confidence · BART-large-MNLI
           </p>
         </div>
       </div>
