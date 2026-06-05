@@ -26,6 +26,14 @@ import {
   Zap,
   Activity,
   Scan,
+  Menu,
+  X,
+  Plus,
+  MessageSquare,
+  Clock,
+  Info,
+  PanelLeftClose,
+  PanelLeft,
 } from 'lucide-react'
 
 // ─── TYPES ───────────────────────────────────────────────
@@ -273,6 +281,29 @@ const starters = [
   { id: 'stress', label: 'Low Confidence', description: 'I need help with my situation', icon: 'help' },
   { id: 'senior', label: 'Senior', description: "I'm 78 and need help getting groceries delivered", icon: 'heart' },
   { id: 'veteran', label: 'Complex', description: "I'm a veteran dealing with PTSD and housing issues", icon: 'star' }
+]
+
+// ─── CONVERSATION HISTORY ─────────────────────────────────
+interface ConversationHistory {
+  id: string
+  title: string
+  preview: string
+  timestamp: string
+  starterId: string
+}
+
+const todayConversations: ConversationHistory[] = [
+  { id: 'conv-job', title: 'Job loss and rent help', preview: "I lost my job and can't pay rent...", timestamp: '2 min ago', starterId: 'job' },
+  { id: 'conv-crisis', title: 'Crisis support needed', preview: "I can't take this anymore...", timestamp: '18 min ago', starterId: 'crisis' },
+  { id: 'conv-stress', title: 'Housing clarification', preview: 'I need help with my situation', timestamp: '45 min ago', starterId: 'stress' },
+  { id: 'conv-senior', title: 'Senior grocery delivery', preview: "I'm 78 and need help...", timestamp: '1 hr ago', starterId: 'senior' },
+  { id: 'conv-veteran', title: 'Veteran PTSD support', preview: "I'm a veteran dealing with...", timestamp: '3 hr ago', starterId: 'veteran' },
+]
+
+const previousConversations: ConversationHistory[] = [
+  { id: 'conv-job-snap', title: 'SNAP eligibility check', preview: 'Do I qualify for SNAP?', timestamp: 'Yesterday', starterId: 'job-snap' },
+  { id: 'conv-vet-housing', title: 'Emergency housing tonight', preview: 'I need emergency housing...', timestamp: 'Yesterday', starterId: 'veteran-housing' },
+  { id: 'conv-stress-emot', title: 'Mental health resources', preview: "It's about my emotions...", timestamp: '2 days ago', starterId: 'stress-emotions' },
 ]
 
 // ─── UTILITIES ───────────────────────────────────────────
@@ -949,6 +980,176 @@ function FloatingParticles() {
   )
 }
 
+// ─── SIDEBAR ──────────────────────────────────────────────
+function Sidebar({
+  isOpen,
+  onToggle,
+  activeConversationId,
+  onConversationSelect,
+  onNewSearch,
+}: {
+  isOpen: boolean
+  onToggle: () => void
+  activeConversationId: string | null
+  onConversationSelect: (conv: ConversationHistory) => void
+  onNewSearch: () => void
+}) {
+  return (
+    <>
+      {/* Mobile overlay */}
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="fixed inset-0 bg-black/40 backdrop-blur-sm z-30 md:hidden"
+            onClick={onToggle}
+          />
+        )}
+      </AnimatePresence>
+
+      {/* Sidebar */}
+      <motion.aside
+        initial={false}
+        animate={{
+          width: isOpen ? 280 : 0,
+          minWidth: isOpen ? 280 : 0,
+        }}
+        transition={{ type: 'spring', stiffness: 400, damping: 35 }}
+        className={`sidebar-dark sidebar-transition flex-shrink-0 overflow-hidden relative z-40 ${
+          isOpen ? '' : 'pointer-events-none'
+        } md:relative md:z-auto fixed md:static inset-y-0 left-0`}
+        style={{
+          boxShadow: isOpen ? '4px 0 24px rgba(0,0,0,0.15)' : 'none',
+        }}
+      >
+        <div className="w-[280px] h-full flex flex-col">
+          {/* Header */}
+          <div className="shrink-0 px-4 pt-4 pb-3">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-gray-700 to-gray-800 flex items-center justify-center shadow-lg shadow-black/20">
+                  <Layers className="w-4 h-4 text-white" />
+                </div>
+                <span className="text-[14px] font-bold text-white tracking-tight">ClearPath AI</span>
+              </div>
+              <button
+                onClick={onToggle}
+                className="w-8 h-8 rounded-lg flex items-center justify-center text-gray-400 hover:text-white hover:bg-white/10 transition-all duration-200"
+              >
+                <PanelLeftClose className="w-4 h-4" />
+              </button>
+            </div>
+
+            {/* New Search button */}
+            <motion.button
+              whileHover={{ scale: 1.01 }}
+              whileTap={{ scale: 0.98 }}
+              onClick={onNewSearch}
+              className="w-full flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl border border-white/10 text-white/80 hover:text-white hover:bg-white/[0.06] transition-all duration-200 text-[13px] font-medium sidebar-new-btn"
+              style={{
+                background: 'rgba(255,255,255,0.04)',
+              }}
+            >
+              <Plus className="w-4 h-4" />
+              New Search
+            </motion.button>
+          </div>
+
+          {/* Conversation List */}
+          <div className="flex-1 overflow-y-auto sidebar-scrollbar px-3 pb-3">
+            {/* Today */}
+            <div className="mb-4">
+              <div className="flex items-center gap-2 px-2 mb-2">
+                <Clock className="w-3 h-3 text-gray-500" />
+                <span className="text-[11px] font-semibold text-gray-500 uppercase tracking-wider">Today</span>
+              </div>
+              <div className="space-y-0.5">
+                {todayConversations.map((conv) => (
+                  <motion.button
+                    key={conv.id}
+                    onClick={() => onConversationSelect(conv)}
+                    whileHover={{ x: 2 }}
+                    className={`w-full text-left px-3 py-2.5 rounded-lg transition-all duration-200 group sidebar-item-hover ${
+                      activeConversationId === conv.id
+                        ? 'sidebar-item-active'
+                        : ''
+                    }`}
+                  >
+                    <div className="flex items-center gap-2.5">
+                      <MessageSquare className={`w-3.5 h-3.5 shrink-0 ${
+                        activeConversationId === conv.id ? 'text-emerald-400' : 'text-gray-600 group-hover:text-gray-400'
+                      }`} />
+                      <div className="min-w-0 flex-1">
+                        <p className={`text-[13px] font-medium truncate ${
+                          activeConversationId === conv.id ? 'text-white' : 'text-gray-300 group-hover:text-white'
+                        }`}>{conv.title}</p>
+                        <p className="text-[11px] text-gray-600 truncate mt-0.5">{conv.preview}</p>
+                      </div>
+                      <span className="text-[10px] text-gray-600 shrink-0">{conv.timestamp}</span>
+                    </div>
+                  </motion.button>
+                ))}
+              </div>
+            </div>
+
+            {/* Previous */}
+            <div className="mb-4">
+              <div className="flex items-center gap-2 px-2 mb-2">
+                <Clock className="w-3 h-3 text-gray-500" />
+                <span className="text-[11px] font-semibold text-gray-500 uppercase tracking-wider">Previous</span>
+              </div>
+              <div className="space-y-0.5">
+                {previousConversations.map((conv) => (
+                  <motion.button
+                    key={conv.id}
+                    onClick={() => onConversationSelect(conv)}
+                    whileHover={{ x: 2 }}
+                    className={`w-full text-left px-3 py-2.5 rounded-lg transition-all duration-200 group sidebar-item-hover ${
+                      activeConversationId === conv.id
+                        ? 'sidebar-item-active'
+                        : ''
+                    }`}
+                  >
+                    <div className="flex items-center gap-2.5">
+                      <MessageSquare className={`w-3.5 h-3.5 shrink-0 ${
+                        activeConversationId === conv.id ? 'text-emerald-400' : 'text-gray-600 group-hover:text-gray-400'
+                      }`} />
+                      <div className="min-w-0 flex-1">
+                        <p className={`text-[13px] font-medium truncate ${
+                          activeConversationId === conv.id ? 'text-white' : 'text-gray-300 group-hover:text-white'
+                        }`}>{conv.title}</p>
+                        <p className="text-[11px] text-gray-600 truncate mt-0.5">{conv.preview}</p>
+                      </div>
+                      <span className="text-[10px] text-gray-600 shrink-0">{conv.timestamp}</span>
+                    </div>
+                  </motion.button>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Footer */}
+          <div className="shrink-0 px-4 py-3 border-t border-white/[0.06]">
+            <button className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-gray-500 hover:text-gray-300 hover:bg-white/[0.04] transition-all duration-200 text-[12px] font-medium">
+              <Info className="w-3.5 h-3.5" />
+              About ClearPath AI
+            </button>
+            <div className="flex items-center justify-center mt-2">
+              <span className="inline-flex items-center gap-1.5 text-[10px] text-gray-600 font-semibold px-2.5 py-1 rounded-md bg-white/[0.04] border border-white/[0.06]">
+                <Layers className="w-2.5 h-2.5" />
+                6-Layer Pipeline
+              </span>
+            </div>
+          </div>
+        </div>
+      </motion.aside>
+    </>
+  )
+}
+
 // ─── MAIN ─────────────────────────────────────────────────
 export default function Home() {
   const [messages, setMessages] = useState<Array<{
@@ -970,6 +1171,8 @@ export default function Home() {
   const [isTyping, setIsTyping] = useState(false)
   const chatRef = useRef<HTMLDivElement>(null)
   const [headerScrolled, setHeaderScrolled] = useState(false)
+  const [sidebarOpen, setSidebarOpen] = useState(true)
+  const [activeConversationId, setActiveConversationId] = useState<string | null>(null)
 
   const scrollToBottom = useCallback(() => {
     setTimeout(() => {
@@ -1028,25 +1231,60 @@ export default function Home() {
   const reset = () => {
     setMessages([])
     setSuggestions(starters)
+    setActiveConversationId(null)
   }
+
+  const handleConversationSelect = useCallback((conv: ConversationHistory) => {
+    setActiveConversationId(conv.id)
+    setMessages([])
+    setSuggestions([])
+    setIsTyping(false)
+    const step = chatSteps[conv.starterId]
+    if (step) {
+      handleSelect(conv.starterId, conv.starterId === 'job-snap' ? 'Do I qualify for SNAP?' : step.userText)
+    }
+    if (window.innerWidth < 768) {
+      setSidebarOpen(false)
+    }
+  }, [handleSelect])
 
   const hasMessages = messages.length > 0
 
   return (
-    <div className="h-screen flex flex-col overflow-hidden relative">
+    <div className="h-screen flex overflow-hidden relative">
       {/* Animated mesh gradient background */}
       <div className="absolute inset-0 mesh-gradient-bg" />
       {/* Noise texture overlay */}
       <div className="absolute inset-0 noise-overlay pointer-events-none" />
 
+      {/* ─── SIDEBAR ─── */}
+      <Sidebar
+        isOpen={sidebarOpen}
+        onToggle={() => setSidebarOpen(!sidebarOpen)}
+        activeConversationId={activeConversationId}
+        onConversationSelect={handleConversationSelect}
+        onNewSearch={reset}
+      />
+
+      {/* ─── MAIN AREA ─── */}
+      <div className="flex-1 flex flex-col min-w-0 relative">
       {/* ─── HEADER ─── */}
       <div
         className={`shrink-0 border-b z-10 transition-all duration-500 header-glass ${
           headerScrolled ? 'border-gray-200/40 shadow-[0_1px_12px_rgba(0,0,0,0.06)]' : 'border-gray-100/20'
         }`}
       >
-        <div className="max-w-[780px] mx-auto px-6 h-14 flex items-center justify-between">
+        <div className="max-w-[820px] mx-auto px-6 h-14 flex items-center justify-between">
           <div className="flex items-center gap-3">
+            {/* Sidebar toggle */}
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => setSidebarOpen(!sidebarOpen)}
+              className="w-8 h-8 rounded-lg flex items-center justify-center hover:bg-gray-100/80 transition-colors text-gray-400 hover:text-gray-600"
+            >
+              {sidebarOpen ? <PanelLeftClose className="w-4 h-4" /> : <PanelLeft className="w-4 h-4" />}
+            </motion.button>
             <div className="w-8 h-8 rounded-xl ai-avatar-orb flex items-center justify-center shadow-md shadow-gray-900/15">
               <Layers className="w-4 h-4 text-white" />
             </div>
@@ -1071,7 +1309,7 @@ export default function Home() {
 
       {/* ─── CHAT AREA ─── */}
       <div ref={chatRef} className="flex-1 overflow-y-auto scroll-smooth relative">
-        <div className="max-w-[780px] mx-auto px-6 relative">
+        <div className="max-w-[820px] mx-auto px-6 relative">
 
           {/* Empty state — Premium Welcome */}
           <AnimatePresence mode="wait">
@@ -1328,7 +1566,7 @@ export default function Home() {
 
       {/* ─── INPUT BAR ─── */}
       <div className="shrink-0 border-t border-gray-100/40 relative z-10 input-bar-glass">
-        <div className="max-w-[780px] mx-auto px-6 py-3">
+        <div className="max-w-[820px] mx-auto px-6 py-3">
           <div className="flex items-center gap-3 glass-card rounded-2xl px-5 py-3.5 border border-gray-100/30 focus-within:border-gray-200/60 transition-all duration-300 relative overflow-hidden input-focus-ring">
             {/* Animated gradient border on focus */}
             <input
@@ -1347,6 +1585,7 @@ export default function Home() {
           </p>
         </div>
       </div>
+      </div>{/* end main area wrapper */}
     </div>
   )
 }
