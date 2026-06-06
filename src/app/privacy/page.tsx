@@ -26,6 +26,7 @@ import {
   UserCheck,
 } from 'lucide-react'
 import Navbar from '@/components/Navbar'
+import Footer from '@/components/Footer'
 
 const fadeInUp = {
   hidden: { opacity: 0, y: 20 },
@@ -1178,6 +1179,7 @@ export default function PrivacyPage() {
           </div>
         </div>
       </footer>
+      <Footer />
     </div>
   )
 }

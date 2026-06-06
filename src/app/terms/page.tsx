@@ -34,6 +34,7 @@ import {
   Lock,
 } from 'lucide-react'
 import Navbar from '@/components/Navbar'
+import Footer from '@/components/Footer'
 
 const fadeInUp = {
   hidden: { opacity: 0, y: 20 },
@@ -1173,6 +1174,7 @@ export default function TermsPage() {
           </div>
         </div>
       </footer>
+      <Footer />
     </div>
   )
 }

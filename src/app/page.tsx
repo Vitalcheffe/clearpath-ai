@@ -55,6 +55,7 @@ import {
   ExternalLink,
 } from 'lucide-react'
 import Navbar from '@/components/Navbar'
+import Footer from '@/components/Footer'
 
 // ─── CONFIDENCE RING (simplified for landing) ────────────
 function ConfidenceRing({ value, size = 56, strokeWidth = 3.5 }: { value: number; size?: number; strokeWidth?: number }) {
@@ -2345,6 +2346,7 @@ export default function LandingPage() {
           </div>
         </div>
       </footer>
+      <Footer />
     </div>
   )
 }

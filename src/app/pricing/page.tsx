@@ -47,6 +47,7 @@ import {
   Server,
 } from 'lucide-react'
 import Navbar from '@/components/Navbar'
+import Footer from '@/components/Footer'
 
 // ─── PRICING TIERS ───────────────────────────────────────
 const tiersBase = [
@@ -2063,6 +2064,7 @@ export default function PricingPage() {
           </div>
         </div>
       </footer>
+      <Footer />
     </div>
   )
 }

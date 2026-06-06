@@ -41,6 +41,7 @@ import {
   Calendar,
 } from 'lucide-react'
 import Navbar from '@/components/Navbar'
+import Footer from '@/components/Footer'
 
 // ─── ANIMATION VARIANTS ──────────────────────────────────
 const fadeInUp = {
@@ -2295,6 +2296,7 @@ export default function ResponsibleAIPage() {
           </div>
         </div>
       </footer>
+      <Footer />
     </div>
   )
 }
