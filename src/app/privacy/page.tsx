@@ -332,7 +332,7 @@ export default function PrivacyPage() {
                 </p>
                 <ul className="space-y-2.5">
                   {[
-                    'Guest sessions are processed in-memory and no data is written to persistent storage',
+                    'Guest sessions are processed in-memory with no persistent storage. Authenticated user data is encrypted and stored securely for cross-session access',
                     'For authenticated users, conversations are stored in an encrypted SQLite database to provide history and resource tracking',
                     'Guest session data is gone when you close the browser tab or navigate away',
                     'Account holders can access past conversations; guest sessions cannot be retrieved',
@@ -593,8 +593,8 @@ export default function PrivacyPage() {
                   {[
                     {
                       icon: Cpu,
-                      title: 'In-Memory Processing',
-                      desc: 'All data processed in RAM, never persisted to disk',
+                      title: 'In-Memory Guest Processing',
+                      desc: 'Guest data processed in RAM, never persisted to disk. Authenticated user data encrypted at rest',
                       color: '#10b981',
                     },
                     {

@@ -303,7 +303,7 @@ const comparisons = [
   { negative: 'Shows every answer with same confidence', positive: 'Calibrated confidence scores on every result' },
   { negative: 'No crisis detection protocol', positive: 'Hardcoded crisis layer bypasses AI entirely' },
   { negative: 'Can\'t connect you to a real person', positive: 'One-click escalation to 211 human navigators' },
-  { negative: 'Stores your conversations', positive: 'Nothing stored, ever' },
+  { negative: 'Stores your conversations', positive: 'Guest mode needs no account; data stays yours' },
   { negative: 'No way to verify source accuracy', positive: 'Every resource shows source and last-verified date' },
   { negative: 'Single-label classification only', positive: 'Multi-label detection for complex situations' },
   { negative: 'No accountability when wrong', positive: 'Confidence gating and human escalation at <70%' },
@@ -387,7 +387,7 @@ const faqs = [
   },
   {
     question: 'Is ClearPath AI HIPAA compliant?',
-    answer: 'ClearPath AI is designed with privacy-first architecture: zero data storage, no accounts, no PII collection. While we don\'t store health data (and therefore don\'t require HIPAA compliance), our architecture exceeds typical privacy standards. We can\'t breach what we don\'t store.',
+    answer: 'ClearPath AI is designed with a privacy-first architecture. Guest users can use the service without creating an account — no email, no profile, no PII required. For registered users, we store only the minimum data needed to provide the service (conversations, saved resources). We never sell or share personal data. While we don\'t store health data (and therefore don\'t require HIPAA compliance), our architecture prioritizes minimal data collection and user control.'
   },
   {
     question: 'How can organizations integrate ClearPath AI?',
@@ -584,22 +584,22 @@ const integrationPartners = [
 const securityFeatures = [
   {
     icon: Lock,
-    title: 'Zero Data Storage',
-    desc: 'Your conversations are processed in real-time and never written to disk. When you close the tab, your data ceases to exist.',
+    title: 'Privacy by Design',
+    desc: 'Guest users need no account — conversations are processed without storing personal data. Registered users control what gets saved and can delete everything anytime.',
     colorHex: '#3b82f6',
     bgColor: 'rgba(59,130,246,0.06)',
   },
   {
     icon: UserCheck,
-    title: 'No Account Required',
-    desc: 'Use ClearPath AI instantly. No sign-up, no email, no profile. Your privacy isn\'t a setting — it\'s the default.',
+    title: 'Optional Accounts',
+    desc: 'Use ClearPath AI instantly as a guest. No sign-up, no email, no profile required. Create an account only if you want to save conversations and resources.',
     colorHex: '#10b981',
     bgColor: 'rgba(16,185,129,0.06)',
   },
   {
     icon: Server,
-    title: 'In-Memory Processing',
-    desc: 'All classification happens in volatile memory. No database, no logs, no audit trails of personal information. You can\'t breach what doesn\'t exist.',
+    title: 'Minimal Data Collection',
+    desc: 'We collect only what\'s necessary to provide the service. No tracking pixels, no third-party analytics, no advertising. Your data is never sold or shared.',
     colorHex: '#8b5cf6',
     bgColor: 'rgba(139,92,246,0.06)',
   },
@@ -612,8 +612,8 @@ const securityFeatures = [
   },
   {
     icon: ShieldCheck,
-    title: 'COPPA Compliant',
-    desc: 'No personal information collected from anyone — including children. No accounts, no tracking, no behavioral data. Safe for all ages by design.',
+    title: 'COPPA Conscious',
+    desc: 'No personal information collected from guests — including children. Accounts are optional with minimal data. No tracking, no behavioral data. Privacy-first for all ages.',
     colorHex: '#f59e0b',
     bgColor: 'rgba(245,158,11,0.06)',
   },
@@ -831,7 +831,7 @@ export default function LandingPage() {
                 className="flex flex-wrap gap-6 pt-2"
               >
                 {[
-                  { text: 'No data stored', icon: Shield },
+                  { text: 'Privacy by design', icon: Shield },
                   { text: 'Crisis detection', icon: ShieldCheck },
                   { text: 'Human escalation', icon: Navigation },
                 ].map((item) => (
@@ -1093,8 +1093,9 @@ export default function LandingPage() {
             No matter who you are, ClearPath AI helps
           </motion.h2>
           <motion.p variants={staggerItem} className="text-lg text-gray-500 mt-4 max-w-2xl mx-auto">
-            Community resources shouldn&apos;t require a degree to find. Here&apos;s how real people use ClearPath AI every day.
+            Community resources shouldn&apos;t require a degree to find. Here&apos;s how people use ClearPath AI every day.
           </motion.p>
+          <motion.p variants={staggerItem} className="text-[12px] text-gray-400 mt-1 italic">(Illustrative scenarios)</motion.p>
         </motion.div>
 
         <motion.div
@@ -1861,7 +1862,7 @@ export default function LandingPage() {
                 <ShieldCheck className="w-6 h-6 text-white" />
               </div>
               <div>
-                <h3 className="text-[16px] font-bold text-gray-900 tracking-tight">Zero hallucinations. Zero data stored. Zero cost.</h3>
+                <h3 className="text-[16px] font-bold text-gray-900 tracking-tight">Zero hallucinations. Privacy by design. Zero cost.</h3>
                 <p className="text-[13px] text-gray-500 mt-0.5">Experience AI that tells the truth — even when the truth is &ldquo;I&apos;m not sure.&rdquo;</p>
               </div>
             </div>
@@ -1945,10 +1946,10 @@ export default function LandingPage() {
             <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 via-emerald-500 to-blue-500" />
             <div className="flex items-center justify-center gap-3 mb-4">
               <Lock className="w-6 h-6 text-blue-600" />
-              <h3 className="text-[18px] font-bold text-gray-900 tracking-tight">You can&apos;t breach what doesn&apos;t exist.</h3>
+              <h3 className="text-[18px] font-bold text-gray-900 tracking-tight">Privacy by design, not by afterthought.</h3>
             </div>
             <p className="text-[14px] text-gray-500 leading-relaxed max-w-xl mx-auto">
-              ClearPath AI was designed from the ground up with a zero-retention architecture. No database. No logs. No profiles. When you close the tab, your session is gone — permanently. This isn&apos;t a feature we added. It&apos;s how we built it from day one.
+              ClearPath AI was designed from the ground up with privacy-first architecture. Guest users need no account — sessions process in real-time with no persistence. For authenticated users, data is encrypted and fully controlled. Delete everything anytime. This isn&apos;t a feature we added. It&apos;s how we built it from day one.
             </p>
           </div>
         </motion.div>
@@ -2099,6 +2100,7 @@ export default function LandingPage() {
           <motion.h2 variants={staggerItem} className="text-3xl sm:text-4xl font-extrabold tracking-tight text-gray-900">
             Trusted by people on the front lines
           </motion.h2>
+          <motion.p variants={staggerItem} className="text-[12px] text-gray-400 mt-1 italic">(Illustrative — representing typical user experiences)</motion.p>
           <motion.p variants={staggerItem} className="text-lg text-gray-500 mt-4 max-w-2xl mx-auto">
             Social workers, navigators, counselors, and health professionals share their experience with ClearPath AI.
           </motion.p>
@@ -2218,13 +2220,13 @@ export default function LandingPage() {
             <div className="relative z-10 space-y-8">
               <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-[12px] font-semibold bg-white/10 text-white/80 border border-white/10 backdrop-blur-sm">
                 <Sparkles className="w-3 h-3" />
-                Free forever — No account required
+                Free forever — Optional accounts
               </div>
               <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-white leading-tight">
                 Ready to see honest AI in action?
               </h2>
               <p className="text-lg text-blue-200 max-w-2xl mx-auto">
-                Join thousands of people who have already found verified community resources through ClearPath AI. No sign-up, no data storage, no risk.
+                Join thousands of people who have already found verified community resources through ClearPath AI. Accounts are optional, privacy-first, no risk.
               </p>
               <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
                 <Link

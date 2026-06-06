@@ -447,7 +447,7 @@ export default function HistoryPage() {
                 </span>
               </div>
               <p className="text-[12px] text-gray-400 font-medium">
-                Built for USAII Global AI Hackathon 2026 &middot; No data stored, ever
+                Built for USAII Global AI Hackathon 2026 &middot; Privacy by design
               </p>
             </div>
           </div>
@@ -1291,7 +1291,7 @@ export default function HistoryPage() {
             </div>
             <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-violet-50/60 border border-violet-100/40">
               <Shield className="w-4 h-4 text-violet-600" />
-              <span className="text-[12px] font-semibold text-violet-700">No data stored</span>
+              <span className="text-[12px] font-semibold text-violet-700">Privacy by design</span>
             </div>
           </div>
         </motion.div>
@@ -1311,7 +1311,7 @@ export default function HistoryPage() {
               </span>
             </div>
             <p className="text-[12px] text-gray-400 font-medium">
-              Built for USAII Global AI Hackathon 2026 &middot; No data stored, ever
+              Built for USAII Global AI Hackathon 2026 &middot; Privacy by design
             </p>
           </div>
         </div>

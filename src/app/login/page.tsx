@@ -96,7 +96,7 @@ export default function LoginPage() {
     { icon: Shield, text: 'Crisis detection always active', color: 'bg-red-400/20' },
     { icon: Eye, text: 'Calibrated confidence scores', color: 'bg-blue-400/20' },
     { icon: Navigation, text: 'Human escalation at <70%', color: 'bg-amber-400/20' },
-    { icon: Lock, text: 'No data stored, ever', color: 'bg-emerald-400/20' },
+    { icon: Lock, text: 'Privacy by design', color: 'bg-emerald-400/20' },
     { icon: Heart, text: 'Community impact tracking', color: 'bg-pink-400/20' },
     { icon: Fingerprint, text: 'End-to-end encrypted sessions', color: 'bg-violet-400/20' },
   ]
@@ -231,7 +231,7 @@ export default function LoginPage() {
                 ))}
               </div>
               <p className="text-[13px] text-white/50 font-medium">
-                Trusted by <span className="text-white/80 font-semibold">50,000+</span> users
+                Trusted by <span className="text-white/80 font-semibold">community</span> navigators
               </p>
             </div>
           </motion.div>
@@ -621,9 +621,9 @@ export default function LoginPage() {
               <div className="grid grid-cols-2 gap-3">
                 {[
                   { icon: Lock, label: 'End-to-end encryption', color: 'text-blue-500 bg-blue-50' },
-                  { icon: ShieldCheck, label: 'Zero data storage', color: 'text-emerald-500 bg-emerald-50' },
+                  { icon: ShieldCheck, label: 'Privacy-first design', color: 'text-emerald-500 bg-emerald-50' },
                   { icon: Shield, label: 'Crisis detection always active', color: 'text-red-500 bg-red-50' },
-                  { icon: Heart, label: 'COPPA compliant', color: 'text-pink-500 bg-pink-50' },
+                  { icon: Heart, label: 'COPPA conscious', color: 'text-pink-500 bg-pink-50' },
                 ].map((badge, i) => (
                   <div key={i} className="flex items-center gap-2 px-3 py-2.5 rounded-xl bg-white/60 border border-gray-100/60">
                     <div className={`w-6 h-6 rounded-md ${badge.color} flex items-center justify-center shrink-0`}>
@@ -660,7 +660,7 @@ export default function LoginPage() {
             <div className="flex items-center justify-center gap-4 mt-6">
               <div className="flex items-center gap-1.5 text-[11px] text-gray-400 font-medium">
                 <ShieldCheck className="w-3.5 h-3.5 text-emerald-500" />
-                No data stored
+                Privacy by design
               </div>
               <div className="flex items-center gap-1.5 text-[11px] text-gray-400 font-medium">
                 <Lock className="w-3.5 h-3.5 text-blue-500" />

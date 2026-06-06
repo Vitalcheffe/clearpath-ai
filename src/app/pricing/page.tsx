@@ -734,7 +734,7 @@ export default function PricingPage() {
           >
             {[
               { icon: Shield, text: 'Crisis detection always on', color: '#ef4444' },
-              { icon: Lock, text: 'Zero data stored', color: '#3b82f6' },
+              { icon: Lock, text: 'Privacy by design', color: '#3b82f6' },
               { icon: BadgeCheck, text: 'No credit card required', color: '#10b981' },
               { icon: Heart, text: 'Free forever', color: '#f59e0b' },
             ].map((badge) => {
@@ -1911,8 +1911,8 @@ export default function PricingPage() {
               {[
                 {
                   icon: Lock,
-                  title: 'No data stored. Ever.',
-                  desc: 'Your conversations are processed in real-time and immediately discarded. Zero retention.',
+                  title: 'Privacy-first by design.',
+                  desc: 'Guest sessions process in real-time with no persistence. Accounts store conversations securely for cross-session access.',
                   color: '#3b82f6',
                   bg: 'rgba(59,130,246,0.06)',
                 },

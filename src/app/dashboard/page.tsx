@@ -2144,7 +2144,7 @@ export default function DashboardPage() {
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
               <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-50/60 border border-emerald-100/40">
                 <ShieldCheck className="w-4 h-4 text-emerald-600" />
-                <span className="text-[12px] font-semibold text-emerald-700">No data stored</span>
+                <span className="text-[12px] font-semibold text-emerald-700">Privacy by design</span>
               </div>
               <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-blue-50/60 border border-blue-100/40">
                 <Shield className="w-4 h-4 text-blue-600" />

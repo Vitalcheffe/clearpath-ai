@@ -2188,7 +2188,7 @@ export default function VerificationPage() {
                 {/* Trust indicators */}
                 <div className="flex flex-wrap items-center justify-center gap-6 mt-8">
                   {[
-                    { text: 'No data stored', icon: Lock },
+                    { text: 'Privacy by design', icon: Lock },
                     { text: 'Crisis detection', icon: ShieldCheck },
                     { text: 'Human escalation', icon: Navigation },
                     { text: '4-tier verification', icon: Layers },

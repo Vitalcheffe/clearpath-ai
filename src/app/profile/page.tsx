@@ -93,8 +93,8 @@ const connectedAccounts = [
     id: 'google',
     name: 'Google',
     icon: Globe2,
-    connected: true,
-    email: 'alex@gmail.com',
+    connected: false,
+    email: '',
     color: '#3b82f6',
     bgColor: 'rgba(59,130,246,0.06)',
   },
@@ -110,8 +110,7 @@ const connectedAccounts = [
 ]
 
 const activeSessions = [
-  { id: '1', device: 'Chrome on macOS', location: 'New York, US', time: 'Current session', current: true },
-  { id: '2', device: 'Safari on iPhone', location: 'New York, US', time: '2 hours ago', current: false },
+  { id: '1', device: 'Current browser', location: '', time: 'Active now', current: true },
 ]
 
 const planFeatures = [
@@ -532,8 +531,15 @@ export default function ProfilePage() {
     return 0
   })
 
-  // Privacy score calculation
-  const privacyScore = 85
+  // Privacy score — computed from actual settings
+  const privacyScore = Math.round(
+    (emailNotifications ? 0 : 15) +
+    (pushNotifications ? 0 : 10) +
+    (dataSharing ? 0 : 25) +
+    (accessLargeText || accessHighContrast ? 10 : 0) +
+    (twoFactor ? 20 : 0) +
+    20 // base score for having an account
+  )
 
   // Computed values from profile data
   const memberSince = profileData?.createdAt
@@ -1715,7 +1721,7 @@ export default function ProfilePage() {
               </span>
             </div>
             <p className="text-[12px] text-gray-400 font-medium">
-              Built for USAII Global AI Hackathon 2026 &middot; No data stored, ever
+              Built for USAII Global AI Hackathon 2026 &middot; Privacy by design
             </p>
           </div>
         </div>

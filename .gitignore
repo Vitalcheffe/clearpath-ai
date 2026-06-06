@@ -50,3 +50,6 @@ venv/
 
 # OS
 Thumbs.db
+
+# Uploads (user files, not part of the app)
+upload/

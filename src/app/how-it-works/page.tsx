@@ -539,12 +539,12 @@ const safetyGuardrails = [
   {
     title: 'Minimal Data Retention',
     subtitle: 'Privacy by default',
-    description: 'ClearPath AI processes queries in real-time and never stores them. No database, no logs, no audit trails of personal information. Session data exists only in volatile memory and is purged when the browser closes. No account is required to use the basic classification features. Users can optionally create accounts to save conversation history and access personalized features. The only data that leaves our system is the classification API call to Hugging Face, which processes text through their API. We recommend reviewing their privacy policy for details on their data handling. Users seeking help for domestic violence or substance abuse often do so from shared devices — they deserve absolute privacy by default.',
+    description: 'ClearPath AI processes guest queries in real-time without storing them. Guest session data exists only in volatile memory and is purged when the browser closes. Accounts are optional — users can create free accounts to save conversation history and access personalized features, with data stored securely and encrypted at rest. The only data that leaves our system is the classification API call to Hugging Face, which processes text through their API. We recommend reviewing their privacy policy for details on their data handling. Users seeking help for domestic violence or substance abuse often do so from shared devices — they deserve absolute privacy by default.',
     icon: Lock,
     color: '#8b5cf6',
     bgColor: 'rgba(139,92,246,0.06)',
     features: [
-      'In-memory processing — no database writes of any kind',
+      'Guest sessions are in-memory only; account data is encrypted at rest',
       'Session-only data — purged when browser tab closes',
       'Basic classification works without an account — create a free account to save your history',
       'No third-party analytics — no Google Analytics, no Facebook Pixel, no tracking cookies',
@@ -885,7 +885,7 @@ export default function HowItWorksPage() {
                   <span className="flex items-center gap-1.5"><Shield className="w-3.5 h-3.5 text-red-400" /> Crisis-safe</span>
                   <span className="flex items-center gap-1.5"><Eye className="w-3.5 h-3.5 text-emerald-400" /> Transparent</span>
                   <span className="flex items-center gap-1.5"><Users className="w-3.5 h-3.5 text-blue-400" /> Human-first</span>
-                  <span className="flex items-center gap-1.5"><Lock className="w-3.5 h-3.5 text-violet-400" /> Zero storage</span>
+                  <span className="flex items-center gap-1.5"><Lock className="w-3.5 h-3.5 text-violet-400" /> Privacy-first</span>
                 </div>
               </motion.div>
             </motion.div>
@@ -2105,7 +2105,7 @@ export default function HowItWorksPage() {
                 {/* Trust indicators */}
                 <div className="flex flex-wrap items-center justify-center gap-6 pt-6">
                   {[
-                    { text: 'No data stored', icon: Shield },
+                    { text: 'Privacy by design', icon: Shield },
                     { text: 'Crisis detection', icon: ShieldCheck },
                     { text: 'Human escalation', icon: Navigation },
                     { text: 'Zero hallucination', icon: Eye },

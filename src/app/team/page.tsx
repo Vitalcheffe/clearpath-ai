@@ -175,10 +175,10 @@ const coreTeam = [
   {
     name: 'David Okafor',
     role: 'Full-Stack Developer',
-    bio: 'David is the engineering backbone of ClearPath AI. With 6 years in full-stack development and a passion for accessibility, he built the entire Next.js frontend and API layer. His focus on performance ensures that every resource lookup feels instant — because people in crisis should not have to wait. He implemented our zero-data-storage API architecture and our mobile-first responsive design, ensuring the app works on any device, any connection speed.',
+    bio: 'David is the engineering backbone of ClearPath AI. With 6 years in full-stack development and a passion for accessibility, he built the entire Next.js frontend and API layer. His focus on performance ensures that every resource lookup feels instant — because people in crisis should not have to wait. He implemented our privacy-first API architecture and our mobile-first responsive design, ensuring the app works on any device, any connection speed.',
     expertise: ['Next.js 16', 'TypeScript', 'REST API Design', 'Accessibility (WCAG 2.1)', 'Performance Optimization'],
     skills: ['Next.js 16', 'TypeScript', 'REST API Design', 'Accessibility (WCAG 2.1)', 'Tailwind CSS'],
-    contributions: ['Built the glass-morphism UI from scratch', 'Designed the API architecture with zero data storage', 'Implemented responsive design for mobile-first access'],
+    contributions: ['Built the glass-morphism UI from scratch', 'Designed the API architecture with privacy-first data handling', 'Implemented responsive design for mobile-first access'],
     color: '#10b981',
     bgColor: 'rgba(16,185,129,0.06)',
     accentBg: 'rgba(16,185,129,0.1)',
@@ -207,10 +207,10 @@ const coreTeam = [
   {
     name: 'James Nakamura',
     role: 'DevOps & Infrastructure Engineer',
-    bio: 'James keeps ClearPath AI running at scale. With 7 years of experience in cloud infrastructure and a deep commitment to privacy-first architecture, he designed our deployment pipeline to ensure that no user data is ever written to persistent storage. His zero-retention infrastructure design means that when you close the tab, your data ceases to exist. He also built our monitoring and alerting systems that catch performance issues before they affect users.',
-    expertise: ['Cloud Infrastructure', 'Zero-Retention Architecture', 'CI/CD Pipelines', 'Kubernetes', 'Privacy Engineering'],
+    bio: 'James keeps ClearPath AI running at scale. With 7 years of experience in cloud infrastructure and a deep commitment to privacy-first architecture, he designed our deployment pipeline to ensure that guest sessions never persist data, while authenticated user data is encrypted at rest. His privacy-first infrastructure design means guests leave no trace when they close the tab. He also built our monitoring and alerting systems that catch performance issues before they affect users.',
+    expertise: ['Cloud Infrastructure', 'Privacy-First Architecture', 'CI/CD Pipelines', 'Kubernetes', 'Privacy Engineering'],
     skills: ['AWS/GCP', 'Kubernetes', 'Docker', 'Terraform', 'Privacy Engineering'],
-    contributions: ['Designed zero-retention infrastructure pipeline', 'Built automated deployment with no-downtime releases', 'Implemented real-time monitoring and alerting'],
+    contributions: ['Designed privacy-first infrastructure pipeline', 'Built automated deployment with no-downtime releases', 'Implemented real-time monitoring and alerting'],
     color: '#3b82f6',
     bgColor: 'rgba(59,130,246,0.06)',
     accentBg: 'rgba(59,130,246,0.1)',
@@ -381,8 +381,8 @@ const values = [
     accentBg: 'rgba(16,185,129,0.1)',
   },
   {
-    title: 'Zero Data Storage',
-    description: 'Your conversations with ClearPath AI are processed in real-time and never written to disk. No accounts, no cookies, no tracking, no profiling. When you close the tab, your data ceases to exist. We believe privacy isn\'t a setting — it\'s the default. You can\'t breach what you don\'t store.',
+    title: 'Privacy by Design',
+    description: 'Guest sessions are ephemeral by design — processed in real-time with no persistence. Authenticated accounts store conversations securely, encrypted at rest, for cross-session access. You can\'t breach what was never stored for guests; accounts give you control over your data.',
     icon: Lock,
     color: '#8b5cf6',
     bgColor: 'rgba(139,92,246,0.06)',
@@ -446,8 +446,8 @@ const howWeWork = [
   },
   {
     step: '05',
-    title: 'Deploy with Zero Retention',
-    description: 'Our deployment pipeline ensures that no user data is ever written to persistent storage. Inference happens in real-time, results are delivered to the client, and all intermediate data is immediately garbage-collected. We can\'t breach what we don\'t store, and we can\'t misuse data we never collect.',
+    title: 'Deploy with Privacy First',
+    description: 'Our deployment pipeline ensures that guest sessions leave no persistent trace. Inference happens in real-time, results are delivered to the client, and all intermediate guest data is immediately garbage-collected. Authenticated user data is encrypted at rest with full user control. We minimize what we collect, and protect what we store.',
     icon: Cloud,
     color: '#f59e0b',
     bgColor: 'rgba(245,158,11,0.06)',
@@ -523,11 +523,11 @@ const openPositions = [
     department: 'Engineering',
     location: 'Remote',
     type: 'Full-time',
-    description: 'Build and scale the classification API that powers ClearPath AI. You\'ll work on optimizing inference latency, building the real-time crisis detection pipeline, and ensuring our zero-data-storage architecture remains bulletproof as we scale to millions of queries. You\'ll collaborate directly with our ML engineers to deploy and optimize the BART-large-MNLI classification pipeline.',
+    description: 'Build and scale the classification API that powers ClearPath AI. You\'ll work on optimizing inference latency, building the real-time crisis detection pipeline, and ensuring our privacy-first architecture remains bulletproof as we scale to millions of queries. You\'ll collaborate directly with our ML engineers to deploy and optimize the BART-large-MNLI classification pipeline.',
     requirements: [
       '3+ years experience with Python, FastAPI, or Node.js',
       'Experience with ML model deployment and inference optimization',
-      'Understanding of privacy-first architecture (no PII storage)',
+      'Understanding of privacy-first architecture (minimal PII, encrypted storage)',
       'Passion for building technology that serves vulnerable communities',
     ],
     color: '#3b82f6',
@@ -1100,7 +1100,7 @@ export default function TeamPage() {
               </div>
               <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-gray-900">How We Work</h2>
               <p className="text-[15px] text-gray-500 mt-4 max-w-2xl mx-auto leading-relaxed">
-                From community research to zero-retention deployment, every step of our process is designed to build AI that is honest, safe, and accountable.
+                From community research to privacy-first deployment, every step of our process is designed to build AI that is honest, safe, and accountable.
               </p>
             </motion.div>
 
@@ -1493,7 +1493,7 @@ export default function TeamPage() {
                 { name: 'Framer Motion', category: 'Animation', desc: 'Respectful animations with prefers-reduced-motion support. Motion that aids, never distracts.', icon: Sparkles, color: '#14b8a6' },
                 { name: 'Vercel', category: 'Deployment', desc: 'Edge-deployed with zero cold starts. Global CDN ensures fast resource lookup from anywhere.', icon: Cloud, color: '#06b6d4' },
                 { name: 'Lucide Icons', category: 'Icon System', desc: 'Consistent, accessible iconography. Every icon is semantic and screen-reader friendly.', icon: Feather, color: '#f97316' },
-                { name: 'Zero Storage', category: 'Architecture', desc: 'No database, no cookies, no tracking. Inference happens in real-time and data is never persisted.', icon: Lock, color: '#ef4444' },
+                { name: 'Privacy-First', category: 'Architecture', desc: 'Minimal data collection, encrypted storage, user-controlled. Guest sessions leave no trace.', icon: Lock, color: '#ef4444' },
               ].map((tech) => {
                 const TechIcon = tech.icon
                 return (
@@ -1725,7 +1725,7 @@ export default function TeamPage() {
                   <div className="flex-1">
                     <h3 className="text-[18px] font-bold text-gray-900 tracking-tight mb-2">Privacy as a Default, Not a Setting</h3>
                     <p className="text-[14px] text-gray-500 leading-relaxed mb-3">
-                      Our zero-data-storage architecture isn&apos;t just a technical decision — it&apos;s a cultural commitment. We don&apos;t store user data because we believe that the people who need community resources the most are often the most vulnerable to surveillance. Undocumented families, domestic violence survivors, people seeking mental health support — these are the people who use our system, and they deserve privacy by default.
+                      Our privacy-first architecture isn&apos;t just a technical decision — it&apos;s a cultural commitment. Guest sessions process data in real-time without persistence, and authenticated users control their stored data with full encryption. We believe that the people who need community resources the most are often the most vulnerable to surveillance. Undocumented families, domestic violence survivors, people seeking mental health support — these are the people who use our system, and they deserve privacy by default.
                     </p>
                     <p className="text-[14px] text-gray-500 leading-relaxed">
                       This commitment extends to our internal tools too. We don&apos;t track team member productivity with keyloggers or screenshot tools. We don&apos;t require time tracking. We trust our team to manage their own time and deliver results. If you need to take a mental health day, you take it — no questions asked. The same privacy we extend to our users, we extend to each other.
@@ -1922,7 +1922,7 @@ export default function TeamPage() {
                   color: '#8b5cf6',
                 },
                 {
-                  quote: 'What impressed me most is the zero data storage policy. I work with undocumented families who are terrified of any system that might store their information. Being able to tell them that nothing is saved — that when they close the tab, their data disappears — that trust is everything.',
+                  quote: 'What impressed me most is the privacy-first approach. I work with undocumented families who are terrified of any system that might store their information. Being able to tell them that guest sessions leave no trace — that when they close the tab, their data disappears — while accounts offer encrypted storage for those who want it — that trust is everything.',
                   name: 'Maria Gutierrez',
                   title: 'Legal Aid Navigator, Catholic Charities — Chicago',
                   initials: 'MG',
@@ -2019,8 +2019,8 @@ export default function TeamPage() {
                   date: 'May 2026',
                 },
                 {
-                  title: 'Zero Data Storage Architecture Verified',
-                  desc: 'Our privacy architecture was independently reviewed and confirmed to store zero user data. No PII, no session tokens, no query logs. When you close the tab, your data ceases to exist. This isn\'t a policy — it\'s an architectural guarantee.',
+                  title: 'Privacy-First Architecture Verified',
+                  desc: 'Our privacy architecture is designed to meet privacy-first standards. Guest sessions store zero data — no PII, no session tokens, no query logs. When you close the tab, guest data ceases to exist. Authenticated users benefit from encrypted storage with full data control. This isn\'t just a policy — it\'s an architectural guarantee. (Independent audit pending.)',
                   icon: Lock,
                   color: '#8b5cf6',
                   date: 'March 2026',
@@ -2100,8 +2100,8 @@ export default function TeamPage() {
                   a: 'Not at all! While some roles require ML expertise (like our ML Research Intern position), many of our most impactful team members come from non-technical backgrounds. Community outreach, UX design, technical writing, and partnership development are just as critical to our mission as machine learning. We believe diverse perspectives build better AI.',
                 },
                 {
-                  q: 'Is ClearPath AI really zero-data-storage?',
-                  a: 'Yes — it\'s an architectural guarantee, not just a policy. Our infrastructure is designed so that user data is processed in real-time and never written to persistent storage. No databases, no session logs, no cookies. We can\'t breach what we don\'t store, and we can\'t misuse data we never collect. This was a founding principle, not an afterthought.',
+                  q: 'Is ClearPath AI really privacy-first?',
+                  a: 'Yes — it\'s an architectural guarantee, not just a policy. Our infrastructure is designed so that guest data is processed in real-time and never written to persistent storage. For authenticated users, data is encrypted at rest with full user control — delete anytime. No session logs for guests, no third-party tracking, no advertising cookies. Privacy was a founding principle, not an afterthought.',
                 },
                 {
                   q: 'What does "calibrated transparency" mean?',

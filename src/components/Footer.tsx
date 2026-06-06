@@ -91,13 +91,13 @@ const socialLinks = [
 
 const trustBadges = [
   {
-    label: 'No data stored',
+    label: 'Privacy by design',
     icon: Lock,
     color: '#10b981',
     bgColor: 'rgba(16, 185, 129, 0.08)',
     borderColor: 'rgba(16, 185, 129, 0.15)',
-    desc: 'Zero retention architecture',
-    detail: 'Your queries are processed in real-time and never written to disk.',
+    desc: 'Privacy-first architecture',
+    detail: 'Guest sessions process queries in real-time with no persistence. Accounts store conversations securely for cross-session access.'
   },
   {
     label: 'Crisis detection',
@@ -457,12 +457,12 @@ export default function Footer() {
                     <span className="text-[12px] font-semibold text-gray-300">Transparency Pledge</span>
                   </div>
                   <p className="text-[11px] text-gray-500 leading-relaxed">
-                    We will never store your data, track your behavior, or hide our confidence scores. What you see is exactly what the model returns — no post-processing, no filtering.
+                    We minimize data collection, never track your behavior, and never hide our confidence scores. What you see is exactly what the model returns — no post-processing, no filtering.
                   </p>
                   <div className="flex items-center gap-3 pt-1">
                     <div className="flex items-center gap-1.5 text-[10px] text-gray-500">
                       <div className="w-1.5 h-1.5 rounded-full bg-emerald-500/60" />
-                      Zero data storage
+                      Privacy-first design
                     </div>
                     <div className="flex items-center gap-1.5 text-[10px] text-gray-500">
                       <div className="w-1.5 h-1.5 rounded-full bg-blue-500/60" />
@@ -482,8 +482,8 @@ export default function Footer() {
                     <div className="text-[10px] text-gray-500 mt-1">Crisis detection</div>
                   </div>
                   <div className="p-3 rounded-lg bg-gray-800/20 border border-gray-800/40">
-                    <div className="text-[18px] font-bold text-white leading-none">0</div>
-                    <div className="text-[10px] text-gray-500 mt-1">Data points stored</div>
+                    <div className="text-[18px] font-bold text-white leading-none">100%</div>
+                    <div className="text-[10px] text-gray-500 mt-1">Encrypted at rest</div>
                   </div>
                   <div className="p-3 rounded-lg bg-gray-800/20 border border-gray-800/40">
                     <div className="text-[18px] font-bold text-white leading-none">24/7</div>

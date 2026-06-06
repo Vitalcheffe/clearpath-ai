@@ -12,8 +12,8 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Log for hackathon demo — in production, send email or save to DB
-    console.log("Contact form submission:", { name, email, subject, message });
+    // In production, send email notification or save to DB
+    // TODO: Implement email notification via SendGrid/Resend
 
     return NextResponse.json({ success: true, message: "Thank you for your message. We'll get back to you soon." });
   } catch (error) {

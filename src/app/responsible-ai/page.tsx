@@ -2108,7 +2108,7 @@ export default function ResponsibleAIPage() {
               },
               {
                 principle: 'Security',
-                implementation: 'Input sanitization + rate limiting + no persistent data storage',
+                implementation: 'Input sanitization + rate limiting + minimal data collection for authenticated users',
                 icon: Lock,
                 color: '#8b5cf6',
               },

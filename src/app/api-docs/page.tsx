@@ -2046,7 +2046,7 @@ curl -X GET http://localhost:3000/api/conversations?userId=user_456 \\
                       <div className="flex flex-wrap items-center justify-center gap-4 mt-8">
                         {[
                           { icon: Shield, text: 'Crisis detection always on', color: '#ef4444' },
-                          { icon: Lock, text: 'Zero data stored', color: '#3b82f6' },
+                          { icon: Lock, text: 'Privacy by design', color: '#3b82f6' },
                           { icon: Zap, text: '10K free requests/month', color: '#f59e0b' },
                           { icon: Users, text: '211 navigator access', color: '#10b981' },
                         ].map((badge) => {

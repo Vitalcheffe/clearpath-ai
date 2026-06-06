@@ -131,7 +131,7 @@ export const authOptions: NextAuthOptions = {
     signUp: "/signup",
     error: "/login",
   },
-  secret: process.env.NEXTAUTH_SECRET || "development-secret-change-in-production",
+  secret: process.env.NEXTAUTH_SECRET,
 }
 
 const handler = NextAuth(authOptions)

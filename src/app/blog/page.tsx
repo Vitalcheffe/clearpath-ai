@@ -461,11 +461,11 @@ const researchPapers = [
     authors: 'ClearPath AI Team',
     venue: 'USAII Global AI Hackathon 2026 — Privacy Documentation',
     date: '2026',
-    abstract: 'Documentation of ClearPath AI\'s privacy-first architecture for AI-assisted social service navigation. Our approach minimizes data collection, processes queries through PII stripping, and avoids persistent storage of user queries. Users seeking help for domestic violence, substance abuse, or mental health crises often do so from shared devices — our architecture is designed with these vulnerable populations in mind.',
+    abstract: 'Documentation of ClearPath AI\'s privacy-first architecture for AI-assisted social service navigation. Our approach minimizes data collection, processes queries through PII stripping, and only stores data for authenticated users who choose to create accounts. Guest sessions are ephemeral by design. Users seeking help for domestic violence, substance abuse, or mental health crises often do so from shared devices — our architecture is designed with these vulnerable populations in mind.',
     citations: 0,
     doi: '',
     gradient: 'from-amber-600 to-orange-600',
-    keyFindings: ['Minimal data collection', 'No persistent query storage', 'Privacy-first architecture', 'Designed for vulnerable populations'],
+    keyFindings: ['Minimal data collection', 'Guest queries not persisted', 'Privacy-first architecture', 'Designed for vulnerable populations'],
   },
 ]
 

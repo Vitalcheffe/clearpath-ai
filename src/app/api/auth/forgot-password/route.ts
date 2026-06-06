@@ -21,9 +21,7 @@ export async function POST(req: NextRequest) {
     // Always return success to prevent email enumeration
     // In a real implementation, you would send an email here
     if (user) {
-      // TODO: Send password reset email
-      // For now, we just log that a reset was requested
-      console.log(`Password reset requested for: ${email}`)
+      // TODO: Send password reset email with secure token
     }
 
     return NextResponse.json(

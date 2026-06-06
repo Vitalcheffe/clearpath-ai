@@ -1418,9 +1418,9 @@ export default function AboutPage() {
                 </div>
                 <div className="space-y-4">
                   {[
-                    { title: 'Zero Data Storage', desc: 'All processing happens in-memory. No database, no logs, no conversation history stored anywhere.', icon: Database, color: '#ef4444' },
+                    { title: 'Privacy by Design', desc: 'Guest sessions process in real-time with no persistence. Accounts store conversations securely for cross-session access. Minimal data collection, encrypted storage, no tracking.', icon: Database, color: '#ef4444' },
                     { title: 'HTTPS Encryption', desc: 'All data in transit is encrypted via TLS 1.3. No plaintext transmission at any point.', icon: Lock, color: '#3b82f6' },
-                    { title: 'No PII Collection', desc: 'We never ask for names, addresses, SSNs, or any personally identifiable information.', icon: Fingerprint, color: '#8b5cf6' },
+                    { title: 'Minimal PII', desc: 'Guest users share no PII at all. Account holders provide only email and optional name — we never ask for addresses, SSNs, or sensitive identifiers.', icon: Fingerprint, color: '#8b5cf6' },
                     { title: 'No Model Training', desc: 'User queries are never used to train, fine-tune, or improve any model. Zero data retention.', icon: Cpu, color: '#10b981' },
                     { title: 'Crisis Data Isolation', desc: 'Crisis-related inputs are processed locally and never transmitted to external services.', icon: Shield, color: '#f59e0b' },
                   ].map((item) => {

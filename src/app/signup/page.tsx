@@ -109,19 +109,11 @@ export default function SignupPage() {
   const [accessLargeText, setAccessLargeText] = useState(false)
   const [accessHighContrast, setAccessHighContrast] = useState(false)
   const [accessScreenReader, setAccessScreenReader] = useState(false)
-  const [userCount, setUserCount] = useState(49847)
   const [isLoading, setIsLoading] = useState(false)
   const [authError, setAuthError] = useState('')
 
   const strength = useMemo(() => getPasswordStrength(password), [password])
   const crackTime = useMemo(() => getCrackTime(password), [password])
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setUserCount(prev => prev + Math.floor(Math.random() * 3))
-    }, 5000)
-    return () => clearInterval(interval)
-  }, [])
 
   // Redirect if already logged in
   useEffect(() => {
@@ -161,7 +153,7 @@ export default function SignupPage() {
     'Unlimited free resource searches',
     'Confidence scores on every result',
     '211 human navigator access 24/7',
-    'Zero data storage — your privacy guaranteed',
+    'Privacy-first — your data stays yours',
     'Crisis detection always active',
     'Community impact tracking',
   ]
@@ -304,7 +296,7 @@ export default function SignupPage() {
             >
               <Zap className="w-3.5 h-3.5 text-amber-300" />
               <span className="text-[13px] text-white/80 font-medium">
-                Join <span className="text-white font-bold">{userCount.toLocaleString()}+</span> users
+                Built for <span className="text-white font-bold">community impact</span>
               </span>
             </motion.div>
 
@@ -967,7 +959,7 @@ export default function SignupPage() {
             <div className="flex items-center justify-center gap-4 mt-6">
               <div className="flex items-center gap-1.5 text-[11px] text-gray-400 font-medium">
                 <ShieldCheck className="w-3.5 h-3.5 text-emerald-500" />
-                No data stored
+                Privacy by design
               </div>
               <div className="flex items-center gap-1.5 text-[11px] text-gray-400 font-medium">
                 <Lock className="w-3.5 h-3.5 text-blue-500" />
