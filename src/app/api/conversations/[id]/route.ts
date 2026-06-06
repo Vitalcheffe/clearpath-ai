@@ -1,6 +1,70 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 
+// GET /api/conversations/[id] — Get conversation with messages
+export async function GET(
+  _request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const { id } = await params;
+
+    const conversation = await db.conversation.findUnique({
+      where: { id },
+      include: {
+        messages: {
+          orderBy: { createdAt: "asc" },
+        },
+      },
+    });
+
+    if (!conversation) {
+      return NextResponse.json(
+        { error: "Conversation not found" },
+        { status: 404 }
+      );
+    }
+
+    return NextResponse.json({
+      id: conversation.id,
+      title: conversation.title,
+      preview: conversation.preview,
+      category: conversation.category,
+      categoryColor: conversation.categoryColor,
+      confidence: conversation.confidence,
+      isCrisis: conversation.isCrisis,
+      isGuest: conversation.isGuest,
+      userId: conversation.userId,
+      createdAt: conversation.createdAt.toISOString(),
+      updatedAt: conversation.updatedAt.toISOString(),
+      messages: conversation.messages.map((m) => ({
+        id: m.id,
+        role: m.role,
+        text: m.text,
+        category: m.category,
+        confidence: m.confidence,
+        isCrisis: m.isCrisis,
+        resources: m.resources ? (() => {
+          try { return JSON.parse(m.resources); } catch { return m.resources; }
+        })() : null,
+        alternatives: m.alternatives ? (() => {
+          try { return JSON.parse(m.alternatives); } catch { return m.alternatives; }
+        })() : null,
+        why: m.why,
+        also: m.also,
+        warning: m.warning,
+        createdAt: m.createdAt.toISOString(),
+      })),
+    });
+  } catch (error) {
+    console.error("Get conversation error:", error);
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 }
+    );
+  }
+}
+
 // DELETE /api/conversations/[id] — Delete a conversation and its messages
 export async function DELETE(
   _request: NextRequest,

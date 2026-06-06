@@ -3,7 +3,7 @@
 import { useState, useMemo, useEffect } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { signIn } from 'next-auth/react'
+import { signIn, useSession } from 'next-auth/react'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   Layers, Mail, Lock, User, ArrowRight, ShieldCheck, Eye, EyeOff, Check, CircleCheck,
@@ -87,6 +87,7 @@ const languageOptions = [
 
 export default function SignupPage() {
   const router = useRouter()
+  const { data: session, status } = useSession()
   const { toast } = useToast()
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
@@ -121,6 +122,13 @@ export default function SignupPage() {
     }, 5000)
     return () => clearInterval(interval)
   }, [])
+
+  // Redirect if already logged in
+  useEffect(() => {
+    if (status === 'authenticated') {
+      router.push('/dashboard')
+    }
+  }, [status, router])
 
   const leftPanelVariants = {
     hidden: { opacity: 0, x: -40 },
@@ -168,6 +176,12 @@ export default function SignupPage() {
     // Validate
     if (!name || !email || !password || !confirmPassword) {
       setAuthError('Please fill in all required fields')
+      return
+    }
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    if (!emailRegex.test(email)) {
+      setAuthError('Please enter a valid email address')
       return
     }
     if (password !== confirmPassword) {

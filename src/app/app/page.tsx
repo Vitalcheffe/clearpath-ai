@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect, useCallback, ReactNode } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import Link from 'next/link'
+import { useSession } from 'next-auth/react'
 import {
   Layers,
   Shield,
@@ -79,6 +80,7 @@ interface ClassifyResponse {
   clarificationMessage: string | null
   crisisLines?: CrisisLine[]
   note?: string
+  conversationId?: string
   model: string
 }
 
@@ -175,34 +177,29 @@ function enrichCategories(rawCategories: { label: string; confidence: number }[]
 
 // ─── UTILITIES ───────────────────────────────────────────
 function getConfidenceColor(v: number): string {
-  if (v >= 80) return '#10b981'
-  if (v >= 70) return '#3b82f6'
-  if (v >= 50) return '#f59e0b'
-  return '#f97316'
+  if (v > 70) return '#10b981'
+  if (v >= 40) return '#f59e0b'
+  return '#ef4444'
 }
 function getConfidenceBg(v: number): string {
-  if (v >= 80) return 'rgba(16,185,129,0.06)'
-  if (v >= 70) return 'rgba(59,130,246,0.06)'
-  if (v >= 50) return 'rgba(245,158,11,0.06)'
-  return 'rgba(249,115,22,0.06)'
+  if (v > 70) return 'rgba(16,185,129,0.06)'
+  if (v >= 40) return 'rgba(245,158,11,0.06)'
+  return 'rgba(239,68,68,0.06)'
 }
 function getConfidenceGlow(v: number): string {
-  if (v >= 80) return '0 0 16px rgba(16,185,129,0.25)'
-  if (v >= 70) return '0 0 16px rgba(59,130,246,0.25)'
-  if (v >= 50) return '0 0 16px rgba(245,158,11,0.25)'
-  return '0 0 16px rgba(249,115,22,0.25)'
+  if (v > 70) return '0 0 16px rgba(16,185,129,0.25)'
+  if (v >= 40) return '0 0 16px rgba(245,158,11,0.25)'
+  return '0 0 16px rgba(239,68,68,0.25)'
 }
 function getConfidenceLabel(v: number): string {
-  if (v >= 80) return 'High'
-  if (v >= 70) return 'Good'
-  if (v >= 50) return 'Moderate'
+  if (v > 70) return 'High'
+  if (v >= 40) return 'Moderate'
   return 'Low'
 }
 function getConfidenceRingBg(v: number): string {
-  if (v >= 80) return 'rgba(16,185,129,0.08)'
-  if (v >= 70) return 'rgba(59,130,246,0.08)'
-  if (v >= 50) return 'rgba(245,158,11,0.08)'
-  return 'rgba(249,115,22,0.08)'
+  if (v > 70) return 'rgba(16,185,129,0.08)'
+  if (v >= 40) return 'rgba(245,158,11,0.08)'
+  return 'rgba(239,68,68,0.08)'
 }
 
 function formatTimeAgo(dateStr: string): string {
@@ -1104,8 +1101,8 @@ function Sidebar({
   const olderConvs = conversations.filter(c => new Date(c.createdAt) < yesterday)
 
   const renderConvItem = (conv: ConversationHistory) => {
-    const confDot = conv.isCrisis ? 'bg-red-500' : (conv.confidence >= 80 ? 'bg-emerald-500' : conv.confidence >= 50 ? 'bg-amber-500' : 'bg-orange-500')
-    const confBadge = conv.isCrisis ? 'bg-red-500/20 text-red-300' : conv.confidence >= 80 ? 'bg-emerald-500/20 text-emerald-300' : conv.confidence >= 50 ? 'bg-amber-500/20 text-amber-300' : 'bg-orange-500/20 text-orange-300'
+    const confDot = conv.isCrisis ? 'bg-red-500' : (conv.confidence > 70 ? 'bg-emerald-500' : conv.confidence >= 40 ? 'bg-amber-500' : 'bg-red-500')
+    const confBadge = conv.isCrisis ? 'bg-red-500/20 text-red-300' : conv.confidence > 70 ? 'bg-emerald-500/20 text-emerald-300' : conv.confidence >= 40 ? 'bg-amber-500/20 text-amber-300' : 'bg-red-500/20 text-red-300'
     const confValue = conv.isCrisis ? '!' : String(conv.confidence)
 
     return (
@@ -1440,6 +1437,7 @@ function getTransparencyItems(result: {
 
 // ─── MAIN ─────────────────────────────────────────────────
 export default function Home() {
+  const { data: session } = useSession()
   const [messages, setMessages] = useState<Array<{
     role: 'user' | 'ai'
     text: string
@@ -1473,10 +1471,14 @@ export default function Home() {
   const [conversations, setConversations] = useState<ConversationHistory[]>([])
   const [isLoadingConversations, setIsLoadingConversations] = useState(false)
 
-  // Current conversation ID for saving
+  // Current conversation ID from /api/classify response
   const currentConvIdRef = useRef<string | null>(null)
   // Track the previous confidence for upgrade detection
   const previousConfidenceRef = useRef<number | null>(null)
+
+  // Full-screen crisis overlay state
+  const [showCrisisOverlay, setShowCrisisOverlay] = useState(false)
+  const [crisisOverlayLines, setCrisisOverlayLines] = useState<CrisisLine[]>([])
 
   // Fetch conversations from API
   const fetchConversations = useCallback(async () => {
@@ -1515,73 +1517,6 @@ export default function Home() {
     }, 80)
   }, [])
 
-  // Create conversation in DB and save user message
-  const createConversationAndSave = useCallback(async (userText: string, classifyResult: ClassifyResponse) => {
-    try {
-      // Determine conversation title and metadata from the classify result
-      const topCategory = classifyResult.categories[0]
-      const title = classifyResult.isCrisis
-        ? 'Crisis support needed'
-        : topCategory
-          ? `${topCategory.label} — ${userText.slice(0, 40)}${userText.length > 40 ? '...' : ''}`
-          : userText.slice(0, 60)
-      const preview = userText.slice(0, 60)
-      const category = classifyResult.isCrisis ? 'Crisis' : topCategory?.label || null
-      const categoryColor = classifyResult.isCrisis ? '#ef4444' : topCategory ? getConfidenceColor(topCategory.confidence) : '#6b7280'
-      const confidence = topCategory?.confidence || 0
-
-      // Create conversation
-      const convRes = await fetch('/api/conversations', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          title,
-          preview,
-          category,
-          categoryColor,
-          confidence,
-          isCrisis: classifyResult.isCrisis,
-        }),
-      })
-
-      if (convRes.ok) {
-        const convData = await convRes.json()
-        currentConvIdRef.current = convData.id
-        setActiveConversationId(convData.id)
-
-        // Save user message
-        await fetch(`/api/conversations/${convData.id}/messages`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ role: 'user', text: userText }),
-        })
-
-        // Save AI message
-        await fetch(`/api/conversations/${convData.id}/messages`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            role: 'ai',
-            text: classifyResult.isCrisis
-              ? 'Crisis detected — providing immediate resources'
-              : classifyResult.needsClarification
-                ? 'Clarification needed'
-                : `Found ${classifyResult.categories.length} resource categories`,
-            category,
-            confidence,
-            isCrisis: classifyResult.isCrisis,
-            resources: classifyResult.categories.map(c => c.label),
-          }),
-        })
-
-        // Refresh sidebar
-        fetchConversations()
-      }
-    } catch {
-      // Silently fail — conversation saving is non-critical
-    }
-  }, [fetchConversations])
-
   // Main handler: send user text to /api/classify
   const handleSend = useCallback(async (text: string) => {
     if (!text.trim() || isTyping) return
@@ -1595,26 +1530,38 @@ export default function Home() {
     setIsTyping(true)
 
     try {
+      // Build request body — include conversationId if we have one
+      const requestBody: Record<string, string> = { text: userText }
+      if (currentConvIdRef.current) {
+        requestBody.conversationId = currentConvIdRef.current
+      }
+
       const res = await fetch('/api/classify', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text: userText }),
+        body: JSON.stringify(requestBody),
       })
 
       if (!res.ok) {
         setIsTyping(false)
         setMessages(prev => [...prev, {
           role: 'ai',
-          text: 'Sorry, something went wrong. Please try again.',
+          text: 'Something went wrong. You can still search resources or talk to a navigator.',
           statusBadge: 'clarify',
           isClarify: true,
           clarifyConfidence: 0,
-          transparencyItems: ['An error occurred while processing your request'],
+          transparencyItems: ['An error occurred while processing your request. Please try again.'],
         }])
         return
       }
 
       const data: ClassifyResponse = await res.json()
+
+      // Track conversationId from the API response
+      if (data.conversationId) {
+        currentConvIdRef.current = data.conversationId
+        setActiveConversationId(data.conversationId)
+      }
 
       // Enrich categories with resources, why, also, warning
       const enrichedCategories = enrichCategories(data.categories)
@@ -1636,6 +1583,9 @@ export default function Home() {
           { name: 'Crisis Text Line', action: 'Text HOME to 741741', call: 'Text' },
           { name: 'Local Crisis Center', action: 'Talk to a real person now', call: '211' },
         ]
+        // Show full-screen crisis overlay
+        setCrisisOverlayLines(crisisLines)
+        setShowCrisisOverlay(true)
       } else if (data.needsClarification) {
         statusBadge = 'clarify'
         isClarify = true
@@ -1696,20 +1646,20 @@ export default function Home() {
         setSuggestions([])
       }
 
-      // Save conversation to DB
-      createConversationAndSave(userText, data)
+      // Refresh sidebar — the /api/classify already saved to DB
+      fetchConversations()
     } catch {
       setIsTyping(false)
       setMessages(prev => [...prev, {
         role: 'ai',
-        text: 'Network error. Please check your connection and try again.',
+        text: 'Something went wrong. You can still search resources or talk to a navigator.',
         statusBadge: 'clarify',
         isClarify: true,
         clarifyConfidence: 0,
-        transparencyItems: ['A network error occurred'],
+        transparencyItems: ['A network error occurred. Please check your connection and try again.'],
       }])
     }
-  }, [isTyping, createConversationAndSave])
+  }, [isTyping, fetchConversations])
 
   // Handle starter card selection — pre-fill and submit
   const handleSelectStarter = useCallback((id: string, _label: string) => {
@@ -1758,6 +1708,8 @@ export default function Home() {
     currentConvIdRef.current = null
     previousConfidenceRef.current = null
     setInputText('')
+    setShowCrisisOverlay(false)
+    setCrisisOverlayLines([])
   }
 
   const handleNavHome = () => {
@@ -1829,6 +1781,69 @@ export default function Home() {
       <div className="absolute inset-0 mesh-gradient-bg" />
       {/* Noise texture overlay */}
       <div className="absolute inset-0 noise-overlay pointer-events-none" />
+
+      {/* ─── FULL-SCREEN CRISIS OVERLAY ─── */}
+      <AnimatePresence>
+        {showCrisisOverlay && (
+          <motion.div
+            key="crisis-overlay"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3 }}
+            className="fixed inset-0 z-[100] flex items-center justify-center p-4"
+          >
+            {/* Backdrop */}
+            <div className="absolute inset-0 bg-black/70 backdrop-blur-md" />
+
+            {/* Content */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              transition={{ type: 'spring', stiffness: 350, damping: 25, delay: 0.1 }}
+              className="relative w-full max-w-lg z-10"
+            >
+              <CrisisBlock lines={crisisOverlayLines} />
+
+              {/* Action buttons below crisis block */}
+              <div className="mt-5 space-y-3">
+                {/* "I've reached out for help" acknowledge button */}
+                <motion.button
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.5 }}
+                  onClick={() => setShowCrisisOverlay(false)}
+                  className="w-full py-4 rounded-2xl bg-white text-gray-900 text-[15px] font-bold hover:bg-gray-50 transition-colors shadow-lg border border-gray-100/60 active:scale-[0.98]"
+                >
+                  <span className="flex items-center justify-center gap-2.5">
+                    <CheckCircle className="w-5 h-5 text-emerald-500" />
+                    I&apos;ve reached out for help
+                  </span>
+                </motion.button>
+
+                {/* "Talk to a Navigator" button */}
+                <motion.button
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.6 }}
+                  onClick={() => setShowCrisisOverlay(false)}
+                  className="w-full py-4 rounded-2xl text-white text-[15px] font-bold transition-all active:scale-[0.98] relative overflow-hidden"
+                  style={{
+                    background: 'linear-gradient(135deg, #2563EB, #1d4ed8)',
+                    boxShadow: '0 4px 20px rgba(37,99,235,0.3)',
+                  }}
+                >
+                  <span className="flex items-center justify-center gap-2.5 relative z-10">
+                    <Navigation className="w-5 h-5" />
+                    Talk to a Navigator
+                  </span>
+                </motion.button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* ─── SIDEBAR ─── */}
       <Sidebar
@@ -2009,8 +2024,14 @@ export default function Home() {
             </Link>
 
             {/* Profile */}
-            <Link href="/profile" className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-emerald-500 flex items-center justify-center text-white text-[11px] font-bold shadow-sm shadow-gray-900/10 hover:shadow-md hover:shadow-gray-900/15 transition-shadow">
-              AK
+            <Link href="/profile" className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-emerald-500 flex items-center justify-center text-white shadow-sm shadow-gray-900/10 hover:shadow-md hover:shadow-gray-900/15 transition-shadow">
+              {session?.user?.name ? (
+                <span className="text-[11px] font-bold">
+                  {session.user.name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase()}
+                </span>
+              ) : (
+                <User className="w-4 h-4" />
+              )}
             </Link>
           </div>
         </div>

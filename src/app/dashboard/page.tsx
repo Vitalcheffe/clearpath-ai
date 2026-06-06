@@ -443,9 +443,12 @@ const staggerItem = {
 
 // ─── API TYPES ──────────────────────────────────────────
 interface StatsData {
+  conversations: number
+  resourcesFound: number
+  avgConfidence: number
+  streak: number
   totalConversations: number
   totalResources: number
-  avgConfidence: number
   crisisCount: number
   categoryBreakdown: { category: string; count: number; percentage: number }[]
   weeklyActivity: { date: string; day: string; count: number }[]
@@ -597,7 +600,8 @@ export default function DashboardPage() {
           setStatsData(await statsRes.json())
         }
         if (convRes.ok) {
-          setConversationsData(await convRes.json())
+          const convJson = await convRes.json()
+          setConversationsData(Array.isArray(convJson) ? convJson : (convJson.conversations || []))
         }
         if (resourcesRes.ok) {
           setSavedResourcesData(await resourcesRes.json())
@@ -625,7 +629,7 @@ export default function DashboardPage() {
       { label: 'Total conversations', value: String(totalConv), icon: MessageCircle, colorHex: '#3b82f6', bgColor: 'rgba(59,130,246,0.06)', change: totalConv > 0 ? `${statsData.crisisCount} crisis${statsData.crisisCount !== 1 ? 's' : ''} detected` : 'Start your first conversation' },
       { label: 'Resources found', value: String(statsData.totalResources), icon: Sparkles, colorHex: '#10b981', bgColor: 'rgba(16,185,129,0.06)', change: statsData.totalResources > 0 ? 'Saved to your profile' : 'Explore resources' },
       { label: 'Average confidence', value: `${statsData.avgConfidence}%`, icon: TrendingUp, colorHex: '#8b5cf6', bgColor: 'rgba(139,92,246,0.06)', change: statsData.avgConfidence >= 70 ? 'Above threshold' : statsData.avgConfidence > 0 ? 'Below threshold' : 'No data yet' },
-      { label: 'Day streak', value: '7', icon: Flame, colorHex: '#f97316', bgColor: 'rgba(249,115,22,0.06)', change: totalConv > 0 ? 'Keep it going!' : 'Start a conversation' },
+      { label: 'Day streak', value: String(statsData.streak || 0), icon: Flame, colorHex: '#f97316', bgColor: 'rgba(249,115,22,0.06)', change: statsData.streak > 0 ? `${statsData.streak}-day streak!` : 'Start a conversation' },
     ]
   }, [statsData])
 
@@ -804,7 +808,7 @@ export default function DashboardPage() {
                   </div>
                   <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-orange-50/80 border border-orange-100/60">
                     <Flame className="w-3.5 h-3.5 text-orange-500" />
-                    <span className="text-[12px] font-medium text-orange-700">7-day streak</span>
+                    <span className="text-[12px] font-medium text-orange-700">{statsData ? `${statsData.streak || 0}-day streak` : '0-day streak'}</span>
                   </div>
                   <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-emerald-50/80 border border-emerald-100/60">
                     <Sparkles className="w-3.5 h-3.5 text-emerald-500" />
@@ -875,10 +879,53 @@ export default function DashboardPage() {
             </div>
           </motion.section>
 
+          {/* ═══════════ ERROR STATE ═══════════ */}
+          {dataError && !dataLoading && (
+            <motion.div
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="mb-10"
+            >
+              <div className="glass-card rounded-2xl p-6 shadow-premium text-center border border-red-100/60">
+                <div className="w-12 h-12 rounded-xl bg-red-50/80 flex items-center justify-center mx-auto mb-3">
+                  <Info className="w-6 h-6 text-red-500" />
+                </div>
+                <h3 className="text-[15px] font-bold text-gray-900 mb-1">Failed to load dashboard data</h3>
+                <p className="text-[13px] text-gray-500 mb-4">{dataError}</p>
+                <button
+                  onClick={() => {
+                    setDataError(null)
+                    setDataLoading(true)
+                    // Re-trigger fetch
+                    if (user?.id) {
+                      Promise.all([
+                        fetch(`/api/user/stats?userId=${user.id}`),
+                        fetch(`/api/conversations?userId=${user.id}`),
+                        fetch(`/api/saved-resources?userId=${user.id}`),
+                      ]).then(([statsRes2, convRes2, resourcesRes2]) => {
+                        if (statsRes2.ok) statsRes2.json().then(setStatsData)
+                        if (convRes2.ok) convRes2.json().then((d) => setConversationsData(Array.isArray(d) ? d : (d.conversations || [])))
+                        if (resourcesRes2.ok) resourcesRes2.json().then(setSavedResourcesData)
+                        setDataLoading(false)
+                      }).catch(() => {
+                        setDataError('Failed to load dashboard data')
+                        setDataLoading(false)
+                      })
+                    }
+                  }}
+                  className="inline-flex items-center gap-2 px-4 py-2 text-[13px] font-semibold text-white rounded-xl bg-gradient-to-b from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 shadow-md shadow-blue-500/20 transition-all"
+                >
+                  <RefreshCw className="w-4 h-4" />
+                  Try again
+                </button>
+              </div>
+            </motion.div>
+          )}
+
           {/* ═══════════ STATS ROW ═══════════ */}
           {dataLoading ? (
             <StatsSkeleton />
-          ) : (
+          ) : dataError ? null : (
             <motion.section
               initial="hidden"
               animate="visible"

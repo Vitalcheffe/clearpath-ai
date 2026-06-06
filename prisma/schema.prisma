@@ -19,6 +19,7 @@ model User {
   username      String?
   location      String?
   language      String   @default("en")
+  phone         String?
   password      String?
   plan          String   @default("free")
   hearAbout     String?
@@ -121,6 +122,22 @@ model SavedResource {
   createdAt      DateTime @default(now())
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Resource {
+  id          String   @id @default(cuid())
+  name        String
+  category    String
+  description String
+  phone       String?
+  address     String?
+  hours       String?
+  eligibility String?
+  services    String?  // comma-separated
+  languages   String?  // comma-separated
+  lastVerified String?
+  url         String?
+  createdAt   DateTime @default(now())
 }
 
 model UserSettings {

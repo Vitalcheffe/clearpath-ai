@@ -8,12 +8,12 @@ import { db } from "@/lib/db"
 export const authOptions: NextAuthOptions = {
   providers: [
     GoogleProvider({
-      clientId: process.env.GOOGLE_CLIENT_ID || "mock-google-id",
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET || "mock-google-secret",
+      clientId: process.env.GOOGLE_CLIENT_ID!,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
     }),
     GitHubProvider({
-      clientId: process.env.GITHUB_CLIENT_ID || "mock-github-id",
-      clientSecret: process.env.GITHUB_CLIENT_SECRET || "mock-github-secret",
+      clientId: process.env.GITHUB_CLIENT_ID!,
+      clientSecret: process.env.GITHUB_CLIENT_SECRET!,
     }),
     CredentialsProvider({
       name: "credentials",

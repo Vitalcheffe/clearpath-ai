@@ -251,7 +251,15 @@ export default function SettingsPage() {
   const [activeSection, setActiveSection] = useState<SectionKey>('general')
   const [settingsLoading, setSettingsLoading] = useState(true)
   const [saving, setSaving] = useState(false)
+  const [lastSaved, setLastSaved] = useState(false)
   const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null)
+
+  // Password change state
+  const [currentPassword, setCurrentPassword] = useState('')
+  const [newPassword, setNewPassword] = useState('')
+  const [confirmPassword, setConfirmPassword] = useState('')
+  const [passwordSaving, setPasswordSaving] = useState(false)
+  const [passwordSaved, setPasswordSaved] = useState(false)
 
   // General state
   const [language, setLanguage] = useState('English')
@@ -362,11 +370,15 @@ export default function SettingsPage() {
     if (!user?.id) return
     setSaving(true)
     try {
-      await fetch('/api/user/settings', {
+      const res = await fetch('/api/user/settings', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ userId: user.id, ...updates }),
       })
+      if (res.ok) {
+        setLastSaved(true)
+        setTimeout(() => setLastSaved(false), 2000)
+      }
     } catch (err) {
       console.error('Failed to save settings:', err)
     } finally {
@@ -462,6 +474,12 @@ export default function SettingsPage() {
                     <span className="inline-flex items-center gap-1.5 ml-3 text-[12px] text-blue-500">
                       <Loader2 className="w-3 h-3 animate-spin" />
                       Saving...
+                    </span>
+                  )}
+                  {lastSaved && !saving && (
+                    <span className="inline-flex items-center gap-1.5 ml-3 text-[12px] text-emerald-600">
+                      <Check className="w-3 h-3" />
+                      Saved
                     </span>
                   )}
                 </p>
@@ -1006,26 +1024,65 @@ export default function SettingsPage() {
                                 className="overflow-hidden px-5"
                               >
                                 <div className="py-4 space-y-3 rounded-xl bg-white/40 p-4 mb-2">
-                                  <div>
-                                    <label className="text-[12px] font-semibold text-gray-700 mb-1.5 block">Current password</label>
-                                    <input type="password" placeholder="Enter current password" className="w-full px-4 py-2.5 rounded-xl text-[13px] bg-white border border-gray-200 outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-500/10 transition-all" />
-                                  </div>
-                                  <div>
-                                    <label className="text-[12px] font-semibold text-gray-700 mb-1.5 block">New password</label>
-                                    <input type="password" placeholder="Enter new password" className="w-full px-4 py-2.5 rounded-xl text-[13px] bg-white border border-gray-200 outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-500/10 transition-all" />
-                                  </div>
-                                  <div>
-                                    <label className="text-[12px] font-semibold text-gray-700 mb-1.5 block">Confirm new password</label>
-                                    <input type="password" placeholder="Confirm new password" className="w-full px-4 py-2.5 rounded-xl text-[13px] bg-white border border-gray-200 outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-500/10 transition-all" />
-                                  </div>
-                                  <div className="flex items-center gap-2 pt-2">
-                                    <button className="px-4 py-2 text-[12px] font-semibold text-white bg-gradient-to-b from-blue-600 to-blue-700 rounded-xl shadow-sm hover:shadow-md transition-all">
-                                      Update password
-                                    </button>
-                                    <button onClick={() => setShowPasswordChange(false)} className="px-4 py-2 text-[12px] font-semibold text-gray-500 hover:text-gray-700 rounded-xl hover:bg-gray-100/60 transition-all">
-                                      Cancel
-                                    </button>
-                                  </div>
+                                  {passwordSaved ? (
+                                    <div className="flex items-center gap-3 py-3">
+                                      <div className="w-8 h-8 rounded-full bg-emerald-100 flex items-center justify-center">
+                                        <Check className="w-4 h-4 text-emerald-600" />
+                                      </div>
+                                      <p className="text-[13px] font-semibold text-emerald-700">Password updated successfully!</p>
+                                    </div>
+                                  ) : (
+                                    <>
+                                      <div>
+                                        <label className="text-[12px] font-semibold text-gray-700 mb-1.5 block">Current password</label>
+                                        <input type="password" value={currentPassword} onChange={(e) => setCurrentPassword(e.target.value)} placeholder="Enter current password" className="w-full px-4 py-2.5 rounded-xl text-[13px] bg-white border border-gray-200 outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-500/10 transition-all" />
+                                      </div>
+                                      <div>
+                                        <label className="text-[12px] font-semibold text-gray-700 mb-1.5 block">New password</label>
+                                        <input type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} placeholder="Enter new password" className="w-full px-4 py-2.5 rounded-xl text-[13px] bg-white border border-gray-200 outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-500/10 transition-all" />
+                                      </div>
+                                      <div>
+                                        <label className="text-[12px] font-semibold text-gray-700 mb-1.5 block">Confirm new password</label>
+                                        <input type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} placeholder="Confirm new password" className="w-full px-4 py-2.5 rounded-xl text-[13px] bg-white border border-gray-200 outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-500/10 transition-all" />
+                                      </div>
+                                      <div className="flex items-center gap-2 pt-2">
+                                        <button
+                                          onClick={async () => {
+                                            if (!user?.id || !newPassword || newPassword !== confirmPassword) return
+                                            setPasswordSaving(true)
+                                            try {
+                                              const res = await fetch('/api/user/profile', {
+                                                method: 'PUT',
+                                                headers: { 'Content-Type': 'application/json' },
+                                                body: JSON.stringify({ userId: user.id, currentPassword, newPassword }),
+                                              })
+                                              if (res.ok) {
+                                                setPasswordSaved(true)
+                                                setCurrentPassword('')
+                                                setNewPassword('')
+                                                setConfirmPassword('')
+                                                setTimeout(() => {
+                                                  setPasswordSaved(false)
+                                                  setShowPasswordChange(false)
+                                                }, 2000)
+                                              }
+                                            } catch (err) {
+                                              console.error('Failed to update password:', err)
+                                            } finally {
+                                              setPasswordSaving(false)
+                                            }
+                                          }}
+                                          disabled={passwordSaving || !newPassword || newPassword !== confirmPassword}
+                                          className="px-4 py-2 text-[12px] font-semibold text-white bg-gradient-to-b from-blue-600 to-blue-700 rounded-xl shadow-sm hover:shadow-md transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                                        >
+                                          {passwordSaving ? 'Updating...' : 'Update password'}
+                                        </button>
+                                        <button onClick={() => { setShowPasswordChange(false); setCurrentPassword(''); setNewPassword(''); setConfirmPassword('') }} className="px-4 py-2 text-[12px] font-semibold text-gray-500 hover:text-gray-700 rounded-xl hover:bg-gray-100/60 transition-all">
+                                          Cancel
+                                        </button>
+                                      </div>
+                                    </>
+                                  )}
                                 </div>
                               </motion.div>
                             )}

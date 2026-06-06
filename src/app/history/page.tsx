@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
@@ -287,8 +287,10 @@ export default function HistoryPage() {
   const { isAuthenticated, isLoading: authLoading, user } = useAuth()
   const [conversations, setConversations] = useState<Conversation[]>([])
   const [dataLoading, setDataLoading] = useState(true)
+  const [dataError, setDataError] = useState<string | null>(null)
   const [deletingIds, setDeletingIds] = useState<string[]>([])
   const [searchQuery, setSearchQuery] = useState('')
+  const [debouncedSearch, setDebouncedSearch] = useState('')
   const [activeFilter, setActiveFilter] = useState('all')
   const [filterOpen, setFilterOpen] = useState(false)
   const [confidenceFilter, setConfidenceFilter] = useState('all')
@@ -296,25 +298,49 @@ export default function HistoryPage() {
   const [selectedConversations, setSelectedConversations] = useState<string[]>([])
   const [showRecentSearches, setShowRecentSearches] = useState(false)
   const [currentPage, setCurrentPage] = useState(1)
-  const itemsPerPage = 8
+  const [totalCount, setTotalCount] = useState(0)
+  const itemsPerPage = 20
+  const debounceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
-  // Fetch conversations from API
+  // Debounce search input
+  useEffect(() => {
+    if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current)
+    debounceTimerRef.current = setTimeout(() => {
+      setDebouncedSearch(searchQuery)
+      setCurrentPage(1)
+    }, 300)
+    return () => { if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current) }
+  }, [searchQuery])
+
+  // Fetch conversations from API with search/category/pagination params
   const fetchConversations = useCallback(async () => {
     try {
       setDataLoading(true)
+      setDataError(null)
       const params = new URLSearchParams()
       if (user?.id) params.set('userId', user.id)
+      if (debouncedSearch) params.set('search', debouncedSearch)
+      if (activeFilter && activeFilter !== 'all') params.set('category', activeFilter)
+      const skip = (currentPage - 1) * itemsPerPage
+      params.set('skip', String(skip))
+      params.set('take', String(itemsPerPage))
       const res = await fetch(`/api/conversations?${params.toString()}`)
       if (res.ok) {
-        const data: ApiConversation[] = await res.json()
-        setConversations(data.map(mapApiConversation))
+        const json = await res.json()
+        const apiData: ApiConversation[] = Array.isArray(json) ? json : (json.conversations || [])
+        const total = json.total ?? apiData.length
+        setConversations(apiData.map(mapApiConversation))
+        setTotalCount(total)
+      } else {
+        setDataError('Failed to load conversations')
       }
     } catch (err) {
       console.error('Failed to fetch conversations:', err)
+      setDataError('Failed to load conversations')
     } finally {
       setDataLoading(false)
     }
-  }, [user?.id])
+  }, [user?.id, debouncedSearch, activeFilter, currentPage])
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -330,7 +356,8 @@ export default function HistoryPage() {
       setDeletingIds((prev) => [...prev, id])
       const res = await fetch(`/api/conversations/${id}`, { method: 'DELETE' })
       if (res.ok) {
-        setConversations((prev) => prev.filter((c) => c.id !== id))
+        // Refetch to keep pagination in sync
+        fetchConversations()
         setSelectedConversations((prev) => prev.filter((sid) => sid !== id))
       }
     } catch (err) {
@@ -350,8 +377,9 @@ export default function HistoryPage() {
           fetch(`/api/conversations/${id}`, { method: 'DELETE' })
         )
       )
-      setConversations((prev) => prev.filter((c) => !idsToDelete.includes(c.id)))
       setSelectedConversations([])
+      // Refetch to keep pagination in sync
+      fetchConversations()
     } catch (err) {
       console.error('Failed to delete selected conversations:', err)
     } finally {
@@ -428,46 +456,34 @@ export default function HistoryPage() {
     )
   }
 
-  // Filter conversations
+  // Filter conversations - only confidence filter is client-side now
+  // Search and category filtering are handled by the API
   const filteredConversations = conversations.filter((conv) => {
-    const matchesSearch =
-      searchQuery === '' ||
-      conv.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      conv.preview.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      conv.category.toLowerCase().includes(searchQuery.toLowerCase())
-
-    const matchesFilter =
-      activeFilter === 'all' || conv.category === activeFilter
-
     const matchesConfidence =
       confidenceFilter === 'all' ||
       (confidenceFilter === 'high' && conv.confidence >= 80) ||
       (confidenceFilter === 'medium' && conv.confidence >= 50 && conv.confidence < 80) ||
       (confidenceFilter === 'low' && conv.confidence < 50)
 
-    return matchesSearch && matchesFilter && matchesConfidence
+    return matchesConfidence
   })
 
-  // Pagination
-  const totalPages = Math.ceil(filteredConversations.length / itemsPerPage)
-  const paginatedConversations = filteredConversations.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
-  )
+  // Pagination - use server-side total count
+  const totalPages = Math.max(1, Math.ceil(totalCount / itemsPerPage))
 
   // Group conversations
   const groupedConversations: Record<string, Conversation[]> = {}
   const groupOrder = ['Today', 'Yesterday', 'This Week', 'Earlier']
 
-  paginatedConversations.forEach((conv) => {
+  filteredConversations.forEach((conv) => {
     if (!groupedConversations[conv.group]) {
       groupedConversations[conv.group] = []
     }
     groupedConversations[conv.group].push(conv)
   })
 
-  // Stats
-  const totalConversations = conversations.length
+  // Stats - computed from the current page of conversations
+  const totalConversations = totalCount
   const avgConfidence = conversations.length > 0
     ? Math.round(conversations.reduce((sum, c) => sum + c.confidence, 0) / conversations.length)
     : 0
@@ -498,7 +514,7 @@ export default function HistoryPage() {
   }
 
   // Is empty (no conversations at all)
-  const isEmpty = conversations.length === 0
+  const isEmpty = conversations.length === 0 && !debouncedSearch && activeFilter === 'all'
 
   return (
     <div className="min-h-screen flex flex-col mesh-gradient-bg">
@@ -737,8 +753,31 @@ export default function HistoryPage() {
             </motion.div>
           </motion.div>
 
+          {/* ═══════════ ERROR STATE ═══════════ */}
+          {dataError && !dataLoading && (
+            <motion.div
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="mb-8"
+            >
+              <div className="glass-card rounded-2xl p-6 shadow-premium text-center border border-red-100/60">
+                <div className="w-12 h-12 rounded-xl bg-red-50/80 flex items-center justify-center mx-auto mb-3">
+                  <Layers className="w-6 h-6 text-red-500" />
+                </div>
+                <h3 className="text-[15px] font-bold text-gray-900 mb-1">Failed to load conversations</h3>
+                <p className="text-[13px] text-gray-500 mb-4">{dataError}</p>
+                <button
+                  onClick={() => fetchConversations()}
+                  className="inline-flex items-center gap-2 px-4 py-2 text-[13px] font-semibold text-white rounded-xl bg-gradient-to-b from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 shadow-md shadow-blue-500/20 transition-all"
+                >
+                  Try again
+                </button>
+              </div>
+            </motion.div>
+          )}
+
           {/* ═══════════ STATS SUMMARY CARDS ═══════════ */}
-          {!isEmpty && (
+          {!isEmpty && !dataError && (
             <motion.div
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
@@ -1092,7 +1131,7 @@ export default function HistoryPage() {
           )}
 
           {/* ═══════════ PAGINATION ═══════════ */}
-          {!isEmpty && totalPages > 1 && (
+          {!isEmpty && !dataError && totalPages > 1 && (
             <motion.div
               initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
@@ -1107,7 +1146,19 @@ export default function HistoryPage() {
                 <ChevronLeft className="w-3.5 h-3.5" />
                 Prev
               </button>
-              {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+              {Array.from({ length: Math.min(totalPages, 7) }, (_, i) => {
+                // Show pages around the current page
+                let page: number
+                if (totalPages <= 7) {
+                  page = i + 1
+                } else if (currentPage <= 4) {
+                  page = i + 1
+                } else if (currentPage >= totalPages - 3) {
+                  page = totalPages - 6 + i
+                } else {
+                  page = currentPage - 3 + i
+                }
+                return (
                 <button
                   key={page}
                   onClick={() => setCurrentPage(page)}
@@ -1119,7 +1170,8 @@ export default function HistoryPage() {
                 >
                   {page}
                 </button>
-              ))}
+              )
+              })}
               <button
                 onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
                 disabled={currentPage === totalPages}

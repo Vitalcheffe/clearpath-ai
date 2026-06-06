@@ -10,9 +10,12 @@ export async function GET(request: NextRequest) {
     if (!userId) {
       // Return empty/guest stats
       return NextResponse.json({
+        conversations: 0,
+        resourcesFound: 0,
+        avgConfidence: 0,
+        streak: 0,
         totalConversations: 0,
         totalResources: 0,
-        avgConfidence: 0,
         crisisCount: 0,
         categoryBreakdown: [],
         weeklyActivity: [],
@@ -52,6 +55,36 @@ export async function GET(request: NextRequest) {
     // Crisis count
     const crisisCount = conversations.filter(c => c.isCrisis).length;
 
+    // Calculate streak: count consecutive days with at least one conversation, ending today or yesterday
+    const today = new Date();
+    const todayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+    let streak = 0;
+    let checkDate = new Date(todayStart);
+
+    // Check if there's a conversation today; if not, start from yesterday
+    const hasToday = conversations.some(c => new Date(c.createdAt) >= todayStart);
+    if (!hasToday) {
+      checkDate.setDate(checkDate.getDate() - 1);
+    }
+
+    for (let i = 0; i < 365; i++) {
+      const dayStart = new Date(checkDate);
+      dayStart.setDate(dayStart.getDate() - i);
+      const dayStartNorm = new Date(dayStart.getFullYear(), dayStart.getMonth(), dayStart.getDate());
+      const dayEndNorm = new Date(dayStart.getFullYear(), dayStart.getMonth(), dayStart.getDate() + 1);
+
+      const hasConversation = conversations.some(c => {
+        const created = new Date(c.createdAt);
+        return created >= dayStartNorm && created < dayEndNorm;
+      });
+
+      if (hasConversation) {
+        streak++;
+      } else {
+        break;
+      }
+    }
+
     // Category breakdown (top 5 with percentages)
     const categoryMap = new Map<string, number>();
     for (const conv of conversations) {
@@ -74,17 +107,17 @@ export async function GET(request: NextRequest) {
     for (let i = 6; i >= 0; i--) {
       const day = new Date(now);
       day.setDate(day.getDate() - i);
-      const dayStart = new Date(day.getFullYear(), day.getMonth(), day.getDate());
-      const dayEnd = new Date(day.getFullYear(), day.getMonth(), day.getDate() + 1);
+      const dayStart2 = new Date(day.getFullYear(), day.getMonth(), day.getDate());
+      const dayEnd2 = new Date(day.getFullYear(), day.getMonth(), day.getDate() + 1);
 
       const count = conversations.filter(c => {
         const created = new Date(c.createdAt);
-        return created >= dayStart && created < dayEnd;
+        return created >= dayStart2 && created < dayEnd2;
       }).length;
 
       weeklyActivity.push({
-        date: dayStart.toISOString().split("T")[0],
-        day: dayStart.toLocaleDateString("en-US", { weekday: "short" }),
+        date: dayStart2.toISOString().split("T")[0],
+        day: dayStart2.toLocaleDateString("en-US", { weekday: "short" }),
         count,
       });
     }
@@ -110,9 +143,14 @@ export async function GET(request: NextRequest) {
     }
 
     return NextResponse.json({
+      // Simple format for quick access
+      conversations: totalConversations,
+      resourcesFound: totalResources,
+      avgConfidence,
+      streak,
+      // Extended format for dashboard charts
       totalConversations,
       totalResources,
-      avgConfidence,
       crisisCount,
       categoryBreakdown,
       weeklyActivity,

@@ -57,122 +57,26 @@ import {
 import Navbar from '@/components/Navbar'
 import { useAuth } from '@/hooks/use-auth'
 
-// ─── MOCK DATA ──────────────────────────────────────────
-const activityTimeline = [
-  {
-    id: '1',
-    text: 'Searched for housing assistance',
-    time: '2 hours ago',
-    icon: Layers,
-    colorHex: '#3b82f6',
-    bgColor: 'rgba(59,130,246,0.06)',
-  },
-  {
-    id: '2',
-    text: 'Found 3 legal aid resources',
-    time: 'Yesterday',
-    icon: Shield,
-    colorHex: '#10b981',
-    bgColor: 'rgba(16,185,129,0.06)',
-  },
-  {
-    id: '3',
-    text: 'Connected with crisis line',
-    time: '2 days ago',
-    icon: AlertTriangle,
-    colorHex: '#ef4444',
-    bgColor: 'rgba(239,68,68,0.06)',
-  },
-  {
-    id: '4',
-    text: 'Updated profile settings',
-    time: '3 days ago',
-    icon: User,
-    colorHex: '#8b5cf6',
-    bgColor: 'rgba(139,92,246,0.06)',
-  },
-]
+// ─── STATIC CONFIG (not mock data) ─────────────────────
+// Category colors used for display mapping
+const categoryColorMap: Record<string, string> = {
+  Housing: '#3b82f6',
+  Food: '#10b981',
+  'Mental Health': '#8b5cf6',
+  Crisis: '#ef4444',
+  Employment: '#f59e0b',
+  Legal: '#06b6d4',
+}
 
-const accountStats = [
-  {
-    label: 'Conversations',
-    value: '24',
-    icon: Layers,
-    colorHex: '#3b82f6',
-    bgColor: 'rgba(59,130,246,0.06)',
-  },
-  {
-    label: 'Resources found',
-    value: '47',
-    icon: Shield,
-    colorHex: '#10b981',
-    bgColor: 'rgba(16,185,129,0.06)',
-  },
-  {
-    label: 'Member for',
-    value: '7 days',
-    icon: Calendar,
-    colorHex: '#8b5cf6',
-    bgColor: 'rgba(139,92,246,0.06)',
-  },
-]
-
-const savedResources = [
-  {
-    id: '1',
-    title: 'Section 8 Emergency Transfer',
-    category: 'Housing',
-    categoryIcon: Home,
-    categoryColor: '#3b82f6',
-    categoryBg: 'rgba(59,130,246,0.06)',
-    confidence: 87,
-    verifiedDate: 'May 2026',
-    action: '2 locations near you',
-    actionIcon: MapPin,
-  },
-  {
-    id: '2',
-    title: 'SNAP Benefits Application',
-    category: 'Food',
-    categoryIcon: Utensils,
-    categoryColor: '#10b981',
-    categoryBg: 'rgba(16,185,129,0.06)',
-    confidence: 94,
-    verifiedDate: 'June 2026',
-    action: 'Apply online',
-    actionIcon: Zap,
-  },
-  {
-    id: '3',
-    title: '988 Crisis Lifeline',
-    category: 'Crisis',
-    categoryIcon: Heart,
-    categoryColor: '#ef4444',
-    categoryBg: 'rgba(239,68,68,0.06)',
-    confidence: 100,
-    verifiedDate: 'Available 24/7',
-    action: 'Phone & chat',
-    actionIcon: Phone,
-  },
-  {
-    id: '4',
-    title: 'Veteran Employment Program',
-    category: 'Employment',
-    categoryIcon: Briefcase,
-    categoryColor: '#f59e0b',
-    categoryBg: 'rgba(245,158,11,0.06)',
-    confidence: 78,
-    verifiedDate: 'April 2026',
-    action: 'Job training',
-    actionIcon: Star,
-  },
-]
-
-const searchCategories = [
-  { label: 'Housing', percent: 38, color: '#3b82f6' },
-  { label: 'Food', percent: 22, color: '#10b981' },
-  { label: 'Mental Health', percent: 18, color: '#8b5cf6' },
-]
+// Category icon mapping for timeline
+const categoryIconMap: Record<string, { icon: React.ComponentType<{ className?: string }>; colorHex: string; bgColor: string }> = {
+  Housing: { icon: Home, colorHex: '#3b82f6', bgColor: 'rgba(59,130,246,0.06)' },
+  Food: { icon: Utensils, colorHex: '#10b981', bgColor: 'rgba(16,185,129,0.06)' },
+  'Mental Health': { icon: Heart, colorHex: '#8b5cf6', bgColor: 'rgba(139,92,246,0.06)' },
+  Crisis: { icon: AlertTriangle, colorHex: '#ef4444', bgColor: 'rgba(239,68,68,0.06)' },
+  Employment: { icon: Briefcase, colorHex: '#f59e0b', bgColor: 'rgba(245,158,11,0.06)' },
+  Legal: { icon: Shield, colorHex: '#06b6d4', bgColor: 'rgba(6,182,212,0.06)' },
+}
 
 const resourceFilterTabs = [
   { label: 'All', value: 'all' },
@@ -369,6 +273,23 @@ function ProfileSkeleton() {
   )
 }
 
+// ─── TIME AGO HELPER ────────────────────────────────────
+function getTimeAgo(dateStr: string): string {
+  const now = Date.now()
+  const then = new Date(dateStr).getTime()
+  const diffMs = now - then
+  const diffMins = Math.floor(diffMs / 60000)
+  if (diffMins < 1) return 'Just now'
+  if (diffMins < 60) return `${diffMins} min ago`
+  const diffHours = Math.floor(diffMins / 60)
+  if (diffHours < 24) return `${diffHours} hour${diffHours !== 1 ? 's' : ''} ago`
+  const diffDays = Math.floor(diffHours / 24)
+  if (diffDays < 7) return `${diffDays} day${diffDays !== 1 ? 's' : ''} ago`
+  const diffWeeks = Math.floor(diffDays / 7)
+  if (diffWeeks < 4) return `${diffWeeks} week${diffWeeks !== 1 ? 's' : ''} ago`
+  return new Date(dateStr).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+}
+
 // ─── MAIN PROFILE PAGE ─────────────────────────────────
 export default function ProfilePage() {
   const router = useRouter()
@@ -379,12 +300,22 @@ export default function ProfilePage() {
   // Profile state from API
   const [profileData, setProfileData] = useState<{
     id: string; name: string; email: string; image: string | null; username: string | null;
-    location: string | null; language: string | null; plan: string; createdAt: string;
+    phone: string | null; location: string | null; language: string | null; plan: string; createdAt: string;
     stats: { totalConversations: number; totalResources: number; avgConfidence: number };
   } | null>(null)
   const [apiSavedResources, setApiSavedResources] = useState<Array<{
     id: string; title: string; category: string; confidence: number; verifiedDate: string | null;
     action: string | null; categoryColor: string;
+  }>>([])
+
+  // Activity timeline from conversations API
+  const [activityTimeline, setActivityTimeline] = useState<Array<{
+    id: string; text: string; time: string; icon: React.ComponentType<{ className?: string }>; colorHex: string; bgColor: string;
+  }>>([])
+
+  // Search categories from stats API
+  const [apiSearchCategories, setApiSearchCategories] = useState<Array<{
+    label: string; percent: number; color: string;
   }>>([])
 
   const [isEditing, setIsEditing] = useState(false)
@@ -432,22 +363,59 @@ export default function ProfilePage() {
     }
     const fetchProfile = async () => {
       try {
-        const [profileRes, resourcesRes] = await Promise.all([
+        const [profileRes, resourcesRes, conversationsRes, statsRes] = await Promise.all([
           fetch(`/api/user/profile?userId=${authUser.id}`),
           fetch(`/api/saved-resources?userId=${authUser.id}`),
+          fetch(`/api/conversations?userId=${authUser.id}`),
+          fetch(`/api/user/stats?userId=${authUser.id}`),
         ])
         if (profileRes.ok) {
           const data = await profileRes.json()
           setProfileData(data)
           setFullName(data.name ?? '')
           setEmail(data.email ?? '')
-          setPhone('')
+          setPhone(data.phone ?? '')
           setLocation(data.location ?? '')
           setLanguage(data.language ?? 'English')
         }
         if (resourcesRes.ok) {
           const resData = await resourcesRes.json()
           setApiSavedResources(Array.isArray(resData) ? resData : [])
+        }
+        // Build activity timeline from conversations
+        if (conversationsRes.ok) {
+          const convData = await conversationsRes.json()
+          const conversations = Array.isArray(convData) ? convData : []
+          const recent = conversations.slice(0, 5)
+          const timeline = recent.map((c: { id: string; title: string; category: string | null; isCrisis: boolean; createdAt: string }) => {
+            const cat = c.category || 'General'
+            const meta = categoryIconMap[cat] ?? { icon: Layers, colorHex: '#6b7280', bgColor: 'rgba(107,114,128,0.06)' }
+            const icon = c.isCrisis ? AlertTriangle : meta.icon
+            const colorHex = c.isCrisis ? '#ef4444' : meta.colorHex
+            const bgColor = c.isCrisis ? 'rgba(239,68,68,0.06)' : meta.bgColor
+            const timeAgo = getTimeAgo(c.createdAt)
+            return {
+              id: c.id,
+              text: c.title,
+              time: timeAgo,
+              icon,
+              colorHex,
+              bgColor,
+            }
+          })
+          setActivityTimeline(timeline)
+        }
+        // Build search categories from stats
+        if (statsRes.ok) {
+          const statsData = await statsRes.json()
+          if (statsData.categoryBreakdown && Array.isArray(statsData.categoryBreakdown)) {
+            const cats = statsData.categoryBreakdown.map((c: { category: string; percentage: number }) => ({
+              label: c.category,
+              percent: c.percentage,
+              color: categoryColorMap[c.category] ?? '#6b7280',
+            }))
+            setApiSearchCategories(cats)
+          }
         }
       } catch (err) {
         console.error('Failed to fetch profile:', err)
@@ -492,6 +460,7 @@ export default function ProfilePage() {
           userId: authUser.id,
           name: fullName,
           email,
+          phone,
           location,
           language,
         }),
@@ -635,10 +604,14 @@ export default function ProfilePage() {
                   <div className="relative group">
                     {/* Gradient border ring */}
                     <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-full p-[3px] bg-gradient-to-br from-blue-500 via-emerald-400 to-violet-500 shadow-lg shadow-blue-500/15">
-                      <div className="w-full h-full rounded-full bg-white flex items-center justify-center">
-                        <span className="text-[22px] sm:text-[26px] font-extrabold tracking-tight bg-gradient-to-br from-gray-800 to-gray-600 bg-clip-text text-transparent">
-                          {initials}
-                        </span>
+                      <div className="w-full h-full rounded-full bg-white flex items-center justify-center overflow-hidden">
+                        {profileData?.image ? (
+                          <img src={profileData.image} alt={fullName} className="w-full h-full object-cover" />
+                        ) : (
+                          <span className="text-[22px] sm:text-[26px] font-extrabold tracking-tight bg-gradient-to-br from-gray-800 to-gray-600 bg-clip-text text-transparent">
+                            {initials}
+                          </span>
+                        )}
                       </div>
                     </div>
                     {/* Camera overlay on hover */}
@@ -1097,7 +1070,7 @@ export default function ProfilePage() {
                 <div className="rounded-xl bg-white/50 border border-gray-100/60 p-4 sm:p-5">
                   <h3 className="text-[13px] font-semibold text-gray-700 mb-4">Most Searched Categories</h3>
                   <div className="space-y-3">
-                    {searchCategories.map((cat, i) => (
+                    {apiSearchCategories.length > 0 ? apiSearchCategories.map((cat, i) => (
                       <div key={cat.label} className="space-y-1.5">
                         <div className="flex items-center justify-between">
                           <span className="text-[12px] font-medium text-gray-600">{cat.label}</span>
@@ -1113,12 +1086,16 @@ export default function ProfilePage() {
                           />
                         </div>
                       </div>
-                    ))}
+                    )) : (
+                      <p className="text-[12px] text-gray-400 text-center py-4">No category data yet</p>
+                    )}
                   </div>
-                  <div className="mt-3 pt-3 border-t border-gray-100/60 flex items-center justify-between">
-                    <span className="text-[11px] text-gray-400 font-medium">Other categories</span>
-                    <span className="text-[11px] font-semibold text-gray-500">22%</span>
-                  </div>
+                  {apiSearchCategories.length > 0 && (
+                    <div className="mt-3 pt-3 border-t border-gray-100/60 flex items-center justify-between">
+                      <span className="text-[11px] text-gray-400 font-medium">Other categories</span>
+                      <span className="text-[11px] font-semibold text-gray-500">{Math.max(0, 100 - apiSearchCategories.reduce((sum, c) => sum + c.percent, 0))}%</span>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
@@ -1148,7 +1125,7 @@ export default function ProfilePage() {
                 </Link>
               </div>
               <div className="space-y-0">
-                {activityTimeline.map((item, i) => {
+                {activityTimeline.length > 0 ? activityTimeline.map((item, i) => {
                   const Icon = item.icon
                   return (
                     <motion.div
@@ -1177,7 +1154,13 @@ export default function ProfilePage() {
                       </div>
                     </motion.div>
                   )
-                })}
+                }) : (
+                  <div className="text-center py-6">
+                    <Clock className="w-8 h-8 text-gray-300 mx-auto mb-2" />
+                    <p className="text-[13px] text-gray-400 font-medium">No recent activity yet</p>
+                    <p className="text-[11px] text-gray-300 mt-1">Start a conversation to see your activity here</p>
+                  </div>
+                )}
               </div>
               <div className="sm:hidden mt-4 pt-4 border-t border-gray-100/60">
                 <Link href="/history" className="inline-flex items-center gap-1.5 text-[13px] font-semibold text-blue-600 hover:text-blue-700 transition-colors">

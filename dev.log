@@ -4,8 +4,4 @@
 - Environments: .env
 
 ✓ Starting...
-✓ Ready in 580ms
- GET / 200 in 1823ms (compile: 1503ms, render: 320ms)
- GET / 200 in 121ms (compile: 7ms, render: 115ms)
- GET /api/auth/session 200 in 585ms (compile: 564ms, render: 20ms)
- POST /api/classify 200 in 143ms (compile: 136ms, render: 7ms)
+✓ Ready in 604ms
