@@ -22,11 +22,15 @@ export default function Navbar({ scrolled: scrolledProp }: NavbarProps) {
   const scrolled = scrolledProp ?? internalScrolled
 
   const navLinks = [
-    { label: 'How It Works', href: '/#how-it-works' },
+    { label: 'How It Works', href: '/how-it-works' },
     { label: 'About', href: '/about' },
     { label: 'Responsible AI', href: '/responsible-ai' },
     { label: 'Pricing', href: '/pricing' },
-    { label: 'Scenarios', href: '/#scenarios' },
+    { label: 'Blog', href: '/blog' },
+    { label: 'API Docs', href: '/api-docs' },
+    { label: 'Team', href: '/team' },
+    { label: 'Verification', href: '/verification' },
+    { label: 'Contact', href: '/contact' },
   ]
 
   return (
@@ -62,30 +66,28 @@ export default function Navbar({ scrolled: scrolledProp }: NavbarProps) {
                   {link.label}
                 </Link>
               ))}
-              {navLinks.length > 3 && (
-                <div className="relative group">
-                  <button className="flex items-center gap-1 px-4 py-2 text-[13px] font-medium text-gray-600 hover:text-gray-900 rounded-lg hover:bg-gray-50/80 transition-all">
-                    More
-                    <ChevronDown className="w-3 h-3" />
-                  </button>
-                  <div className="absolute top-full right-0 mt-1 w-48 bg-white rounded-xl shadow-lg border border-gray-100/60 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 py-2 z-50">
-                    {navLinks.slice(3).map((link) => (
-                      <Link
-                        key={link.label}
-                        href={link.href}
-                        className="block px-4 py-2.5 text-[13px] font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50 transition-all"
-                      >
-                        {link.label}
-                      </Link>
-                    ))}
-                    <div className="border-t border-gray-100 my-1" />
-                    <Link href="/dashboard" className="block px-4 py-2.5 text-[13px] font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50 transition-all">Dashboard</Link>
-                    <Link href="/history" className="block px-4 py-2.5 text-[13px] font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50 transition-all">History</Link>
-                    <Link href="/settings" className="block px-4 py-2.5 text-[13px] font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50 transition-all">Settings</Link>
-                    <Link href="/profile" className="block px-4 py-2.5 text-[13px] font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50 transition-all">Profile</Link>
-                  </div>
+              <div className="relative group">
+                <button className="flex items-center gap-1 px-4 py-2 text-[13px] font-medium text-gray-600 hover:text-gray-900 rounded-lg hover:bg-gray-50/80 transition-all">
+                  More
+                  <ChevronDown className="w-3 h-3" />
+                </button>
+                <div className="absolute top-full right-0 mt-1 w-52 bg-white rounded-xl shadow-lg border border-gray-100/60 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 py-2 z-50">
+                  {navLinks.slice(3).map((link) => (
+                    <Link
+                      key={link.label}
+                      href={link.href}
+                      className="block px-4 py-2.5 text-[13px] font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50 transition-all"
+                    >
+                      {link.label}
+                    </Link>
+                  ))}
+                  <div className="border-t border-gray-100 my-1" />
+                  <Link href="/dashboard" className="block px-4 py-2.5 text-[13px] font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50 transition-all">Dashboard</Link>
+                  <Link href="/history" className="block px-4 py-2.5 text-[13px] font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50 transition-all">History</Link>
+                  <Link href="/settings" className="block px-4 py-2.5 text-[13px] font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50 transition-all">Settings</Link>
+                  <Link href="/profile" className="block px-4 py-2.5 text-[13px] font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50 transition-all">Profile</Link>
                 </div>
-              )}
+              </div>
             </nav>
 
             {/* Desktop CTAs */}
@@ -145,8 +147,20 @@ export default function Navbar({ scrolled: scrolledProp }: NavbarProps) {
                     <X className="w-5 h-5" />
                   </button>
                 </div>
-                <nav className="flex flex-col p-4 gap-1">
-                  {navLinks.map((link) => (
+                <nav className="flex flex-col p-4 gap-1 overflow-y-auto flex-1">
+                  <p className="px-4 py-2 text-[10px] font-bold text-gray-400 uppercase tracking-wider">Platform</p>
+                  {navLinks.slice(0, 3).map((link) => (
+                    <Link
+                      key={link.label}
+                      href={link.href}
+                      className="px-4 py-3 text-[14px] font-medium text-gray-700 hover:text-gray-900 rounded-xl hover:bg-gray-50 transition-all"
+                      onClick={() => setMobileOpen(false)}
+                    >
+                      {link.label}
+                    </Link>
+                  ))}
+                  <p className="px-4 py-2 text-[10px] font-bold text-gray-400 uppercase tracking-wider mt-2">Resources</p>
+                  {navLinks.slice(3).map((link) => (
                     <Link
                       key={link.label}
                       href={link.href}
@@ -157,6 +171,7 @@ export default function Navbar({ scrolled: scrolledProp }: NavbarProps) {
                     </Link>
                   ))}
                   <div className="border-t border-gray-100 my-2" />
+                  <p className="px-4 py-2 text-[10px] font-bold text-gray-400 uppercase tracking-wider">App</p>
                   <Link href="/dashboard" className="px-4 py-3 text-[14px] font-medium text-gray-700 hover:text-gray-900 rounded-xl hover:bg-gray-50 transition-all" onClick={() => setMobileOpen(false)}>Dashboard</Link>
                   <Link href="/history" className="px-4 py-3 text-[14px] font-medium text-gray-700 hover:text-gray-900 rounded-xl hover:bg-gray-50 transition-all" onClick={() => setMobileOpen(false)}>History</Link>
                   <Link href="/settings" className="px-4 py-3 text-[14px] font-medium text-gray-700 hover:text-gray-900 rounded-xl hover:bg-gray-50 transition-all" onClick={() => setMobileOpen(false)}>Settings</Link>
