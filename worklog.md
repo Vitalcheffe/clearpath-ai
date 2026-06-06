@@ -973,3 +973,30 @@ Stage Summary:
 - Commit: 0eb93ac on main branch of clearpath-ai-prod
 - 28 files changed, 2908 insertions, 356 deletions
 - All mock data replaced with real database queries
+
+---
+Task ID: production-hardening-1
+Agent: Main Agent
+Task: Production hardening — fix security bugs, replace mock data, add auth checks
+
+Work Log:
+- Audited entire codebase to identify what's working vs mock/broken
+- Found: DB working, auth working (credentials), all API routes using real Prisma queries
+- Found critical bugs: plaintext password storage, no API auth checks, hardcoded resourceDb
+- Fixed P0: Password change now uses bcrypt.compare to verify old password, bcrypt.hash to store new
+- Fixed P0: Replaced hardcoded resourceDb in chat page with fetch from /api/community-resources
+- Created src/lib/auth-helpers.ts with requireAuth/requireSameUser helpers
+- Applied auth checks to all API routes (strict for user data, graceful for conversations/guest access)
+- Fixed dashboard: resourceStatuses and achievements now computed from real DB data
+- Marked static dashboard sections (community feed, events, updates) as informational
+- Added @unique constraint to username in Prisma schema, ran prisma generate + db push
+- Login page: Magic Link and OTP tabs marked as "Coming Soon" with disabled buttons
+- Updated PROGRESS.MD and TASKS.md with actual completion status (82% done)
+- Build passes cleanly: 34 pages, all API routes, 0 errors
+- Committed and pushed to origin (clearpath-ai-prod) as commit cf88dec
+
+Stage Summary:
+- Production is 82% complete
+- All core functionality works: DB, auth (credentials), API routes, chat, dashboard, history, profile, settings
+- Remaining: real OAuth credentials (Google/GitHub), static pages verification, deploy
+- Commit: cf88dec on main branch of clearpath-ai-prod
