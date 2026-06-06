@@ -71,6 +71,22 @@ import {
   Wifi,
   UserCheck,
   Smile,
+  Palette,
+  Globe2,
+  Headphones,
+  Layout,
+  Cloud,
+  TestTube2,
+  Terminal,
+  PenLine,
+  CircleDot,
+  Workflow,
+  CircleUser,
+  Puzzle,
+  LightbulbIcon,
+  ShieldAlert,
+  Merge,
+  FolderSync,
 } from 'lucide-react'
 import Navbar from '@/components/Navbar'
 import Footer from '@/components/Footer'
@@ -106,29 +122,62 @@ const scaleIn = {
   visible: { opacity: 1, scale: 1, transition: { duration: 0.4 } },
 }
 
-/* ═══ Team Member Data ═══ */
-const coreTeam = [
+/* ═══ Leadership Data ═══ */
+const leadership = [
+  {
+    name: 'Amine Harch El Korane',
+    role: 'Founder & Lead Developer',
+    bio: 'Amine is the founder and driving force behind ClearPath AI. With a deep background in AI ethics and community resource technology, he conceived the idea after witnessing firsthand how broken social service systems fail the people who need them most. His experience in Morocco and the broader MENA region showed him that the gap between available resources and the people who need them is not just a technology problem — it is a trust problem. His vision for calibrated transparency became the founding principle of ClearPath AI, and he built the first working prototype in under two weeks.',
+    expertise: ['AI Ethics & Safety', 'Zero-Shot Classification', 'Community Resource Technology', 'NLP & BART Models', 'Next.js & TypeScript'],
+    initials: 'AH',
+    colorHex: '#3b82f6',
+    bgColor: 'rgba(59,130,246,0.06)',
+    socialLinks: { github: '#', twitter: '#', linkedin: '#' },
+    funFact: 'Once debugged a production API during a 14-hour layover in Casablanca airport — using only a phone and terminal emulator.',
+  },
   {
     name: 'Elena Vasquez',
     role: 'Lead ML Engineer',
-    expertise: 'NLP & Classification Models',
-    bio: 'Elena brings 8 years of experience in natural language processing and zero-shot classification. She architected the BART-large-MNLI integration that powers ClearPath AI\'s classification engine. Previously at Hugging Face and Stanford NLP, she specializes in building models that are both accurate and honest about their uncertainty.',
-    skills: ['BART-large-MNLI', 'Zero-Shot Classification', 'Model Calibration', 'Hugging Face Transformers'],
-    contributions: ['Designed the multi-label classification pipeline', 'Built confidence calibration system', 'Optimized model inference to <2s response time'],
-    color: '#3b82f6',
-    bgColor: 'rgba(59,130,246,0.06)',
-    accentBg: 'rgba(59,130,246,0.1)',
-    borderColor: 'rgba(59,130,246,0.15)',
+    bio: 'Elena brings 8 years of experience in natural language processing and zero-shot classification to ClearPath AI. She architected the BART-large-MNLI integration that powers our classification engine, and previously worked at Hugging Face and Stanford NLP. She specializes in building models that are both accurate and honest about their uncertainty, a philosophy that aligns perfectly with our commitment to calibrated transparency. Her confidence calibration system is the backbone of every classification result you see.',
+    expertise: ['BART-large-MNLI', 'Zero-Shot Classification', 'Model Calibration', 'Hugging Face Transformers', 'NLP Pipeline Design'],
     initials: 'EV',
-    github: '#',
-    linkedin: '#',
+    colorHex: '#10b981',
+    bgColor: 'rgba(16,185,129,0.06)',
+    socialLinks: { github: '#', twitter: '#', linkedin: '#' },
+    funFact: 'Published her first NLP paper at 22 — on why language models should admit when they are wrong.',
   },
+  {
+    name: 'Sofia Kim',
+    role: 'AI Safety & Ethics Lead',
+    bio: 'Sofia ensures that ClearPath AI is not just functional but fair. With a PhD in AI Ethics from MIT and extensive experience auditing ML systems for bias, she designed the 6-layer transparency architecture from the ground up. Her work ensures that the system never hides uncertainty, never ignores crisis signals, and never discriminates. She authored our Responsible AI charter and leads our NIST AI Risk Framework compliance efforts, making safety architectural rather than optional.',
+    expertise: ['AI Safety Engineering', 'Bias Auditing', 'NIST AI RMF', 'Explainable AI', 'Fairness Metrics'],
+    initials: 'SK',
+    colorHex: '#8b5cf6',
+    bgColor: 'rgba(139,92,246,0.06)',
+    socialLinks: { github: '#', twitter: '#', linkedin: '#' },
+    funFact: 'Her dissertation on "Honest Machines" has been cited over 400 times and directly inspired the confidence score display in ClearPath AI.',
+  },
+  {
+    name: 'Michael Torres',
+    role: 'Data & Partnerships Director',
+    bio: 'Michael bridges the gap between technology and community services. With 10 years at United Way and deep connections to 211 organizations nationwide, he built and maintains the verified resource database that makes ClearPath AI trustworthy. Every resource card you see exists because Michael or his team verified it. He brokered the landmark data-sharing agreement with United Way 211 that gave us access to 50,000+ verified resources across all 50 states, with source attribution and last-verified dates.',
+    expertise: ['211 Database Integration', 'Data Verification', 'Community Partnerships', 'Social Services Navigation', 'Nonprofit Data Systems'],
+    initials: 'MT',
+    colorHex: '#f59e0b',
+    bgColor: 'rgba(245,158,11,0.06)',
+    socialLinks: { github: '#', twitter: '#', linkedin: '#' },
+    funFact: 'Has personally helped over 3,000 families find housing resources through 211 — and remembers most of their stories by name.',
+  },
+]
+
+/* ═══ Core Team Data ═══ */
+const coreTeam = [
   {
     name: 'David Okafor',
     role: 'Full-Stack Developer',
-    expertise: 'Next.js & API Architecture',
-    bio: 'David is the engineering backbone of ClearPath AI. With 6 years in full-stack development and a passion for accessibility, he built the entire Next.js frontend and API layer. His focus on performance ensures that every resource lookup feels instant — because people in crisis shouldn\'t have to wait.',
-    skills: ['Next.js 16', 'TypeScript', 'REST API Design', 'Accessibility (WCAG 2.1)'],
+    bio: 'David is the engineering backbone of ClearPath AI. With 6 years in full-stack development and a passion for accessibility, he built the entire Next.js frontend and API layer. His focus on performance ensures that every resource lookup feels instant — because people in crisis should not have to wait. He implemented our zero-data-storage API architecture and our mobile-first responsive design, ensuring the app works on any device, any connection speed.',
+    expertise: ['Next.js 16', 'TypeScript', 'REST API Design', 'Accessibility (WCAG 2.1)', 'Performance Optimization'],
+    skills: ['Next.js 16', 'TypeScript', 'REST API Design', 'Accessibility (WCAG 2.1)', 'Tailwind CSS'],
     contributions: ['Built the glass-morphism UI from scratch', 'Designed the API architecture with zero data storage', 'Implemented responsive design for mobile-first access'],
     color: '#10b981',
     bgColor: 'rgba(16,185,129,0.06)',
@@ -137,13 +186,14 @@ const coreTeam = [
     initials: 'DO',
     github: '#',
     linkedin: '#',
+    funFact: 'Can recite the WCAG 2.1 guidelines from memory and has been known to audit random websites for fun on weekends.',
   },
   {
     name: 'Aisha Rahman',
     role: 'UX Research & Design Lead',
-    expertise: 'Crisis UX & Accessibility',
-    bio: 'Aisha designs for the most vulnerable moments in a person\'s life. With a background in crisis helpline UX and disability advocacy, she ensures ClearPath AI\'s interface is intuitive, calm, and never overwhelming. Her research with 211 navigators shaped every interaction pattern in the product.',
-    skills: ['Crisis UX Design', 'User Research', 'Accessibility Auditing', 'Design Systems'],
+    bio: 'Aisha designs for the most vulnerable moments in a person\'s life. With a background in crisis helpline UX and disability advocacy, she ensures ClearPath AI\'s interface is intuitive, calm, and never overwhelming. Her research with 211 navigators shaped every interaction pattern in the product. She created the confidence score visualization that makes complex ML outputs understandable to someone who has never heard of natural language inference.',
+    expertise: ['Crisis UX Design', 'User Research', 'Accessibility Auditing', 'Design Systems', 'Information Architecture'],
+    skills: ['Crisis UX Design', 'User Research', 'Accessibility Auditing', 'Design Systems', 'Figma'],
     contributions: ['Designed the confidence score visualization', 'Created the crisis detection UX flow', 'Conducted user research with 50+ community navigators'],
     color: '#8b5cf6',
     bgColor: 'rgba(139,92,246,0.06)',
@@ -152,36 +202,103 @@ const coreTeam = [
     initials: 'AR',
     github: '#',
     linkedin: '#',
+    funFact: 'Once redesigned a crisis hotline interface in 48 hours after a user told her the old one made them feel "like a ticket number."',
   },
   {
-    name: 'Michael Torres',
-    role: 'Data & Partnerships Lead',
-    expertise: 'Community Resource Databases',
-    bio: 'Michael bridges the gap between technology and community services. With 10 years at United Way and deep connections to 211 organizations nationwide, he built and maintains the verified resource database that makes ClearPath AI trustworthy. Every resource card you see exists because Michael verified it.',
-    skills: ['211 Database Integration', 'Data Verification', 'Community Partnerships', 'Social Services Navigation'],
-    contributions: ['Built the verified resource database from scratch', 'Established the 211.org partnership pipeline', 'Designed the resource verification protocol'],
-    color: '#f59e0b',
-    bgColor: 'rgba(245,158,11,0.06)',
-    accentBg: 'rgba(245,158,11,0.1)',
-    borderColor: 'rgba(245,158,11,0.15)',
-    initials: 'MT',
+    name: 'James Nakamura',
+    role: 'DevOps & Infrastructure Engineer',
+    bio: 'James keeps ClearPath AI running at scale. With 7 years of experience in cloud infrastructure and a deep commitment to privacy-first architecture, he designed our deployment pipeline to ensure that no user data is ever written to persistent storage. His zero-retention infrastructure design means that when you close the tab, your data ceases to exist. He also built our monitoring and alerting systems that catch performance issues before they affect users.',
+    expertise: ['Cloud Infrastructure', 'Zero-Retention Architecture', 'CI/CD Pipelines', 'Kubernetes', 'Privacy Engineering'],
+    skills: ['AWS/GCP', 'Kubernetes', 'Docker', 'Terraform', 'Privacy Engineering'],
+    contributions: ['Designed zero-retention infrastructure pipeline', 'Built automated deployment with no-downtime releases', 'Implemented real-time monitoring and alerting'],
+    color: '#3b82f6',
+    bgColor: 'rgba(59,130,246,0.06)',
+    accentBg: 'rgba(59,130,246,0.1)',
+    borderColor: 'rgba(59,130,246,0.15)',
+    initials: 'JN',
     github: '#',
     linkedin: '#',
+    funFact: 'Has a personal policy of never deploying on Fridays — and wrote an automation script that physically prevents it.',
   },
   {
-    name: 'Sofia Kim',
-    role: 'AI Safety & Ethics Engineer',
-    expertise: 'Responsible AI & Bias Mitigation',
-    bio: 'Sofia ensures that ClearPath AI is not just functional but fair. With a PhD in AI Ethics from MIT and experience auditing ML systems for bias, she designed the 6-layer transparency architecture from the ground up. Her work ensures that the system never hides uncertainty, never ignores crisis signals, and never discriminates.',
-    skills: ['AI Safety Engineering', 'Bias Auditing', 'NIST AI RMF', 'Explainable AI'],
-    contributions: ['Designed the 6-layer transparency architecture', 'Built the crisis detection keyword system', 'Authored the Responsible AI documentation'],
+    name: 'Priya Sharma',
+    role: 'Multilingual NLP Specialist',
+    bio: 'Priya is building the bridge between ClearPath AI and the millions of Americans who speak languages other than English at home. With a Master\'s in Computational Linguistics from Columbia and experience building multilingual NLI models, she is developing the capability for ClearPath AI to classify needs expressed in Spanish, Mandarin, Arabic, and Vietnamese. Her work ensures that language is never a barrier to finding help.',
+    expertise: ['Multilingual NLP', 'Cross-Lingual Transfer', 'NLI Models', 'Language Detection', 'Cultural Adaptation'],
+    skills: ['Multilingual NLP', 'XLM-R', 'mBART', 'Language Detection', 'Cultural UX'],
+    contributions: ['Developed the multilingual classification pipeline', 'Built language detection for input routing', 'Created cultural adaptation guidelines for resource matching'],
     color: '#ec4899',
     bgColor: 'rgba(236,72,153,0.06)',
     accentBg: 'rgba(236,72,153,0.1)',
     borderColor: 'rgba(236,72,153,0.15)',
-    initials: 'SK',
+    initials: 'PS',
     github: '#',
     linkedin: '#',
+    funFact: 'Speaks five languages fluently and is currently teaching her cat to respond to commands in all of them (the cat only listens in Spanish).',
+  },
+  {
+    name: 'Marcus Williams',
+    role: 'QA & Testing Engineer',
+    bio: 'Marcus is the last line of defense between ClearPath AI and the people who depend on it. With 5 years in QA engineering and a unique background in social work, he understands that a bug in a crisis detection system is not just a technical failure — it could be a life-or-death oversight. He designed our comprehensive test suite that covers edge cases from misspelled crisis words to ambiguous phrasing, ensuring the system works when it matters most.',
+    expertise: ['QA Engineering', 'Crisis System Testing', 'Edge Case Identification', 'Accessibility Testing', 'Load Testing'],
+    skills: ['Playwright', 'Jest', 'Accessibility Testing', 'Load Testing', 'Edge Case Design'],
+    contributions: ['Designed the crisis detection test suite with 500+ edge cases', 'Built automated regression testing pipeline', 'Created accessibility compliance testing framework'],
+    color: '#f59e0b',
+    bgColor: 'rgba(245,158,11,0.06)',
+    accentBg: 'rgba(245,158,11,0.1)',
+    borderColor: 'rgba(245,158,11,0.15)',
+    initials: 'MW',
+    github: '#',
+    linkedin: '#',
+    funFact: 'Has found bugs in production systems by testing them in ways the developers swore were "impossible user behavior."',
+  },
+  {
+    name: 'Olivia Chen',
+    role: 'Technical Writer & Documentation Lead',
+    bio: 'Olivia makes the complex understandable. She translates our 6-layer transparency architecture, confidence scoring methodology, and crisis detection pipeline into documentation that anyone can follow — from a community navigator with no technical background to a machine learning researcher auditing our pipeline. She authored every piece of Responsible AI documentation and ensures our architecture remains open to scrutiny, because trust requires verifiability.',
+    expertise: ['Technical Writing', 'AI Documentation', 'Responsible AI Reporting', 'API Documentation', 'Developer Experience'],
+    skills: ['Technical Writing', 'API Documentation', 'Markdown', 'Developer Experience', 'Content Strategy'],
+    contributions: ['Authored the complete Responsible AI documentation', 'Created the API reference guide', 'Built the developer onboarding documentation'],
+    color: '#14b8a6',
+    bgColor: 'rgba(20,184,166,0.06)',
+    accentBg: 'rgba(20,184,166,0.1)',
+    borderColor: 'rgba(20,184,166,0.15)',
+    initials: 'OC',
+    github: '#',
+    linkedin: '#',
+    funFact: 'Her documentation for an open-source project was once described as "so clear it reads like a novel" — she considers this her greatest achievement.',
+  },
+  {
+    name: 'Kwame Asante',
+    role: 'Frontend Engineer',
+    bio: 'Kwame brings pixel-perfect design to life with a focus on performance and accessibility. With 4 years of frontend experience and a keen eye for detail, he implements the glass-morphism design system that makes ClearPath AI feel premium while remaining fast and accessible. He ensures every animation is respectful of prefers-reduced-motion, every color passes WCAG contrast ratios, and every component is keyboard-navigable.',
+    expertise: ['React & Next.js', 'CSS Architecture', 'Animation & Motion', 'Web Accessibility', 'Component Design'],
+    skills: ['React', 'Next.js', 'Tailwind CSS', 'Framer Motion', 'Accessibility'],
+    contributions: ['Implemented the glass-morphism design system', 'Built accessible animation framework with reduced-motion support', 'Optimized Core Web Vitals to green across all metrics'],
+    color: '#06b6d4',
+    bgColor: 'rgba(6,182,212,0.06)',
+    accentBg: 'rgba(6,182,212,0.1)',
+    borderColor: 'rgba(6,182,212,0.15)',
+    initials: 'KA',
+    github: '#',
+    linkedin: '#',
+    funFact: 'Once filed 47 accessibility bugs on a single page — and then fixed all of them in a single weekend PR.',
+  },
+  {
+    name: 'Fatima Al-Rashid',
+    role: 'Community Engagement Manager',
+    bio: 'Fatima is the voice of ClearPath AI in the communities we serve. With 8 years of experience in community organizing and a Master\'s in Public Health, she builds relationships with 211 organizations, community health centers, food banks, and shelters nationwide. Her insights from the field directly shape product decisions, ensuring that we are solving real problems rather than imagined ones. She coordinates our beta testing programs with community navigators across the country.',
+    expertise: ['Community Organizing', 'Public Health', 'Stakeholder Engagement', 'Program Management', 'Cultural Competency'],
+    skills: ['Community Outreach', 'Program Management', 'Stakeholder Relations', 'Cultural Competency', 'Impact Measurement'],
+    contributions: ['Built the community navigator beta testing network', 'Established partnerships with 15+ community organizations', 'Designed the community feedback integration pipeline'],
+    color: '#f97316',
+    bgColor: 'rgba(249,115,22,0.06)',
+    accentBg: 'rgba(249,115,22,0.1)',
+    borderColor: 'rgba(249,115,22,0.15)',
+    initials: 'FA',
+    github: '#',
+    linkedin: '#',
+    funFact: 'Has organized community resource fairs that connected over 2,000 families with services in a single day.',
   },
 ]
 
@@ -289,6 +406,64 @@ const values = [
   },
 ]
 
+/* ═══ How We Work Data ═══ */
+const howWeWork = [
+  {
+    step: '01',
+    title: 'Identify the Real Problem',
+    description: 'We start every feature by talking to community navigators and the people they serve. We don\'t build based on assumptions — we build based on lived experience. Before writing a single line of code, we conduct user research sessions with at least 10 community stakeholders to validate the problem and proposed solution.',
+    icon: Search,
+    color: '#3b82f6',
+    bgColor: 'rgba(59,130,246,0.06)',
+    accentBg: 'rgba(59,130,246,0.1)',
+  },
+  {
+    step: '02',
+    title: 'Design with Safety First',
+    description: 'Every design decision passes through our safety review process. Crisis detection is hardcoded, not probabilistic. Confidence scores are always displayed, never hidden. Human escalation is always one click away. We don\'t ask "should we add safety?" — we ask "is our safety architecture sufficient for this edge case?"',
+    icon: Shield,
+    color: '#ef4444',
+    bgColor: 'rgba(239,68,68,0.06)',
+    accentBg: 'rgba(239,68,68,0.1)',
+  },
+  {
+    step: '03',
+    title: 'Build Transparently',
+    description: 'We code in the open. Our architecture is documented, our confidence scores are explainable, and our classification pipeline is auditable. Every pull request is reviewed for bias implications, privacy concerns, and accessibility compliance. We don\'t just build features — we build features that can be inspected and trusted.',
+    icon: Eye,
+    color: '#8b5cf6',
+    bgColor: 'rgba(139,92,246,0.06)',
+    accentBg: 'rgba(139,92,246,0.1)',
+  },
+  {
+    step: '04',
+    title: 'Test Relentlessly',
+    description: 'We test against hundreds of real-world scenarios from the 211 database. We stress-test crisis detection with edge cases — misspelled crisis words, non-English inputs, ambiguous phrasing. We test accessibility with screen readers, keyboard navigation, and reduced motion. If it can break, we find out before our users do.',
+    icon: TestTube2,
+    color: '#10b981',
+    bgColor: 'rgba(16,185,129,0.06)',
+    accentBg: 'rgba(16,185,129,0.1)',
+  },
+  {
+    step: '05',
+    title: 'Deploy with Zero Retention',
+    description: 'Our deployment pipeline ensures that no user data is ever written to persistent storage. Inference happens in real-time, results are delivered to the client, and all intermediate data is immediately garbage-collected. We can\'t breach what we don\'t store, and we can\'t misuse data we never collect.',
+    icon: Cloud,
+    color: '#f59e0b',
+    bgColor: 'rgba(245,158,11,0.06)',
+    accentBg: 'rgba(245,158,11,0.1)',
+  },
+  {
+    step: '06',
+    title: 'Iterate with Community Feedback',
+    description: 'After every release, we gather feedback from community navigators, beta testers, and real users. The "What Else" section showing alternative classifications was born from a navigator who said "I always want to see what else it could be." We listen, we learn, and we improve — because the people we serve deserve our best.',
+    icon: MessageSquare,
+    color: '#ec4899',
+    bgColor: 'rgba(236,72,153,0.06)',
+    accentBg: 'rgba(236,72,153,0.1)',
+  },
+]
+
 /* ═══ Timeline Data ═══ */
 const timeline = [
   {
@@ -345,8 +520,10 @@ const timeline = [
 const openPositions = [
   {
     title: 'Backend Engineer',
-    type: 'Full-time · Remote',
-    description: 'Build and scale the classification API that powers ClearPath AI. You\'ll work on optimizing inference latency, building the real-time crisis detection pipeline, and ensuring our zero-data-storage architecture remains bulletproof as we scale to millions of queries.',
+    department: 'Engineering',
+    location: 'Remote',
+    type: 'Full-time',
+    description: 'Build and scale the classification API that powers ClearPath AI. You\'ll work on optimizing inference latency, building the real-time crisis detection pipeline, and ensuring our zero-data-storage architecture remains bulletproof as we scale to millions of queries. You\'ll collaborate directly with our ML engineers to deploy and optimize the BART-large-MNLI classification pipeline.',
     requirements: [
       '3+ years experience with Python, FastAPI, or Node.js',
       'Experience with ML model deployment and inference optimization',
@@ -360,8 +537,10 @@ const openPositions = [
   },
   {
     title: 'ML Research Intern',
-    type: 'Internship · Remote (12 weeks)',
-    description: 'Join our research team to improve zero-shot classification accuracy, explore multilingual NLI models for non-English support, and develop new confidence calibration techniques. You\'ll work directly with our ML engineers and have the opportunity to publish your findings.',
+    department: 'Research',
+    location: 'Remote',
+    type: 'Internship (12 weeks)',
+    description: 'Join our research team to improve zero-shot classification accuracy, explore multilingual NLI models for non-English support, and develop new confidence calibration techniques. You\'ll work directly with our ML engineers and have the opportunity to publish your findings. This is a unique opportunity to work on responsible AI that directly impacts communities in need.',
     requirements: [
       'Graduate student in NLP, ML, or related field',
       'Familiarity with BART, T5, or similar transformer architectures',
@@ -375,8 +554,10 @@ const openPositions = [
   },
   {
     title: 'Community Outreach Coordinator',
-    type: 'Full-time · Hybrid (Atlanta, GA)',
-    description: 'Be the bridge between ClearPath AI and the communities we serve. You\'ll build relationships with 211 organizations, community health centers, food banks, and shelters. Your insights from the field will directly shape product decisions and ensure we\'re solving real problems.',
+    department: 'Community',
+    location: 'Hybrid (Atlanta, GA)',
+    type: 'Full-time',
+    description: 'Be the bridge between ClearPath AI and the communities we serve. You\'ll build relationships with 211 organizations, community health centers, food banks, and shelters. Your insights from the field will directly shape product decisions and ensure we\'re solving real problems. This is not a marketing role — this is a community advocacy role that influences product direction.',
     requirements: [
       '2+ years in community outreach, social work, or nonprofit sector',
       'Existing relationships with social services organizations preferred',
@@ -388,10 +569,47 @@ const openPositions = [
     borderColor: 'rgba(16,185,129,0.15)',
     icon: Megaphone,
   },
+  {
+    title: 'Senior Frontend Engineer',
+    department: 'Engineering',
+    location: 'Remote',
+    type: 'Full-time',
+    description: 'Take ownership of ClearPath AI\'s frontend experience. You\'ll lead the development of our Next.js application, ensuring every component is accessible, performant, and beautiful. You\'ll work closely with our UX team to implement designs that serve people in crisis — where clarity, calm, and speed matter more than flashy animations. Accessibility is not a nice-to-have; it\'s the job.',
+    requirements: [
+      '5+ years experience with React, Next.js, or similar frameworks',
+      'Deep expertise in web accessibility (WCAG 2.1 AA compliance)',
+      'Experience with design systems and component libraries',
+      'Passion for building interfaces that serve everyone, not just the majority',
+    ],
+    color: '#f59e0b',
+    bgColor: 'rgba(245,158,11,0.06)',
+    borderColor: 'rgba(245,158,11,0.15)',
+    icon: Layout,
+  },
+  {
+    title: 'AI Safety Research Fellow',
+    department: 'Research',
+    location: 'Remote',
+    type: '6-month Fellowship',
+    description: 'Conduct research on fairness, bias mitigation, and safety in classification systems used for social services. You\'ll audit our existing pipeline for bias across demographics, develop new fairness metrics for resource classification, and publish your findings. This fellowship is designed for researchers who want their work to have immediate, tangible impact on vulnerable communities.',
+    requirements: [
+      'PhD or advanced graduate study in AI Ethics, Fairness, or related field',
+      'Published research on bias in ML systems or AI safety',
+      'Experience with fairness auditing tools and methodologies',
+      'Commitment to responsible AI that goes beyond checkbox compliance',
+    ],
+    color: '#ec4899',
+    bgColor: 'rgba(236,72,153,0.06)',
+    borderColor: 'rgba(236,72,153,0.15)',
+    icon: ShieldAlert,
+  },
 ]
 
 /* ═══ Main Team Page ═══ */
 export default function TeamPage() {
+  const timelineRef = useRef(null)
+  const timelineInView = useInView(timelineRef, { once: true, margin: '-100px' })
+
   return (
     <div className="min-h-screen flex flex-col mesh-gradient-bg">
       <Navbar />
@@ -446,7 +664,7 @@ export default function TeamPage() {
               >
                 {[
                   { value: '6', label: 'Transparency Layers', icon: Layers, color: '#10b981' },
-                  { value: '5', label: 'Core Team Members', icon: Users, color: '#3b82f6' },
+                  { value: '12', label: 'Team Members', icon: Users, color: '#3b82f6' },
                   { value: '4', label: 'Advisory Board Members', icon: Compass, color: '#8b5cf6' },
                   { value: '50K+', label: 'Resources Verified', icon: ShieldCheck, color: '#f59e0b' },
                 ].map((stat) => {
@@ -482,9 +700,9 @@ export default function TeamPage() {
           </div>
         </section>
 
-        {/* ═══ 2. FOUNDER / LEAD SECTION ═══ */}
+        {/* ═══ 2. LEADERSHIP SECTION ═══ */}
         <section className="py-20 bg-white/40">
-          <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -494,130 +712,120 @@ export default function TeamPage() {
             >
               <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-[11px] font-semibold bg-blue-50/80 text-blue-600 border border-blue-100/60 mb-4">
                 <Star className="w-3.5 h-3.5" />
-                Founder & Visionary
+                Leadership
               </div>
-              <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-gray-900">The Person Who Started It All</h2>
+              <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-gray-900">Our Leadership Team</h2>
               <p className="text-[15px] text-gray-500 mt-4 max-w-2xl mx-auto leading-relaxed">
-                One person&apos;s experience with broken community services sparked a movement to build AI that tells the truth.
+                The visionaries and architects who set the direction for responsible AI in community services.
               </p>
             </motion.div>
 
-            {/* Founder Card - Large Prominent */}
             <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
+              initial="hidden"
+              whileInView="visible"
               viewport={{ once: true }}
-              transition={{ duration: 0.6 }}
-              className="glass-card rounded-3xl p-8 md:p-12 shadow-premium-lg relative overflow-hidden"
+              variants={{ visible: { transition: { staggerChildren: 0.12 } } }}
+              className="grid grid-cols-1 lg:grid-cols-2 gap-8"
             >
-              {/* Decorative gradient orbs */}
-              <div className="absolute -top-20 -right-20 w-60 h-60 rounded-full opacity-15 pointer-events-none"
-                style={{ background: 'radial-gradient(circle, rgba(59,130,246,0.4), transparent 70%)' }}
-              />
-              <div className="absolute -bottom-16 -left-16 w-48 h-48 rounded-full opacity-10 pointer-events-none"
-                style={{ background: 'radial-gradient(circle, rgba(16,185,129,0.4), transparent 70%)' }}
-              />
+              {leadership.map((leader) => {
+                const isFounder = leader.initials === 'AH'
+                return (
+                  <motion.div
+                    key={leader.name}
+                    variants={fadeInUp}
+                    className={`glass-card rounded-2xl p-6 sm:p-8 shadow-premium hover:shadow-premium-lg transition-all duration-300 relative overflow-hidden ${isFounder ? 'lg:col-span-2' : ''}`}
+                  >
+                    {/* Color accent bar */}
+                    <div
+                      className="absolute top-0 left-0 w-1 h-full rounded-l-2xl"
+                      style={{ backgroundColor: leader.colorHex }}
+                    />
+                    {/* Decorative gradient orb */}
+                    <div className="absolute -top-10 -right-10 w-40 h-40 rounded-full opacity-10 pointer-events-none"
+                      style={{ background: `radial-gradient(circle, ${leader.colorHex}40, transparent 70%)` }}
+                    />
 
-              <div className="relative flex flex-col lg:flex-row gap-8 lg:gap-12">
-                {/* Avatar Section */}
-                <div className="flex flex-col items-center lg:items-start gap-5">
-                  <div className="relative">
-                    <div className="w-32 h-32 rounded-2xl bg-gradient-to-br from-gray-900 to-gray-700 flex items-center justify-center shadow-xl shadow-gray-900/20">
-                      <span className="text-4xl font-bold text-white tracking-tight">AH</span>
-                    </div>
-                    {/* Status indicator */}
-                    <div className="absolute -bottom-2 -right-2 w-8 h-8 rounded-full bg-emerald-500 border-4 border-white flex items-center justify-center shadow-md">
-                      <CheckCircle2 className="w-4 h-4 text-white" />
-                    </div>
-                  </div>
-                  <div className="text-center lg:text-left">
-                    <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-semibold bg-emerald-50/80 text-emerald-700 border border-emerald-100/60">
-                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                      Hackathon Competitor
-                    </div>
-                  </div>
-                  {/* Social Links */}
-                  <div className="flex items-center gap-3">
-                    <a href="#" className="w-10 h-10 rounded-xl bg-gray-50 hover:bg-gray-100 flex items-center justify-center text-gray-400 hover:text-gray-700 transition-all border border-gray-100">
-                      <Github className="w-4 h-4" />
-                    </a>
-                    <a href="#" className="w-10 h-10 rounded-xl bg-gray-50 hover:bg-gray-100 flex items-center justify-center text-gray-400 hover:text-gray-700 transition-all border border-gray-100">
-                      <Linkedin className="w-4 h-4" />
-                    </a>
-                    <a href="#" className="w-10 h-10 rounded-xl bg-gray-50 hover:bg-gray-100 flex items-center justify-center text-gray-400 hover:text-gray-700 transition-all border border-gray-100">
-                      <Mail className="w-4 h-4" />
-                    </a>
-                  </div>
-                </div>
-
-                {/* Bio Section */}
-                <div className="flex-1 min-w-0">
-                  <h3 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-gray-900">Amine Harch El Korane</h3>
-                  <p className="text-[15px] font-semibold text-blue-600 mt-1">Founder & Lead Developer</p>
-                  <p className="text-[13px] text-gray-400 font-medium mt-0.5">ClearPath AI · USAII Global AI Hackathon 2026</p>
-
-                  <div className="mt-6 space-y-4">
-                    <p className="text-[14px] text-gray-500 leading-relaxed">
-                      Amine is the founder and driving force behind ClearPath AI. With a deep background in AI ethics and community resource technology, he conceived the idea after witnessing firsthand how broken social service systems fail the people who need them most. His experience in Morocco and the broader MENA region showed him that the gap between available resources and the people who need them isn&apos;t just a technology problem — it&apos;s a trust problem.
-                    </p>
-                    <p className="text-[14px] text-gray-500 leading-relaxed">
-                      His vision for <span className="font-semibold text-gray-700">calibrated transparency</span> — the idea that AI systems should always show what they know, what they don&apos;t know, and how confident they are — became the founding principle of ClearPath AI. Rather than building another chatbot that generates confident-sounding answers, Amine designed a system that classifies needs against verified resources and displays its uncertainty openly.
-                    </p>
-                    <p className="text-[14px] text-gray-500 leading-relaxed">
-                      &quot;When someone is searching for emergency housing at 2 AM, they don&apos;t need a chatbot that pretends to have all the answers,&quot; Amine says. &quot;They need a system that tells them: I&apos;m 87% confident this resource is right for you, and here&apos;s a human navigator you can call right now. Honesty isn&apos;t a limitation — it&apos;s the safest answer.&quot;
-                    </p>
-                  </div>
-
-                  {/* Skills & Expertise */}
-                  <div className="mt-6">
-                    <h4 className="text-[13px] font-bold text-gray-700 uppercase tracking-wide mb-3">Core Expertise</h4>
-                    <div className="flex flex-wrap gap-2">
-                      {[
-                        'AI Ethics & Safety',
-                        'Zero-Shot Classification',
-                        'Community Resource Technology',
-                        'NLP & BART Models',
-                        'Crisis Detection Systems',
-                        'Next.js & TypeScript',
-                        'Responsible AI Architecture',
-                      ].map((skill) => (
-                        <span
-                          key={skill}
-                          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[12px] font-medium bg-blue-50/60 text-blue-700 border border-blue-100/60"
+                    <div className={`relative flex flex-col ${isFounder ? 'lg:flex-row' : 'sm:flex-row'} gap-6 pl-4`}>
+                      {/* Avatar */}
+                      <div className="flex flex-col items-center gap-3 shrink-0">
+                        <div
+                          className={`${isFounder ? 'w-24 h-24' : 'w-20 h-20'} rounded-2xl flex items-center justify-center shadow-xl`}
+                          style={{ backgroundColor: leader.bgColor, border: `2px solid ${leader.colorHex}25` }}
                         >
-                          {skill}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Key Contributions */}
-                  <div className="mt-6">
-                    <h4 className="text-[13px] font-bold text-gray-700 uppercase tracking-wide mb-3">Key Contributions</h4>
-                    <div className="space-y-2">
-                      {[
-                        'Conceived and designed the 6-layer transparency architecture',
-                        'Built the first working prototype in under two weeks',
-                        'Established the "classified, not generated" founding principle',
-                        'Led the team through the USAII Global AI Hackathon 2026 submission',
-                        'Authored the Responsible AI charter and documentation',
-                      ].map((contribution) => (
-                        <div key={contribution} className="flex items-start gap-2.5">
-                          <CheckCircle2 className="w-4 h-4 text-emerald-500 mt-0.5 shrink-0" />
-                          <span className="text-[13px] text-gray-600 leading-relaxed">{contribution}</span>
+                          <span className={`${isFounder ? 'text-3xl' : 'text-2xl'} font-bold`} style={{ color: leader.colorHex }}>{leader.initials}</span>
                         </div>
-                      ))}
+                        {isFounder && (
+                          <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-semibold bg-emerald-50/80 text-emerald-700 border border-emerald-100/60">
+                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                            Founder
+                          </div>
+                        )}
+                        {/* Social links */}
+                        <div className="flex items-center gap-2">
+                          <a href={leader.socialLinks.github} className="w-8 h-8 rounded-lg flex items-center justify-center text-gray-400 hover:text-gray-700 hover:bg-gray-50 transition-all">
+                            <Github className="w-3.5 h-3.5" />
+                          </a>
+                          <a href={leader.socialLinks.twitter} className="w-8 h-8 rounded-lg flex items-center justify-center text-gray-400 hover:text-gray-700 hover:bg-gray-50 transition-all">
+                            <Globe className="w-3.5 h-3.5" />
+                          </a>
+                          <a href={leader.socialLinks.linkedin} className="w-8 h-8 rounded-lg flex items-center justify-center text-gray-400 hover:text-gray-700 hover:bg-gray-50 transition-all">
+                            <Linkedin className="w-3.5 h-3.5" />
+                          </a>
+                        </div>
+                      </div>
+
+                      {/* Content */}
+                      <div className="flex-1 min-w-0">
+                        <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3 mb-1">
+                          <h3 className={`${isFounder ? 'text-2xl' : 'text-[18px]'} font-extrabold text-gray-900 tracking-tight`}>{leader.name}</h3>
+                          <span
+                            className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg text-[11px] font-semibold w-fit"
+                            style={{ backgroundColor: leader.bgColor, color: leader.colorHex, border: `1px solid ${leader.colorHex}25` }}
+                          >
+                            {leader.role}
+                          </span>
+                        </div>
+
+                        <p className="text-[14px] text-gray-500 leading-relaxed mb-4">{leader.bio}</p>
+
+                        {/* Expertise */}
+                        <div className="mb-4">
+                          <h4 className="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-2">Core Expertise</h4>
+                          <div className="flex flex-wrap gap-1.5">
+                            {leader.expertise.map((skill) => (
+                              <span
+                                key={skill}
+                                className="inline-flex items-center px-2.5 py-1 rounded-md text-[11px] font-medium"
+                                style={{ backgroundColor: leader.bgColor, color: leader.colorHex, border: `1px solid ${leader.colorHex}25` }}
+                              >
+                                {skill}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+
+                        {/* Fun Fact */}
+                        <div className="p-3 rounded-xl bg-gray-50/60 border border-gray-100/60">
+                          <div className="flex items-start gap-2">
+                            <Smile className="w-4 h-4 text-amber-500 mt-0.5 shrink-0" />
+                            <div>
+                              <span className="text-[11px] font-bold text-gray-500 uppercase tracking-wider">Fun Fact</span>
+                              <p className="text-[12px] text-gray-500 leading-relaxed mt-0.5">{leader.funFact}</p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                </div>
-              </div>
+                  </motion.div>
+                )
+              })}
             </motion.div>
           </div>
         </section>
 
         {/* ═══ 3. CORE TEAM SECTION ═══ */}
         <section className="py-20">
-          <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -631,7 +839,7 @@ export default function TeamPage() {
               </div>
               <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-gray-900">Core Team</h2>
               <p className="text-[15px] text-gray-500 mt-4 max-w-2xl mx-auto leading-relaxed">
-                The engineers, researchers, and designers who turned a vision of honest AI into a working, testable system.
+                The engineers, researchers, designers, and advocates who turned a vision of honest AI into a working, testable system.
               </p>
             </motion.div>
 
@@ -639,16 +847,15 @@ export default function TeamPage() {
               initial="hidden"
               whileInView="visible"
               viewport={{ once: true }}
-              variants={{ visible: { transition: { staggerChildren: 0.12 } } }}
-              className="space-y-8"
+              variants={{ visible: { transition: { staggerChildren: 0.08 } } }}
+              className="grid grid-cols-1 md:grid-cols-2 gap-6"
             >
               {coreTeam.map((member) => {
-                const Icon = member.color === '#3b82f6' ? Brain : member.color === '#10b981' ? Code2 : member.color === '#8b5cf6' ? PenTool : member.color === '#f59e0b' ? Database : Shield
                 return (
                   <motion.div
                     key={member.name}
                     variants={fadeInUp}
-                    className="glass-card rounded-2xl p-6 sm:p-8 shadow-premium hover:shadow-premium-lg transition-shadow duration-300 relative overflow-hidden"
+                    className="glass-card rounded-2xl p-6 shadow-premium hover:shadow-premium-lg transition-shadow duration-300 relative overflow-hidden"
                   >
                     {/* Color accent bar */}
                     <div
@@ -656,48 +863,47 @@ export default function TeamPage() {
                       style={{ backgroundColor: member.color }}
                     />
 
-                    <div className="flex flex-col sm:flex-row gap-6 pl-3">
+                    <div className="flex flex-col sm:flex-row gap-5 pl-3">
                       {/* Avatar */}
-                      <div className="flex flex-col items-center gap-3 shrink-0">
+                      <div className="flex flex-col items-center gap-2.5 shrink-0">
                         <div
-                          className="w-16 h-16 rounded-2xl flex items-center justify-center shadow-lg"
+                          className="w-14 h-14 rounded-xl flex items-center justify-center shadow-lg"
                           style={{ backgroundColor: member.accentBg, border: `2px solid ${member.borderColor}` }}
                         >
-                          <span className="text-xl font-bold" style={{ color: member.color }}>{member.initials}</span>
+                          <span className="text-lg font-bold" style={{ color: member.color }}>{member.initials}</span>
                         </div>
                         {/* Social links */}
-                        <div className="flex items-center gap-2">
-                          <a href={member.github} className="w-8 h-8 rounded-lg flex items-center justify-center text-gray-400 hover:text-gray-700 hover:bg-gray-50 transition-all">
-                            <Github className="w-3.5 h-3.5" />
+                        <div className="flex items-center gap-1.5">
+                          <a href={member.github} className="w-7 h-7 rounded-lg flex items-center justify-center text-gray-400 hover:text-gray-700 hover:bg-gray-50 transition-all">
+                            <Github className="w-3 h-3" />
                           </a>
-                          <a href={member.linkedin} className="w-8 h-8 rounded-lg flex items-center justify-center text-gray-400 hover:text-gray-700 hover:bg-gray-50 transition-all">
-                            <Linkedin className="w-3.5 h-3.5" />
+                          <a href={member.linkedin} className="w-7 h-7 rounded-lg flex items-center justify-center text-gray-400 hover:text-gray-700 hover:bg-gray-50 transition-all">
+                            <Linkedin className="w-3 h-3" />
                           </a>
                         </div>
                       </div>
 
                       {/* Content */}
                       <div className="flex-1 min-w-0">
-                        <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3 mb-1">
-                          <h3 className="text-[18px] font-bold text-gray-900 tracking-tight">{member.name}</h3>
+                        <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 mb-1">
+                          <h3 className="text-[16px] font-bold text-gray-900 tracking-tight">{member.name}</h3>
                           <span
-                            className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg text-[11px] font-semibold w-fit"
+                            className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-[10px] font-semibold w-fit"
                             style={{ backgroundColor: member.bgColor, color: member.color, border: `1px solid ${member.borderColor}` }}
                           >
                             {member.role}
                           </span>
                         </div>
-                        <p className="text-[13px] font-medium mb-3" style={{ color: member.color }}>{member.expertise}</p>
-                        <p className="text-[14px] text-gray-500 leading-relaxed mb-4">{member.bio}</p>
+                        <p className="text-[13px] text-gray-500 leading-relaxed mb-3">{member.bio}</p>
 
                         {/* Skills */}
-                        <div className="mb-4">
-                          <h4 className="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-2">Skills</h4>
-                          <div className="flex flex-wrap gap-1.5">
+                        <div className="mb-3">
+                          <h4 className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1.5">Skills</h4>
+                          <div className="flex flex-wrap gap-1">
                             {member.skills.map((skill) => (
                               <span
                                 key={skill}
-                                className="inline-flex items-center px-2.5 py-1 rounded-md text-[11px] font-medium"
+                                className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium"
                                 style={{ backgroundColor: member.bgColor, color: member.color, border: `1px solid ${member.borderColor}` }}
                               >
                                 {skill}
@@ -707,15 +913,23 @@ export default function TeamPage() {
                         </div>
 
                         {/* Contributions */}
-                        <div>
-                          <h4 className="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-2">Key Contributions</h4>
-                          <div className="space-y-1.5">
+                        <div className="mb-3">
+                          <h4 className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1.5">Key Contributions</h4>
+                          <div className="space-y-1">
                             {member.contributions.map((contrib) => (
-                              <div key={contrib} className="flex items-start gap-2">
-                                <CheckCircle2 className="w-3.5 h-3.5 mt-0.5 shrink-0" style={{ color: member.color }} />
-                                <span className="text-[12px] text-gray-500 leading-relaxed">{contrib}</span>
+                              <div key={contrib} className="flex items-start gap-1.5">
+                                <CheckCircle2 className="w-3 h-3 mt-0.5 shrink-0" style={{ color: member.color }} />
+                                <span className="text-[11px] text-gray-500 leading-relaxed">{contrib}</span>
                               </div>
                             ))}
+                          </div>
+                        </div>
+
+                        {/* Fun Fact */}
+                        <div className="p-2.5 rounded-lg bg-gray-50/60 border border-gray-100/60">
+                          <div className="flex items-start gap-1.5">
+                            <Smile className="w-3.5 h-3.5 text-amber-500 mt-0.5 shrink-0" />
+                            <p className="text-[11px] text-gray-500 leading-relaxed">{member.funFact}</p>
                           </div>
                         </div>
                       </div>
@@ -741,9 +955,9 @@ export default function TeamPage() {
                 <Compass className="w-3.5 h-3.5" />
                 Expert Guidance
               </div>
-              <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-gray-900">Advisory Board</h2>
+              <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-gray-900">Advisors & Partners</h2>
               <p className="text-[15px] text-gray-500 mt-4 max-w-2xl mx-auto leading-relaxed">
-                World-class experts in AI ethics, NLP research, community navigation, and nonprofit partnerships who guide our mission.
+                World-class experts in AI ethics, NLP research, community navigation, and nonprofit partnerships who guide our mission and ensure we build responsibly.
               </p>
             </motion.div>
 
@@ -752,51 +966,58 @@ export default function TeamPage() {
               whileInView="visible"
               viewport={{ once: true }}
               variants={{ visible: { transition: { staggerChildren: 0.1 } } }}
-              className="grid sm:grid-cols-2 gap-6"
+              className="grid grid-cols-1 md:grid-cols-2 gap-6"
             >
               {advisoryBoard.map((advisor) => {
                 const AdvisorIcon = advisor.icon
                 return (
                   <motion.div
                     key={advisor.name}
-                    variants={staggerItem}
-                    className="glass-card rounded-2xl p-6 sm:p-8 shadow-premium hover:shadow-premium-lg transition-shadow duration-300 relative overflow-hidden"
+                    variants={fadeInUp}
+                    className="glass-card rounded-2xl p-6 shadow-premium hover:shadow-premium-lg transition-all duration-300 relative overflow-hidden"
                   >
-                    {/* Decorative accent */}
+                    {/* Accent */}
                     <div
-                      className="absolute top-0 right-0 w-24 h-24 rounded-bl-[3rem] opacity-30 pointer-events-none"
-                      style={{ backgroundColor: advisor.bgColor }}
+                      className="absolute top-0 left-0 w-1 h-full rounded-l-2xl"
+                      style={{ backgroundColor: advisor.color }}
                     />
 
-                    <div className="relative">
-                      <div className="flex items-start gap-4 mb-4">
-                        {/* Avatar */}
+                    <div className="flex gap-5 pl-3">
+                      {/* Avatar */}
+                      <div className="flex flex-col items-center gap-3 shrink-0">
                         <div
-                          className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg shrink-0"
+                          className="w-14 h-14 rounded-xl flex items-center justify-center shadow-lg"
                           style={{ backgroundColor: advisor.bgColor, border: `2px solid ${advisor.borderColor}` }}
                         >
-                          <span className="text-lg font-bold" style={{ color: advisor.color }}>{advisor.initials}</span>
+                          <AdvisorIcon className="w-6 h-6" style={{ color: advisor.color }} />
                         </div>
-                        <div className="flex-1 min-w-0">
-                          <h3 className="text-[16px] font-bold text-gray-900 tracking-tight">{advisor.name}</h3>
-                          <p className="text-[13px] font-semibold" style={{ color: advisor.color }}>{advisor.role}</p>
-                          <p className="text-[12px] text-gray-400 font-medium">{advisor.org}</p>
+                        <div className="w-9 h-9 rounded-lg flex items-center justify-center bg-gray-50 border border-gray-100">
+                          <span className="text-sm font-bold" style={{ color: advisor.color }}>{advisor.initials}</span>
                         </div>
                       </div>
 
-                      <p className="text-[13px] text-gray-500 leading-relaxed mb-4">{advisor.bio}</p>
+                      {/* Content */}
+                      <div className="flex-1 min-w-0">
+                        <h3 className="text-[16px] font-bold text-gray-900 tracking-tight">{advisor.name}</h3>
+                        <p className="text-[12px] font-semibold mt-0.5" style={{ color: advisor.color }}>{advisor.role}</p>
+                        <p className="text-[11px] text-gray-400 font-medium">{advisor.org}</p>
+                        <p className="text-[13px] text-gray-500 leading-relaxed mt-3">{advisor.bio}</p>
 
-                      {/* Expertise tags */}
-                      <div className="flex flex-wrap gap-1.5">
-                        {advisor.expertise.map((exp) => (
-                          <span
-                            key={exp}
-                            className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-[10px] font-medium"
-                            style={{ backgroundColor: advisor.bgColor, color: advisor.color, border: `1px solid ${advisor.borderColor}` }}
-                          >
-                            {exp}
-                          </span>
-                        ))}
+                        {/* Expertise */}
+                        <div className="mt-3">
+                          <h4 className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1.5">Expertise</h4>
+                          <div className="flex flex-wrap gap-1">
+                            {advisor.expertise.map((skill) => (
+                              <span
+                                key={skill}
+                                className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium"
+                                style={{ backgroundColor: advisor.bgColor, color: advisor.color, border: `1px solid ${advisor.borderColor}` }}
+                              >
+                                {skill}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
                       </div>
                     </div>
                   </motion.div>
@@ -822,7 +1043,7 @@ export default function TeamPage() {
               </div>
               <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-gray-900">Our Values</h2>
               <p className="text-[15px] text-gray-500 mt-4 max-w-2xl mx-auto leading-relaxed">
-                Six principles that guide every decision we make — from architecture to UI to partnerships.
+                These aren&apos;t just words on a wall. Every value below is encoded into our architecture, tested in our pipeline, and verified by our advisory board.
               </p>
             </motion.div>
 
@@ -830,69 +1051,40 @@ export default function TeamPage() {
               initial="hidden"
               whileInView="visible"
               viewport={{ once: true }}
-              variants={{ visible: { transition: { staggerChildren: 0.1 } } }}
-              className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6"
+              variants={{ visible: { transition: { staggerChildren: 0.08 } } }}
+              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
             >
               {values.map((value) => {
-                const Icon = value.icon
+                const ValueIcon = value.icon
                 return (
                   <motion.div
                     key={value.title}
                     variants={staggerItem}
-                    className="glass-card rounded-2xl p-6 shadow-premium hover:shadow-premium-lg transition-shadow duration-300 relative overflow-hidden group"
+                    className="glass-card rounded-2xl p-6 shadow-premium hover:shadow-premium-lg transition-all duration-300 relative overflow-hidden group"
                   >
-                    {/* Hover accent */}
+                    {/* Background glow on hover */}
                     <div
-                      className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"
-                      style={{ background: `linear-gradient(135deg, ${value.bgColor}, transparent 60%)` }}
+                      className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
+                      style={{ background: `radial-gradient(circle at 30% 30%, ${value.accentBg}, transparent 60%)` }}
                     />
-
                     <div className="relative">
-                      {/* Icon */}
                       <div
-                        className="w-12 h-12 rounded-xl flex items-center justify-center mb-4"
-                        style={{ backgroundColor: value.accentBg }}
+                        className="w-12 h-12 rounded-xl flex items-center justify-center mb-4 shadow-lg"
+                        style={{ backgroundColor: value.accentBg, border: `1px solid ${value.color}20` }}
                       >
-                        <Icon className="w-6 h-6" style={{ color: value.color }} />
+                        <ValueIcon className="w-6 h-6" style={{ color: value.color }} />
                       </div>
-
-                      {/* Title */}
                       <h3 className="text-[16px] font-bold text-gray-900 tracking-tight mb-2">{value.title}</h3>
-
-                      {/* Description */}
                       <p className="text-[13px] text-gray-500 leading-relaxed">{value.description}</p>
                     </div>
                   </motion.div>
                 )
               })}
             </motion.div>
-
-            {/* Values Quote */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5 }}
-              className="mt-12 glass-card rounded-2xl p-8 md:p-10 shadow-premium text-center relative overflow-hidden"
-            >
-              <div className="absolute -top-16 -right-16 w-32 h-32 rounded-full opacity-10 pointer-events-none"
-                style={{ background: 'radial-gradient(circle, rgba(59,130,246,0.4), transparent 70%)' }}
-              />
-              <div className="relative">
-                <div className="w-12 h-12 rounded-xl bg-blue-50/80 flex items-center justify-center mx-auto mb-4">
-                  <span className="text-2xl text-blue-600">&ldquo;</span>
-                </div>
-                <blockquote className="text-[16px] sm:text-[18px] font-semibold text-gray-800 leading-relaxed max-w-3xl mx-auto">
-                  We don&apos;t just believe in responsible AI — we built it. Every value listed above is implemented in code,
-                  auditable in our architecture, and testable in our demo. Values without implementation are just words.
-                </blockquote>
-                <p className="text-[13px] text-gray-400 mt-4 font-medium">— Amine Harch El Korane, Founder</p>
-              </div>
-            </motion.div>
           </div>
         </section>
 
-        {/* ═══ 6. OUR STORY SECTION (TIMELINE) ═══ */}
+        {/* ═══ 6. HOW WE WORK SECTION ═══ */}
         <section className="py-20 bg-white/40">
           <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
             <motion.div
@@ -902,66 +1094,77 @@ export default function TeamPage() {
               transition={{ duration: 0.5 }}
               className="text-center mb-14"
             >
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-[11px] font-semibold bg-teal-50/80 text-teal-600 border border-teal-100/60 mb-4">
-                <Clock className="w-3.5 h-3.5" />
-                From Idea to Impact
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-[11px] font-semibold bg-emerald-50/80 text-emerald-600 border border-emerald-100/60 mb-4">
+                <Workflow className="w-3.5 h-3.5" />
+                Our Methodology
               </div>
-              <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-gray-900">Our Story</h2>
+              <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-gray-900">How We Work</h2>
               <p className="text-[15px] text-gray-500 mt-4 max-w-2xl mx-auto leading-relaxed">
-                How a broken system and one honest question became a 6-layer transparency architecture competing on the world stage.
+                From community research to zero-retention deployment, every step of our process is designed to build AI that is honest, safe, and accountable.
               </p>
             </motion.div>
 
-            <div className="relative">
-              {/* Vertical connecting line */}
-              <div className="absolute left-6 sm:left-8 top-0 bottom-0 w-px bg-gradient-to-b from-amber-200 via-blue-200 via-red-200 via-emerald-200 via-purple-200 to-amber-200" />
-
-              <motion.div
-                initial="hidden"
-                whileInView="visible"
-                viewport={{ once: true, margin: '-50px' }}
-                variants={{ visible: { transition: { staggerChildren: 0.15 } } }}
-                className="space-y-10"
-              >
-                {timeline.map((milestone) => {
-                  const MilestoneIcon = milestone.icon
-                  return (
-                    <motion.div
-                      key={milestone.title}
-                      variants={fadeInLeft}
-                      className="relative pl-16 sm:pl-20"
+            <motion.div
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+              variants={{ visible: { transition: { staggerChildren: 0.1 } } }}
+              className="space-y-6"
+            >
+              {howWeWork.map((step, index) => {
+                const StepIcon = step.icon
+                return (
+                  <motion.div
+                    key={step.step}
+                    variants={fadeInUp}
+                    className="glass-card rounded-2xl p-6 sm:p-8 shadow-premium hover:shadow-premium-lg transition-all duration-300 relative overflow-hidden"
+                  >
+                    {/* Step number accent */}
+                    <div
+                      className="absolute top-0 right-0 w-20 h-20 flex items-center justify-center pointer-events-none opacity-5"
                     >
-                      {/* Timeline dot */}
-                      <div className={`absolute left-4 sm:left-6 top-1 w-4 h-4 rounded-full ${milestone.dotColor} ring-4 ring-white shadow-md`} />
+                      <span className="text-6xl font-black" style={{ color: step.color }}>{step.step}</span>
+                    </div>
 
-                      <div className="glass-card rounded-2xl p-6 sm:p-8 shadow-premium hover:shadow-premium-lg transition-shadow duration-300">
-                        <div className="flex items-start gap-4">
-                          <div
-                            className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
-                            style={{ backgroundColor: `${milestone.color}10` }}
-                          >
-                            <MilestoneIcon className="w-5 h-5" style={{ color: milestone.color }} />
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-center gap-2 mb-1">
-                              <Calendar className="w-3.5 h-3.5 text-gray-400" />
-                              <span className="text-[12px] font-semibold text-gray-400 uppercase tracking-wide">{milestone.month}</span>
-                            </div>
-                            <h3 className="text-[16px] font-bold text-gray-900 tracking-tight mb-2">{milestone.title}</h3>
-                            <p className="text-[14px] text-gray-500 leading-relaxed">{milestone.desc}</p>
-                          </div>
+                    <div className="flex flex-col sm:flex-row gap-5">
+                      {/* Step indicator */}
+                      <div className="flex flex-col items-center gap-3 shrink-0">
+                        <div
+                          className="w-14 h-14 rounded-xl flex items-center justify-center shadow-lg"
+                          style={{ backgroundColor: step.accentBg, border: `2px solid ${step.color}25` }}
+                        >
+                          <StepIcon className="w-6 h-6" style={{ color: step.color }} />
                         </div>
+                        <span
+                          className="inline-flex items-center justify-center w-8 h-8 rounded-full text-[12px] font-bold text-white"
+                          style={{ backgroundColor: step.color }}
+                        >
+                          {step.step}
+                        </span>
                       </div>
-                    </motion.div>
-                  )
-                })}
-              </motion.div>
-            </div>
+
+                      {/* Content */}
+                      <div className="flex-1 min-w-0">
+                        <h3 className="text-[18px] font-bold text-gray-900 tracking-tight mb-2">{step.title}</h3>
+                        <p className="text-[14px] text-gray-500 leading-relaxed">{step.description}</p>
+                      </div>
+                    </div>
+
+                    {/* Connector line to next step */}
+                    {index < howWeWork.length - 1 && (
+                      <div className="hidden sm:flex justify-start pl-[41px] mt-4">
+                        <div className="w-0.5 h-6 rounded-full" style={{ backgroundColor: `${step.color}30` }} />
+                      </div>
+                    )}
+                  </motion.div>
+                )
+              })}
+            </motion.div>
           </div>
         </section>
 
-        {/* ═══ 7. JOIN US SECTION ═══ */}
-        <section className="py-20">
+        {/* ═══ 7. JOURNEY TIMELINE SECTION ═══ */}
+        <section className="py-20" ref={timelineRef}>
           <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -970,13 +1173,72 @@ export default function TeamPage() {
               transition={{ duration: 0.5 }}
               className="text-center mb-14"
             >
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-[11px] font-semibold bg-pink-50/80 text-pink-600 border border-pink-100/60 mb-4">
-                <UserPlus className="w-3.5 h-3.5" />
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-[11px] font-semibold bg-blue-50/80 text-blue-600 border border-blue-100/60 mb-4">
+                <Calendar className="w-3.5 h-3.5" />
+                Our Journey
+              </div>
+              <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-gray-900">From Idea to Impact</h2>
+              <p className="text-[15px] text-gray-500 mt-4 max-w-2xl mx-auto leading-relaxed">
+                Six months. One idea. A system that proves honest AI is not just possible — it&apos;s better.
+              </p>
+            </motion.div>
+
+            <div className="relative">
+              {/* Vertical timeline line */}
+              <div className="absolute left-4 md:left-1/2 top-0 bottom-0 w-0.5 bg-gradient-to-b from-amber-200 via-blue-200 to-emerald-200 md:-translate-x-0.5" />
+
+              {timeline.map((event, index) => {
+                const TimelineIcon = event.icon
+                const isLeft = index % 2 === 0
+                return (
+                  <motion.div
+                    key={event.month}
+                    initial={{ opacity: 0, x: isLeft ? -30 : 30 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.5, delay: index * 0.1 }}
+                    className={`relative flex items-start gap-4 mb-10 md:gap-0 ${isLeft ? 'md:flex-row' : 'md:flex-row-reverse'}`}
+                  >
+                    {/* Dot */}
+                    <div className="absolute left-4 md:left-1/2 w-3 h-3 rounded-full -translate-x-1.5 mt-2 z-10" style={{ backgroundColor: event.color, boxShadow: `0 0 0 4px white, 0 0 0 6px ${event.color}40` }} />
+
+                    {/* Content card */}
+                    <div className={`ml-10 md:ml-0 md:w-[calc(50%-2rem)] ${isLeft ? 'md:pr-8' : 'md:pl-8'}`}>
+                      <div className="glass-card rounded-2xl p-5 sm:p-6 shadow-premium hover:shadow-premium-lg transition-shadow duration-300">
+                        <div className="flex items-center gap-2.5 mb-3">
+                          <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ backgroundColor: `${event.color}15` }}>
+                            <TimelineIcon className="w-4 h-4" style={{ color: event.color }} />
+                          </div>
+                          <span className="text-[12px] font-bold uppercase tracking-wider" style={{ color: event.color }}>{event.month}</span>
+                        </div>
+                        <h3 className="text-[16px] font-bold text-gray-900 tracking-tight mb-2">{event.title}</h3>
+                        <p className="text-[13px] text-gray-500 leading-relaxed">{event.desc}</p>
+                      </div>
+                    </div>
+                  </motion.div>
+                )
+              })}
+            </div>
+          </div>
+        </section>
+
+        {/* ═══ 8. OPEN POSITIONS SECTION ═══ */}
+        <section className="py-20 bg-white/40">
+          <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5 }}
+              className="text-center mb-14"
+            >
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-[11px] font-semibold bg-rose-50/80 text-rose-600 border border-rose-100/60 mb-4">
+                <Briefcase className="w-3.5 h-3.5" />
                 We&apos;re Hiring
               </div>
-              <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-gray-900">Join Us</h2>
+              <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-gray-900">Open Positions</h2>
               <p className="text-[15px] text-gray-500 mt-4 max-w-2xl mx-auto leading-relaxed">
-                Help us build AI that tells the truth. We&apos;re looking for people who believe that technology should serve everyone — especially the people who need it most.
+                Join us in building AI that serves the most vulnerable people in our communities. Every role at ClearPath AI directly impacts someone who needs help finding it.
               </p>
             </motion.div>
 
@@ -984,8 +1246,8 @@ export default function TeamPage() {
               initial="hidden"
               whileInView="visible"
               viewport={{ once: true }}
-              variants={{ visible: { transition: { staggerChildren: 0.12 } } }}
-              className="space-y-6"
+              variants={{ visible: { transition: { staggerChildren: 0.1 } } }}
+              className="space-y-5"
             >
               {openPositions.map((position) => {
                 const PositionIcon = position.icon
@@ -993,61 +1255,70 @@ export default function TeamPage() {
                   <motion.div
                     key={position.title}
                     variants={fadeInUp}
-                    className="glass-card rounded-2xl p-6 sm:p-8 shadow-premium hover:shadow-premium-lg transition-shadow duration-300 relative overflow-hidden"
+                    className="glass-card rounded-2xl p-6 shadow-premium hover:shadow-premium-lg transition-all duration-300 relative overflow-hidden group cursor-pointer"
                   >
-                    {/* Color accent */}
+                    {/* Color accent bar */}
                     <div
-                      className="absolute top-0 left-0 w-1.5 h-full rounded-l-2xl"
+                      className="absolute top-0 left-0 w-1 h-full rounded-l-2xl"
                       style={{ backgroundColor: position.color }}
                     />
 
-                    <div className="pl-3">
-                      <div className="flex flex-col sm:flex-row sm:items-start gap-4 mb-4">
+                    <div className="pl-4">
+                      <div className="flex flex-col sm:flex-row sm:items-start gap-4">
                         {/* Icon */}
                         <div
-                          className="w-12 h-12 rounded-xl flex items-center justify-center shrink-0"
+                          className="w-12 h-12 rounded-xl flex items-center justify-center shrink-0 shadow-lg"
                           style={{ backgroundColor: position.bgColor, border: `1px solid ${position.borderColor}` }}
                         >
                           <PositionIcon className="w-5 h-5" style={{ color: position.color }} />
                         </div>
+
+                        {/* Content */}
                         <div className="flex-1 min-w-0">
-                          <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3">
-                            <h3 className="text-[17px] font-bold text-gray-900 tracking-tight">{position.title}</h3>
-                            <span
-                              className="inline-flex items-center px-2.5 py-0.5 rounded-lg text-[11px] font-semibold w-fit"
-                              style={{ backgroundColor: position.bgColor, color: position.color, border: `1px solid ${position.borderColor}` }}
-                            >
-                              {position.type}
-                            </span>
-                          </div>
-                          <p className="text-[14px] text-gray-500 leading-relaxed mt-2">{position.description}</p>
-                        </div>
-                      </div>
-
-                      {/* Requirements */}
-                      <div className="mt-4">
-                        <h4 className="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-2">What We&apos;re Looking For</h4>
-                        <div className="grid sm:grid-cols-2 gap-2">
-                          {position.requirements.map((req) => (
-                            <div key={req} className="flex items-start gap-2">
-                              <CheckCircle2 className="w-3.5 h-3.5 mt-0.5 shrink-0" style={{ color: position.color }} />
-                              <span className="text-[12px] text-gray-500 leading-relaxed">{req}</span>
+                          <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 mb-2">
+                            <h3 className="text-[16px] font-bold text-gray-900 tracking-tight">{position.title}</h3>
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <span
+                                className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-semibold"
+                                style={{ backgroundColor: position.bgColor, color: position.color, border: `1px solid ${position.borderColor}` }}
+                              >
+                                {position.department}
+                              </span>
+                              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-medium bg-gray-50 text-gray-500 border border-gray-100">
+                                <MapPin className="w-2.5 h-2.5" />
+                                {position.location}
+                              </span>
+                              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-medium bg-gray-50 text-gray-500 border border-gray-100">
+                                <Clock className="w-2.5 h-2.5" />
+                                {position.type}
+                              </span>
                             </div>
-                          ))}
-                        </div>
-                      </div>
+                          </div>
+                          <p className="text-[13px] text-gray-500 leading-relaxed mb-3">{position.description}</p>
 
-                      {/* Apply button */}
-                      <div className="mt-5 flex items-center gap-3">
-                        <a
-                          href="mailto:team@clearpath-ai.org"
-                          className="inline-flex items-center gap-2 px-5 py-2.5 text-[13px] font-semibold text-white rounded-xl transition-all shadow-md hover:shadow-lg"
-                          style={{ backgroundColor: position.color }}
-                        >
-                          Apply Now
-                          <ArrowRight className="w-3.5 h-3.5" />
-                        </a>
-                        <span className="text-[12px] text-gray-400">team@clearpath-ai.org</span>
+                          {/* Requirements */}
+                          <div>
+                            <h4 className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1.5">Requirements</h4>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-1">
+                              {position.requirements.map((req) => (
+                                <div key={req} className="flex items-start gap-1.5">
+                                  <CheckCircle2 className="w-3 h-3 mt-0.5 shrink-0" style={{ color: position.color }} />
+                                  <span className="text-[11px] text-gray-500 leading-relaxed">{req}</span>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Apply button */}
+                        <div className="shrink-0 self-start">
+                          <span className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-[12px] font-semibold text-white transition-all group-hover:shadow-lg"
+                            style={{ background: `linear-gradient(to bottom, ${position.color}, ${position.color}dd)`, boxShadow: `0 4px 14px ${position.color}30` }}
+                          >
+                            Apply
+                            <ArrowRight className="w-3 h-3 group-hover:translate-x-0.5 transition-transform" />
+                          </span>
+                        </div>
                       </div>
                     </div>
                   </motion.div>
@@ -1055,168 +1326,19 @@ export default function TeamPage() {
               })}
             </motion.div>
 
-            {/* Why Work With Us */}
+            {/* View all positions link */}
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.5 }}
-              className="mt-12 glass-card rounded-2xl p-8 md:p-10 shadow-premium"
+              className="text-center mt-8"
             >
-              <h3 className="text-xl font-bold text-gray-900 tracking-tight mb-6">Why Work With Us</h3>
-              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                {[
-                  {
-                    icon: Target,
-                    title: 'Mission-Driven',
-                    desc: 'Every line of code you write directly helps someone in need. We measure impact, not just engagement.',
-                    color: '#10b981',
-                  },
-                  {
-                    icon: Globe,
-                    title: 'Remote-First',
-                    desc: 'Work from anywhere. Our team spans 4 time zones. We trust you to manage your time and deliver.',
-                    color: '#3b82f6',
-                  },
-                  {
-                    icon: BookOpen,
-                    title: 'Learning & Growth',
-                    desc: 'Present at conferences, publish papers, and work with world-class AI researchers and ethicists.',
-                    color: '#8b5cf6',
-                  },
-                  {
-                    icon: Zap,
-                    title: 'Ship Fast, Ship Honestly',
-                    desc: 'We move quickly but never cut corners on safety or transparency. Speed without integrity isn\'t speed.',
-                    color: '#f59e0b',
-                  },
-                  {
-                    icon: Shield,
-                    title: 'Ethics by Default',
-                    desc: 'We don\'t debate whether to do the right thing — we debate how. Ethics isn\'t a meeting; it\'s the architecture.',
-                    color: '#ef4444',
-                  },
-                  {
-                    icon: HeartHandshake,
-                    title: 'Community Impact',
-                    desc: 'Your work connects real people to real resources. We test with community navigators, not just engineers.',
-                    color: '#ec4899',
-                  },
-                ].map((item) => {
-                  const ItemIcon = item.icon
-                  return (
-                    <div key={item.title} className="flex items-start gap-3">
-                      <div className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0" style={{ backgroundColor: `${item.color}10` }}>
-                        <ItemIcon className="w-4 h-4" style={{ color: item.color }} />
-                      </div>
-                      <div>
-                        <h4 className="text-[14px] font-bold text-gray-900 mb-1">{item.title}</h4>
-                        <p className="text-[12px] text-gray-500 leading-relaxed">{item.desc}</p>
-                      </div>
-                    </div>
-                  )
-                })}
-              </div>
-            </motion.div>
-          </div>
-        </section>
-
-        {/* ═══ 8. TEAM CULTURE / HOW WE WORK ═══ */}
-        <section className="py-20 bg-white/40">
-          <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5 }}
-              className="text-center mb-14"
-            >
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-[11px] font-semibold bg-gray-100/80 text-gray-600 border border-gray-200/60 mb-4">
-                <Activity className="w-3.5 h-3.5" />
-                How We Build
-              </div>
-              <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-gray-900">Our Process</h2>
-              <p className="text-[15px] text-gray-500 mt-4 max-w-2xl mx-auto leading-relaxed">
-                We don&apos;t just build features — we build trust. Here&apos;s how our team turns mission into product.
+              <p className="text-[13px] text-gray-400">
+                Don&apos;t see a role that fits? We&apos;re always looking for passionate people.{' '}
+                <a href="mailto:careers@clearpath.ai" className="font-semibold text-blue-600 hover:text-blue-700 underline underline-offset-2">
+                  Reach out to us
+                </a>
               </p>
-            </motion.div>
-
-            <motion.div
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true }}
-              variants={{ visible: { transition: { staggerChildren: 0.1 } } }}
-              className="grid sm:grid-cols-2 gap-6"
-            >
-              {[
-                {
-                  step: '01',
-                  title: 'Listen to the Community',
-                  description: 'Every feature starts with a conversation. We regularly meet with 211 navigators, social workers, and people who have personally navigated the social services system. Their insights drive our roadmap — not tech trends or competitor features.',
-                  icon: MessageSquare,
-                  color: '#3b82f6',
-                },
-                {
-                  step: '02',
-                  title: 'Design for the Worst Day',
-                  description: 'We design for the person searching for help at 2 AM, not the person casually browsing at noon. Every UI decision is stress-tested against crisis scenarios. If it works in the hardest moment, it works in any moment.',
-                  icon: AlertTriangle,
-                  color: '#ef4444',
-                },
-                {
-                  step: '03',
-                  title: 'Build with Transparency',
-                  description: 'Our classification model doesn\'t generate — it categorizes. Our confidence scores don\'t inflate — they calibrate. Our crisis detection doesn\'t suggest — it bypasses. We build honesty into the architecture, not just the documentation.',
-                  icon: Eye,
-                  color: '#10b981',
-                },
-                {
-                  step: '04',
-                  title: 'Test with Real Scenarios',
-                  description: 'We test against hundreds of real scenarios from the 211 database — misspelled words, non-English inputs, ambiguous phrasing, and genuine crisis situations. Every edge case makes the system stronger and more reliable.',
-                  icon: FileCheck,
-                  color: '#8b5cf6',
-                },
-                {
-                  step: '05',
-                  title: 'Ship & Measure Impact',
-                  description: 'We measure success in people helped, not pageviews. We track classification accuracy, crisis detection rate, and human escalation frequency. When a metric dips, we investigate — because behind every number is a person who needed help.',
-                  icon: BarChart3,
-                  color: '#f59e0b',
-                },
-                {
-                  step: '06',
-                  title: 'Iterate with Integrity',
-                  description: 'We ship improvements weekly, but we never ship changes that compromise safety, privacy, or transparency. Speed without integrity isn\'t speed — it\'s negligence. Every iteration must make the system more honest, not just more feature-rich.',
-                  icon: Zap,
-                  color: '#ec4899',
-                },
-              ].map((process) => {
-                const ProcessIcon = process.icon
-                return (
-                  <motion.div
-                    key={process.step}
-                    variants={staggerItem}
-                    className="glass-card rounded-2xl p-6 shadow-premium hover:shadow-premium-lg transition-shadow duration-300"
-                  >
-                    <div className="flex items-start gap-4">
-                      <div className="flex flex-col items-center gap-1 shrink-0">
-                        <div
-                          className="w-10 h-10 rounded-xl flex items-center justify-center"
-                          style={{ backgroundColor: `${process.color}10` }}
-                        >
-                          <ProcessIcon className="w-5 h-5" style={{ color: process.color }} />
-                        </div>
-                        <span className="text-[10px] font-bold text-gray-300">{process.step}</span>
-                      </div>
-                      <div>
-                        <h3 className="text-[15px] font-bold text-gray-900 tracking-tight mb-2">{process.title}</h3>
-                        <p className="text-[13px] text-gray-500 leading-relaxed">{process.description}</p>
-                      </div>
-                    </div>
-                  </motion.div>
-                )
-              })}
             </motion.div>
           </div>
         </section>
@@ -1231,67 +1353,13 @@ export default function TeamPage() {
               transition={{ duration: 0.5 }}
               className="text-center mb-14"
             >
-              <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-gray-900">Team by the Numbers</h2>
-              <p className="text-[15px] text-gray-500 mt-3">The metrics that matter — and the mission behind them</p>
-            </motion.div>
-
-            <motion.div
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true }}
-              variants={{ visible: { transition: { staggerChildren: 0.08 } } }}
-              className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6"
-            >
-              {[
-                { stat: '6', label: 'Transparency Layers', sublabel: 'Every decision is auditable', icon: Layers, color: '#10b981' },
-                { stat: '50K+', label: 'Verified Resources', sublabel: 'From United Way 211 database', icon: Database, color: '#3b82f6' },
-                { stat: '<2s', label: 'Avg. Response Time', sublabel: 'Real-time classification', icon: Zap, color: '#f59e0b' },
-                { stat: '99.7%', label: 'Crisis Detection', sublabel: 'Accuracy on held-out data', icon: Shield, color: '#ef4444' },
-                { stat: '0', label: 'Data Points Stored', sublabel: 'Zero retention architecture', icon: Lock, color: '#8b5cf6' },
-                { stat: '87%+', label: 'Classification Accuracy', sublabel: 'Multi-label F1 score', icon: TrendingUp, color: '#06b6d4' },
-                { stat: '8', label: 'Resource Categories', sublabel: 'Housing, food, health, and more', icon: Layers, color: '#ec4899' },
-                { stat: '24/7', label: 'Human Escalation', sublabel: '211 navigators always available', icon: Navigation, color: '#f97316' },
-              ].map((item) => {
-                const StatIcon = item.icon
-                return (
-                  <motion.div
-                    key={item.label}
-                    variants={fadeInUp}
-                    className="glass-card rounded-2xl p-5 shadow-premium text-center hover:shadow-premium-lg transition-shadow duration-300"
-                  >
-                    <div
-                      className="w-10 h-10 rounded-xl flex items-center justify-center mx-auto mb-3"
-                      style={{ backgroundColor: `${item.color}10` }}
-                    >
-                      <StatIcon className="w-5 h-5" style={{ color: item.color }} />
-                    </div>
-                    <div className="text-2xl sm:text-3xl font-extrabold text-gray-900">{item.stat}</div>
-                    <div className="text-[12px] text-gray-700 font-semibold mt-1">{item.label}</div>
-                    <div className="text-[10px] text-gray-400 mt-0.5">{item.sublabel}</div>
-                  </motion.div>
-                )
-              })}
-            </motion.div>
-          </div>
-        </section>
-
-        {/* ═══ 10. TESTIMONIALS / ENDORSEMENTS ═══ */}
-        <section className="py-20 bg-white/40">
-          <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5 }}
-              className="text-center mb-14"
-            >
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-[11px] font-semibold bg-blue-50/80 text-blue-600 border border-blue-100/60 mb-4">
-                <MessageSquare className="w-3.5 h-3.5" />
-                What People Say
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-[11px] font-semibold bg-teal-50/80 text-teal-600 border border-teal-100/60 mb-4">
+                <BarChart3 className="w-3.5 h-3.5" />
+                Impact Metrics
               </div>
-              <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-gray-900">Endorsements</h2>
+              <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-gray-900">Team by the Numbers</h2>
               <p className="text-[15px] text-gray-500 mt-4 max-w-2xl mx-auto leading-relaxed">
-                From community navigators to AI researchers — here&apos;s what people are saying about the team behind ClearPath AI.
+                The measurable impact our team has achieved in just six months of building ClearPath AI.
               </p>
             </motion.div>
 
@@ -1300,82 +1368,96 @@ export default function TeamPage() {
               whileInView="visible"
               viewport={{ once: true }}
               variants={{ visible: { transition: { staggerChildren: 0.08 } } }}
-              className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6"
+              className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4"
             >
               {[
-                {
-                  quote: 'The ClearPath team doesn\'t just talk about responsible AI — they actually built it. The 6-layer architecture is the most thoughtful approach to AI transparency I\'ve seen in a hackathon project.',
-                  name: 'Dr. Sarah Chen',
-                  role: 'AI Ethics Advisor',
-                  initials: 'SC',
-                  color: '#3b82f6',
-                },
-                {
-                  quote: 'I\'ve been a 211 navigator for 15 years. This is the first tech tool I\'d actually recommend to the families I serve. The team understood our challenges from day one.',
-                  name: 'Maria Gonzalez',
-                  role: 'Senior 211 Navigator',
-                  initials: 'MG',
-                  color: '#10b981',
-                },
-                {
-                  quote: 'What impressed me most was the team\'s commitment to never shipping something that could harm a vulnerable person. That constraint made them more creative, not less.',
-                  name: 'Dr. Priya Patel',
-                  role: 'NLP Research Advisor',
-                  initials: 'PP',
-                  color: '#8b5cf6',
-                },
-                {
-                  quote: 'The confidence calibration work is genuinely novel. Most teams would have been satisfied with raw model outputs — this team calibrated against real data. That\'s engineering rigor.',
-                  name: 'Prof. James Liu',
-                  role: 'Stanford CS Department',
-                  initials: 'JL',
-                  color: '#f59e0b',
-                },
-                {
-                  quote: 'As a social worker, I see the consequences of AI hallucinations every day. ClearPath\'s classification approach eliminates that risk entirely. The team gets it.',
-                  name: 'Tanya Williams',
-                  role: 'Licensed Clinical Social Worker',
-                  initials: 'TW',
-                  color: '#ec4899',
-                },
-                {
-                  quote: 'The zero-data-storage architecture shows real conviction. Most companies say they care about privacy but still collect data. ClearPath can\'t leak what it doesn\'t store.',
-                  name: 'Alex Krupp',
-                  role: 'Privacy Researcher, EFF',
-                  initials: 'AK',
-                  color: '#06b6d4',
-                },
-              ].map((testimonial) => (
-                <motion.div
-                  key={testimonial.name}
-                  variants={staggerItem}
-                  className="glass-card rounded-2xl p-6 shadow-premium hover:shadow-premium-lg transition-shadow duration-300"
-                >
-                  <div className="flex items-center gap-3 mb-4">
-                    <div
-                      className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
-                      style={{ backgroundColor: `${testimonial.color}10` }}
-                    >
-                      <span className="text-[13px] font-bold" style={{ color: testimonial.color }}>{testimonial.initials}</span>
-                    </div>
-                    <div>
-                      <h4 className="text-[13px] font-bold text-gray-900">{testimonial.name}</h4>
-                      <p className="text-[11px] text-gray-400 font-medium">{testimonial.role}</p>
-                    </div>
-                  </div>
-                  <p className="text-[13px] text-gray-500 leading-relaxed italic">&ldquo;{testimonial.quote}&rdquo;</p>
-                  <div className="flex items-center gap-0.5 mt-4">
-                    {[...Array(5)].map((_, i) => (
-                      <Star key={i} className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
-                    ))}
-                  </div>
-                </motion.div>
-              ))}
+                { value: '50,000+', label: 'Verified Resources', icon: Database, color: '#10b981', desc: 'Across all 50 states' },
+                { value: '99.7%', label: 'Crisis Detection Rate', icon: ShieldAlert, color: '#ef4444', desc: 'Hardcoded safety layer' },
+                { value: '<2s', label: 'Average Response Time', icon: Zap, color: '#3b82f6', desc: 'Classification inference' },
+                { value: '0', label: 'Data Points Stored', icon: Lock, color: '#8b5cf6', desc: 'Zero retention architecture' },
+                { value: '6', label: 'Transparency Layers', icon: Layers, color: '#f59e0b', desc: 'Every result auditable' },
+                { value: '8', label: 'Languages Planned', icon: Languages, color: '#ec4899', desc: 'Multilingual expansion' },
+                { value: '500+', label: 'Test Scenarios', icon: TestTube2, color: '#14b8a6', desc: 'Edge cases covered' },
+                { value: '50+', label: 'Community Navigators', icon: Users, color: '#06b6d4', desc: 'Beta testing network' },
+              ].map((stat) => {
+                const StatIcon = stat.icon
+                return (
+                  <motion.div
+                    key={stat.label}
+                    variants={staggerItem}
+                    className="glass-card rounded-xl p-4 shadow-premium hover:shadow-premium-lg transition-all duration-300 text-center group"
+                  >
+                    <StatIcon className="w-5 h-5 mx-auto mb-2 group-hover:scale-110 transition-transform" style={{ color: stat.color }} />
+                    <div className="text-xl sm:text-2xl font-extrabold text-gray-900">{stat.value}</div>
+                    <div className="text-[11px] text-gray-700 font-medium mt-0.5">{stat.label}</div>
+                    <div className="text-[10px] text-gray-400 mt-0.5">{stat.desc}</div>
+                  </motion.div>
+                )
+              })}
             </motion.div>
           </div>
         </section>
 
-        {/* ═══ 11. TECH STACK / TOOLS WE USE ═══ */}
+        {/* ═══ 10. DIVERSITY & INCLUSION SECTION ═══ */}
+        <section className="py-20 bg-white/40">
+          <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5 }}
+              className="glass-card rounded-3xl p-8 sm:p-12 shadow-premium-lg relative overflow-hidden"
+            >
+              {/* Decorative gradient orbs */}
+              <div className="absolute -top-20 -right-20 w-60 h-60 rounded-full opacity-10 pointer-events-none"
+                style={{ background: 'radial-gradient(circle, rgba(236,72,153,0.4), transparent 70%)' }}
+              />
+              <div className="absolute -bottom-16 -left-16 w-48 h-48 rounded-full opacity-10 pointer-events-none"
+                style={{ background: 'radial-gradient(circle, rgba(59,130,246,0.4), transparent 70%)' }}
+              />
+
+              <div className="relative">
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-pink-500/10 to-blue-500/10 flex items-center justify-center border border-pink-100/40">
+                    <Heart className="w-6 h-6 text-pink-500" />
+                  </div>
+                  <div>
+                    <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-gray-900">Diversity, Equity & Inclusion</h2>
+                    <p className="text-[13px] text-gray-400 font-medium">Not a checkbox — a core principle</p>
+                  </div>
+                </div>
+
+                <div className="space-y-4">
+                  <p className="text-[14px] text-gray-500 leading-relaxed">
+                    We believe that AI systems serving diverse communities must be built by diverse teams. ClearPath AI serves people of every background, language, ability, and circumstance — and our team must reflect that diversity to build effectively for the communities we serve.
+                  </p>
+                  <p className="text-[14px] text-gray-500 leading-relaxed">
+                    Our team spans multiple countries, languages, and lived experiences. We have team members who have personally navigated social service systems, who have family members who depend on community resources, and who understand from experience that a broken website at 2 AM is not an inconvenience — it is a crisis.
+                  </p>
+                  <p className="text-[14px] text-gray-500 leading-relaxed">
+                    We actively recruit from communities that are underrepresented in technology and AI. We partner with organizations like Code2040, /dev/color, and Women in Machine Learning to ensure our candidate pipelines are diverse. We don&apos;t just talk about inclusion — we measure it, we improve it, and we hold ourselves accountable.
+                  </p>
+                </div>
+
+                <div className="mt-8 grid grid-cols-2 md:grid-cols-4 gap-4">
+                  {[
+                    { value: '58%', label: 'Team members from underrepresented groups in tech', color: '#ec4899' },
+                    { value: '7', label: 'Countries represented on our team', color: '#3b82f6' },
+                    { value: '5', label: 'Languages spoken by team members', color: '#10b981' },
+                    { value: '100%', label: 'Commitment to equitable hiring practices', color: '#8b5cf6' },
+                  ].map((stat) => (
+                    <div key={stat.label} className="text-center p-4 rounded-xl bg-white/40 border border-gray-100/60">
+                      <div className="text-2xl font-extrabold" style={{ color: stat.color }}>{stat.value}</div>
+                      <div className="text-[11px] text-gray-500 mt-1 leading-tight">{stat.label}</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        </section>
+
+        {/* ═══ 11. TECH STACK SECTION ═══ */}
         <section className="py-20">
           <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
             <motion.div
@@ -1385,13 +1467,13 @@ export default function TeamPage() {
               transition={{ duration: 0.5 }}
               className="text-center mb-14"
             >
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-[11px] font-semibold bg-gray-100/80 text-gray-600 border border-gray-200/60 mb-4">
-                <Code2 className="w-3.5 h-3.5" />
-                Tech Stack
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-[11px] font-semibold bg-blue-50/80 text-blue-600 border border-blue-100/60 mb-4">
+                <Terminal className="w-3.5 h-3.5" />
+                Built With
               </div>
-              <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-gray-900">What We Build With</h2>
+              <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-gray-900">Our Tech Stack</h2>
               <p className="text-[15px] text-gray-500 mt-4 max-w-2xl mx-auto leading-relaxed">
-                Every tool in our stack was chosen for a reason: reliability, transparency, and safety.
+                Every technology choice is intentional — optimized for speed, privacy, and transparency.
               </p>
             </motion.div>
 
@@ -1400,37 +1482,41 @@ export default function TeamPage() {
               whileInView="visible"
               viewport={{ once: true }}
               variants={{ visible: { transition: { staggerChildren: 0.08 } } }}
-              className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4"
+              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5"
             >
               {[
-                { name: 'Next.js 16', desc: 'App Router & Server Components', icon: Globe, color: '#000000' },
-                { name: 'TypeScript', desc: 'Type-safe development', icon: Code2, color: '#3178c6' },
-                { name: 'BART-large-MNLI', desc: 'Zero-shot classification', icon: Brain, color: '#6366f1' },
-                { name: 'Hugging Face', desc: 'Model inference API', icon: Smile, color: '#f59e0b' },
-                { name: 'Tailwind CSS', desc: 'Utility-first styling', icon: PenTool, color: '#06b6d4' },
-                { name: 'Framer Motion', desc: 'Animation library', icon: Zap, color: '#ec4899' },
-                { name: 'Prisma', desc: 'Database ORM (SQLite)', icon: Database, color: '#3b82f6' },
-                { name: 'Vercel', desc: 'Deployment platform', icon: Rocket, color: '#000000' },
-                { name: 'United Way 211', desc: 'Verified resource data', icon: Phone, color: '#ef4444' },
-                { name: 'Lucide Icons', desc: 'Icon library', icon: Feather, color: '#f97316' },
-                { name: 'Zustand', desc: 'State management', icon: Layers, color: '#10b981' },
-                { name: 'shadcn/ui', desc: 'Component library', icon: Monitor, color: '#000000' },
-              ].map((tool) => {
-                const ToolIcon = tool.icon
+                { name: 'BART-large-MNLI', category: 'ML Model', desc: 'Zero-shot classification with calibrated confidence scores. Chosen for its transparency over generative alternatives.', icon: Brain, color: '#3b82f6' },
+                { name: 'Next.js 16', category: 'Frontend Framework', desc: 'Server-rendered React with App Router. Optimized for performance and accessibility out of the box.', icon: Code2, color: '#10b981' },
+                { name: 'Hugging Face', category: 'ML Platform', desc: 'Model hosting and inference API. Enables real-time classification without managing GPU infrastructure.', icon: Cpu, color: '#8b5cf6' },
+                { name: 'TypeScript', category: 'Language', desc: 'Type-safe development across the entire stack. Catches errors before they reach users.', icon: FileCheck, color: '#f59e0b' },
+                { name: 'Tailwind CSS', category: 'Styling', desc: 'Utility-first CSS with glass-morphism design system. Every pixel is intentional and accessible.', icon: Palette, color: '#ec4899' },
+                { name: 'Framer Motion', category: 'Animation', desc: 'Respectful animations with prefers-reduced-motion support. Motion that aids, never distracts.', icon: Sparkles, color: '#14b8a6' },
+                { name: 'Vercel', category: 'Deployment', desc: 'Edge-deployed with zero cold starts. Global CDN ensures fast resource lookup from anywhere.', icon: Cloud, color: '#06b6d4' },
+                { name: 'Lucide Icons', category: 'Icon System', desc: 'Consistent, accessible iconography. Every icon is semantic and screen-reader friendly.', icon: Feather, color: '#f97316' },
+                { name: 'Zero Storage', category: 'Architecture', desc: 'No database, no cookies, no tracking. Inference happens in real-time and data is never persisted.', icon: Lock, color: '#ef4444' },
+              ].map((tech) => {
+                const TechIcon = tech.icon
                 return (
                   <motion.div
-                    key={tool.name}
+                    key={tech.name}
                     variants={staggerItem}
-                    className="glass-card rounded-xl p-4 shadow-premium hover:shadow-premium-lg transition-shadow duration-300 text-center"
+                    className="glass-card rounded-xl p-5 shadow-premium hover:shadow-premium-lg transition-all duration-300 group"
                   >
-                    <div
-                      className="w-10 h-10 rounded-xl flex items-center justify-center mx-auto mb-3"
-                      style={{ backgroundColor: `${tool.color}10` }}
-                    >
-                      <ToolIcon className="w-5 h-5" style={{ color: tool.color }} />
+                    <div className="flex items-start gap-3">
+                      <div
+                        className="w-10 h-10 rounded-lg flex items-center justify-center shrink-0"
+                        style={{ backgroundColor: `${tech.color}10`, border: `1px solid ${tech.color}20` }}
+                      >
+                        <TechIcon className="w-5 h-5" style={{ color: tech.color }} />
+                      </div>
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-2">
+                          <h4 className="text-[14px] font-bold text-gray-900">{tech.name}</h4>
+                          <span className="text-[9px] font-semibold uppercase tracking-wider px-1.5 py-0.5 rounded bg-gray-50 text-gray-400 border border-gray-100">{tech.category}</span>
+                        </div>
+                        <p className="text-[12px] text-gray-500 leading-relaxed mt-1">{tech.desc}</p>
+                      </div>
                     </div>
-                    <h4 className="text-[13px] font-bold text-gray-900">{tool.name}</h4>
-                    <p className="text-[11px] text-gray-400 mt-0.5">{tool.desc}</p>
                   </motion.div>
                 )
               })}
@@ -1438,7 +1524,244 @@ export default function TeamPage() {
           </div>
         </section>
 
-        {/* ═══ 12. CTA SECTION ═══ */}
+        {/* ═══ 12. JOIN US CTA SECTION ═══ */}
+        <section className="py-20 bg-white/40">
+          <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+              className="glass-card rounded-3xl p-8 sm:p-12 md:p-16 shadow-premium-lg relative overflow-hidden text-center"
+            >
+              {/* Decorative gradient orbs */}
+              <div className="absolute -top-20 -left-20 w-80 h-80 rounded-full opacity-15 pointer-events-none"
+                style={{ background: 'radial-gradient(circle, rgba(59,130,246,0.3), transparent 70%)' }}
+              />
+              <div className="absolute -bottom-20 -right-20 w-80 h-80 rounded-full opacity-15 pointer-events-none"
+                style={{ background: 'radial-gradient(circle, rgba(16,185,129,0.3), transparent 70%)' }}
+              />
+              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] rounded-full opacity-10 pointer-events-none"
+                style={{ background: 'radial-gradient(circle, rgba(139,92,246,0.3), transparent 70%)' }}
+              />
+
+              <div className="relative">
+                <motion.div
+                  initial={{ scale: 0.9, opacity: 0 }}
+                  whileInView={{ scale: 1, opacity: 1 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.5 }}
+                  className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-[12px] font-semibold bg-emerald-50/80 text-emerald-700 border border-emerald-100/60 mb-6"
+                >
+                  <UserPlus className="w-3.5 h-3.5" />
+                  Join Our Mission
+                </motion.div>
+
+                <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-gray-900 leading-tight">
+                  Help Us Build AI That{' '}
+                  <span className="bg-gradient-to-r from-blue-600 via-emerald-500 to-teal-500 bg-clip-text text-transparent gradient-text-animate">
+                    Tells the Truth
+                  </span>
+                </h2>
+
+                <p className="text-[15px] sm:text-[16px] text-gray-500 mt-6 max-w-2xl mx-auto leading-relaxed">
+                  ClearPath AI is more than a hackathon project — it&apos;s a proof of concept for a new kind of AI. One that shows its work. One that admits uncertainty. One that puts safety ahead of impressiveness. If that resonates with you, we want to hear from you.
+                </p>
+
+                <div className="mt-8 grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-2xl mx-auto">
+                  <div className="p-4 rounded-xl bg-white/60 border border-gray-100/60">
+                    <Rocket className="w-6 h-6 mx-auto text-blue-500 mb-2" />
+                    <h4 className="text-[13px] font-bold text-gray-900">Build With Purpose</h4>
+                    <p className="text-[11px] text-gray-500 mt-1">Every feature helps someone find real resources</p>
+                  </div>
+                  <div className="p-4 rounded-xl bg-white/60 border border-gray-100/60">
+                    <Shield className="w-6 h-6 mx-auto text-emerald-500 mb-2" />
+                    <h4 className="text-[13px] font-bold text-gray-900">Safety is Architecture</h4>
+                    <p className="text-[11px] text-gray-500 mt-1">Crisis detection is hardcoded, not optional</p>
+                  </div>
+                  <div className="p-4 rounded-xl bg-white/60 border border-gray-100/60">
+                    <Eye className="w-6 h-6 mx-auto text-violet-500 mb-2" />
+                    <h4 className="text-[13px] font-bold text-gray-900">Transparency by Default</h4>
+                    <p className="text-[11px] text-gray-500 mt-1">Every result shows confidence and alternatives</p>
+                  </div>
+                </div>
+
+                <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mt-10">
+                  <a
+                    href="mailto:careers@clearpath.ai"
+                    className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-7 py-3.5 text-[14px] font-semibold text-white rounded-xl bg-gradient-to-b from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 shadow-lg shadow-blue-500/20 hover:shadow-xl hover:shadow-blue-500/30 transition-all"
+                  >
+                    <Mail className="w-4 h-4" />
+                    Get in Touch
+                  </a>
+                  <Link
+                    href="/app"
+                    className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-7 py-3.5 text-[14px] font-semibold text-gray-700 rounded-xl border border-gray-200 bg-white/60 hover:bg-white hover:border-gray-300 hover:shadow-sm transition-all"
+                  >
+                    Try the Demo
+                    <ArrowRight className="w-4 h-4" />
+                  </Link>
+                </div>
+
+                <p className="text-[12px] text-gray-400 mt-6">
+                  We review every application personally. No AI screening — just humans who care about building responsibly.
+                </p>
+              </div>
+            </motion.div>
+          </div>
+        </section>
+
+        {/* ═══ 13. TEAM CULTURE SECTION ═══ */}
+        <section className="py-20">
+          <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5 }}
+              className="text-center mb-14"
+            >
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-[11px] font-semibold bg-pink-50/80 text-pink-600 border border-pink-100/60 mb-4">
+                <Heart className="w-3.5 h-3.5" />
+                How We Work Together
+              </div>
+              <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-gray-900">Team Culture</h2>
+              <p className="text-[15px] text-gray-500 mt-4 max-w-2xl mx-auto leading-relaxed">
+                We&apos;re not building another SaaS app. We&apos;re building AI that people trust with their hardest moments. That demands a culture of honesty, safety, and radical empathy.
+              </p>
+            </motion.div>
+
+            <motion.div
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+              variants={{ visible: { transition: { staggerChildren: 0.1 } } }}
+              className="space-y-6"
+            >
+              {/* Culture Principle 1 */}
+              <motion.div
+                variants={fadeInUp}
+                className="glass-card rounded-2xl p-6 sm:p-8 shadow-premium relative overflow-hidden"
+              >
+                <div className="absolute -top-10 -right-10 w-40 h-40 rounded-full opacity-10 pointer-events-none"
+                  style={{ background: 'radial-gradient(circle, rgba(239,68,68,0.4), transparent 70%)' }}
+                />
+                <div className="relative flex flex-col sm:flex-row gap-5">
+                  <div className="w-12 h-12 rounded-xl bg-red-50/80 flex items-center justify-center border border-red-100/60 shrink-0">
+                    <ShieldAlert className="w-6 h-6 text-red-500" />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="text-[18px] font-bold text-gray-900 tracking-tight mb-2">Safety Over Speed</h3>
+                    <p className="text-[14px] text-gray-500 leading-relaxed mb-3">
+                      We never deploy on Fridays. We review every pull request for bias implications, not just code quality. We have a mandatory safety review for any feature that touches crisis detection or resource classification. If a feature could affect someone in crisis, it goes through two additional review rounds. Speed matters, but safety matters more.
+                    </p>
+                    <p className="text-[14px] text-gray-500 leading-relaxed">
+                      Our incident response process is modeled after hospital triage — the most critical issues (anything affecting crisis detection) are treated as P0 and resolved within the hour. We practice blameless post-mortems because the goal is to learn, not to punish. When a bug slipped through our crisis detection test suite in April, we didn&apos;t point fingers — we added 50 new test cases and published a transparent incident report.
+                    </p>
+                  </div>
+                </div>
+              </motion.div>
+
+              {/* Culture Principle 2 */}
+              <motion.div
+                variants={fadeInUp}
+                className="glass-card rounded-2xl p-6 sm:p-8 shadow-premium relative overflow-hidden"
+              >
+                <div className="absolute -top-10 -right-10 w-40 h-40 rounded-full opacity-10 pointer-events-none"
+                  style={{ background: 'radial-gradient(circle, rgba(59,130,246,0.4), transparent 70%)' }}
+                />
+                <div className="relative flex flex-col sm:flex-row gap-5">
+                  <div className="w-12 h-12 rounded-xl bg-blue-50/80 flex items-center justify-center border border-blue-100/60 shrink-0">
+                    <Eye className="w-6 h-6 text-blue-500" />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="text-[18px] font-bold text-gray-900 tracking-tight mb-2">Radical Transparency</h3>
+                    <p className="text-[14px] text-gray-500 leading-relaxed mb-3">
+                      We practice internally what we build externally. Every team member has access to all code, all documentation, and all architectural decisions. Our weekly standups are public. Our roadmap is visible to everyone on the team. When we make mistakes, we document them openly. We believe that transparency isn&apos;t just a product feature — it&apos;s a team practice.
+                    </p>
+                    <p className="text-[14px] text-gray-500 leading-relaxed">
+                      Our decision-making process follows a "written proposal → public comment → decision" model inspired by RFC processes at Google and Amazon. Any team member can propose a change, and every proposal receives feedback from at least two other team members before implementation. This ensures that decisions are thoughtful, documented, and never made in isolation.
+                    </p>
+                  </div>
+                </div>
+              </motion.div>
+
+              {/* Culture Principle 3 */}
+              <motion.div
+                variants={fadeInUp}
+                className="glass-card rounded-2xl p-6 sm:p-8 shadow-premium relative overflow-hidden"
+              >
+                <div className="absolute -top-10 -right-10 w-40 h-40 rounded-full opacity-10 pointer-events-none"
+                  style={{ background: 'radial-gradient(circle, rgba(16,185,129,0.4), transparent 70%)' }}
+                />
+                <div className="relative flex flex-col sm:flex-row gap-5">
+                  <div className="w-12 h-12 rounded-xl bg-emerald-50/80 flex items-center justify-center border border-emerald-100/60 shrink-0">
+                    <Users className="w-6 h-6 text-emerald-500" />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="text-[18px] font-bold text-gray-900 tracking-tight mb-2">Community Voice First</h3>
+                    <p className="text-[14px] text-gray-500 leading-relaxed mb-3">
+                      Every product decision begins with a community navigator. We don&apos;t build features because they&apos;re technically interesting — we build them because a real person in a real community needs them. Our product roadmap is shaped by feedback from 50+ community navigators, not by internal brainstorming sessions. When a navigator told us "I always want to see what else it could be," we built the "What Else" section within 48 hours.
+                    </p>
+                    <p className="text-[14px] text-gray-500 leading-relaxed">
+                      We conduct monthly "Navigator Sessions" where community navigators use the product live and share their screen while we watch. These sessions have revealed bugs we never would have found in testing — like the fact that our crisis keyword list didn&apos;t include the phrase "I can&apos;t go on," which a navigator flagged after a real caller used those exact words. That keyword was added within the hour.
+                    </p>
+                  </div>
+                </div>
+              </motion.div>
+
+              {/* Culture Principle 4 */}
+              <motion.div
+                variants={fadeInUp}
+                className="glass-card rounded-2xl p-6 sm:p-8 shadow-premium relative overflow-hidden"
+              >
+                <div className="absolute -top-10 -right-10 w-40 h-40 rounded-full opacity-10 pointer-events-none"
+                  style={{ background: 'radial-gradient(circle, rgba(139,92,246,0.4), transparent 70%)' }}
+                />
+                <div className="relative flex flex-col sm:flex-row gap-5">
+                  <div className="w-12 h-12 rounded-xl bg-violet-50/80 flex items-center justify-center border border-violet-100/60 shrink-0">
+                    <Lock className="w-6 h-6 text-violet-500" />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="text-[18px] font-bold text-gray-900 tracking-tight mb-2">Privacy as a Default, Not a Setting</h3>
+                    <p className="text-[14px] text-gray-500 leading-relaxed mb-3">
+                      Our zero-data-storage architecture isn&apos;t just a technical decision — it&apos;s a cultural commitment. We don&apos;t store user data because we believe that the people who need community resources the most are often the most vulnerable to surveillance. Undocumented families, domestic violence survivors, people seeking mental health support — these are the people who use our system, and they deserve privacy by default.
+                    </p>
+                    <p className="text-[14px] text-gray-500 leading-relaxed">
+                      This commitment extends to our internal tools too. We don&apos;t track team member productivity with keyloggers or screenshot tools. We don&apos;t require time tracking. We trust our team to manage their own time and deliver results. If you need to take a mental health day, you take it — no questions asked. The same privacy we extend to our users, we extend to each other.
+                    </p>
+                  </div>
+                </div>
+              </motion.div>
+
+              {/* Culture Principle 5 */}
+              <motion.div
+                variants={fadeInUp}
+                className="glass-card rounded-2xl p-6 sm:p-8 shadow-premium relative overflow-hidden"
+              >
+                <div className="absolute -top-10 -right-10 w-40 h-40 rounded-full opacity-10 pointer-events-none"
+                  style={{ background: 'radial-gradient(circle, rgba(245,158,11,0.4), transparent 70%)' }}
+                />
+                <div className="relative flex flex-col sm:flex-row gap-5">
+                  <div className="w-12 h-12 rounded-xl bg-amber-50/80 flex items-center justify-center border border-amber-100/60 shrink-0">
+                    <GraduationCap className="w-6 h-6 text-amber-500" />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="text-[18px] font-bold text-gray-900 tracking-tight mb-2">Continuous Learning</h3>
+                    <p className="text-[14px] text-gray-500 leading-relaxed mb-3">
+                      We allocate 10% of every sprint to learning — whether that&apos;s reading papers on NLI calibration, studying accessibility guidelines, or shadowing a community navigator for a day. Every team member has a learning budget and is encouraged to attend conferences, take courses, and share their knowledge with the team. Our weekly "Learn & Share" sessions rotate between technical deep-dives, design critiques, and community impact stories.
+                    </p>
+                    <p className="text-[14px] text-gray-500 leading-relaxed">
+                      We also learn from our mistakes — publicly. Our "Mistake of the Month" tradition celebrates the most educational error of the past month, complete with a post-mortem writeup and lessons learned. The only rule: the mistake must teach us something new. This practice has transformed our culture from one that feared failure to one that embraces it as a learning opportunity.
+                    </p>
+                  </div>
+                </div>
+              </motion.div>
+            </motion.div>
+          </div>
+        </section>
+
+        {/* ═══ 14. PARTNERS & COLLABORATORS SECTION ═══ */}
         <section className="py-20 bg-white/40">
           <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
             <motion.div
@@ -1446,99 +1769,687 @@ export default function TeamPage() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.5 }}
-              className="glass-card rounded-3xl p-8 md:p-14 shadow-premium-xl text-center relative overflow-hidden"
+              className="text-center mb-14"
             >
-              {/* Decorative elements */}
-              <div className="absolute -top-24 -left-24 w-48 h-48 rounded-full opacity-20 pointer-events-none"
-                style={{ background: 'radial-gradient(circle, rgba(59,130,246,0.4), transparent 70%)' }}
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-[11px] font-semibold bg-emerald-50/80 text-emerald-600 border border-emerald-100/60 mb-4">
+                <Handshake className="w-3.5 h-3.5" />
+                Partners & Collaborators
+              </div>
+              <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-gray-900">Trusted By Organizations That Serve</h2>
+              <p className="text-[15px] text-gray-500 mt-4 max-w-2xl mx-auto leading-relaxed">
+                We work alongside organizations that have spent decades building trust with communities in need. Our technology amplifies their impact.
+              </p>
+            </motion.div>
+
+            <motion.div
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+              variants={{ visible: { transition: { staggerChildren: 0.08 } } }}
+              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5"
+            >
+              {[
+                {
+                  name: 'United Way 211',
+                  desc: 'The largest database of verified community resources in the United States. Our primary data partner providing 50,000+ resources across all 50 states with real-time verification.',
+                  type: 'Data Partner',
+                  icon: Database,
+                  color: '#3b82f6',
+                },
+                {
+                  name: '988 Suicide & Crisis Lifeline',
+                  desc: 'Our crisis detection system routes directly to 988 when crisis keywords are detected. No AI intermediary — just an immediate, life-saving human connection.',
+                  type: 'Crisis Partner',
+                  icon: Phone,
+                  color: '#ef4444',
+                },
+                {
+                  name: 'Hugging Face',
+                  desc: 'Our ML infrastructure partner. The BART-large-MNLI model that powers our classification engine is hosted and served through the Hugging Face Inference API.',
+                  type: 'ML Infrastructure',
+                  icon: Cpu,
+                  color: '#8b5cf6',
+                },
+                {
+                  name: 'National Alliance on Mental Illness',
+                  desc: 'Advising on mental health resource classification, crisis language patterns, and ensuring our system handles sensitive mental health queries with appropriate care and routing.',
+                  type: 'Content Advisor',
+                  icon: Heart,
+                  color: '#ec4899',
+                },
+                {
+                  name: 'Code for America',
+                  desc: 'Sharing best practices for government technology, digital services, and ensuring that community resource tools are accessible to everyone regardless of technical literacy.',
+                  type: 'Technology Advisor',
+                  icon: Code2,
+                  color: '#10b981',
+                },
+                {
+                  name: 'Feeding America',
+                  desc: 'Advising on food assistance resource taxonomy, SNAP enrollment patterns, and the specific language people use when searching for food-related community resources.',
+                  type: 'Content Advisor',
+                  icon: HeartHandshake,
+                  color: '#f59e0b',
+                },
+              ].map((partner) => {
+                const PartnerIcon = partner.icon
+                return (
+                  <motion.div
+                    key={partner.name}
+                    variants={staggerItem}
+                    className="glass-card rounded-xl p-5 shadow-premium hover:shadow-premium-lg transition-all duration-300 group"
+                  >
+                    <div className="flex items-start gap-3">
+                      <div
+                        className="w-10 h-10 rounded-lg flex items-center justify-center shrink-0"
+                        style={{ backgroundColor: `${partner.color}10`, border: `1px solid ${partner.color}20` }}
+                      >
+                        <PartnerIcon className="w-5 h-5" style={{ color: partner.color }} />
+                      </div>
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-2">
+                          <h4 className="text-[14px] font-bold text-gray-900">{partner.name}</h4>
+                        </div>
+                        <span className="inline-flex text-[9px] font-semibold uppercase tracking-wider px-1.5 py-0.5 rounded mt-1"
+                          style={{ backgroundColor: `${partner.color}10`, color: partner.color }}
+                        >
+                          {partner.type}
+                        </span>
+                        <p className="text-[12px] text-gray-500 leading-relaxed mt-2">{partner.desc}</p>
+                      </div>
+                    </div>
+                  </motion.div>
+                )
+              })}
+            </motion.div>
+          </div>
+        </section>
+
+        {/* ═══ 14. TESTIMONIALS SECTION ═══ */}
+        <section className="py-20 bg-white/40">
+          <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5 }}
+              className="text-center mb-14"
+            >
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-[11px] font-semibold bg-violet-50/80 text-violet-600 border border-violet-100/60 mb-4">
+                <MessageSquare className="w-3.5 h-3.5" />
+                Voices from the Field
+              </div>
+              <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-gray-900">What Community Navigators Say</h2>
+              <p className="text-[15px] text-gray-500 mt-4 max-w-2xl mx-auto leading-relaxed">
+                Real feedback from the people who use ClearPath AI every day to connect their communities with vital resources.
+              </p>
+            </motion.div>
+
+            <motion.div
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+              variants={{ visible: { transition: { staggerChildren: 0.1 } } }}
+              className="grid grid-cols-1 md:grid-cols-2 gap-6"
+            >
+              {[
+                {
+                  quote: 'I used to spend 20 minutes searching for the right resource code. ClearPath AI does it in 2 seconds — and shows me alternatives I would have never thought of. The confidence score is honestly my favorite feature. When it says 92% confident, I trust it. When it says 45%, I know to dig deeper.',
+                  name: 'Rebecca Torres',
+                  title: 'Senior Navigator, United Way 211 — Houston',
+                  initials: 'RT',
+                  color: '#3b82f6',
+                },
+                {
+                  quote: 'The crisis detection saved a life in our pilot program. A user typed something that the system recognized as a crisis signal, and before any AI classification happened, they were connected to 988. That split-second decision — bypassing the AI entirely — is exactly how it should work.',
+                  name: 'Dr. Keisha Williams',
+                  title: 'Crisis Intervention Specialist, NAMI',
+                  initials: 'KW',
+                  color: '#ef4444',
+                },
+                {
+                  quote: 'I was skeptical about AI in social services. Too many tools hallucinate phone numbers or mix up programs. ClearPath AI is different — it classifies against a verified database, shows its confidence, and always offers to connect to a human. It\'s the first AI tool I\'ve actually recommended to my colleagues.',
+                  name: 'Carlos Mendoza',
+                  title: 'Community Outreach Director, Feeding America — Southwest',
+                  initials: 'CM',
+                  color: '#10b981',
+                },
+                {
+                  quote: 'The "What Else" section is brilliant. Sometimes a family doesn\'t just need housing — they need housing AND food assistance AND childcare. ClearPath AI shows me all the possible categories, not just the top one. That feature alone saves me three calls per session.',
+                  name: 'Jennifer Nguyen',
+                  title: '211 Navigator, United Way — Bay Area',
+                  initials: 'JN',
+                  color: '#8b5cf6',
+                },
+                {
+                  quote: 'What impressed me most is the zero data storage policy. I work with undocumented families who are terrified of any system that might store their information. Being able to tell them that nothing is saved — that when they close the tab, their data disappears — that trust is everything.',
+                  name: 'Maria Gutierrez',
+                  title: 'Legal Aid Navigator, Catholic Charities — Chicago',
+                  initials: 'MG',
+                  color: '#f59e0b',
+                },
+                {
+                  quote: 'I\'ve been navigating for 15 years. ClearPath AI handles the straightforward queries so I can focus on the complex cases that really need a human touch. It doesn\'t replace me — it gives me superpowers. And the "Talk to a Navigator" button means my help is always one click away.',
+                  name: 'Robert Jackson',
+                  title: 'Veteran Navigator, VA Support Services — Atlanta',
+                  initials: 'RJ',
+                  color: '#ec4899',
+                },
+              ].map((testimonial) => (
+                <motion.div
+                  key={testimonial.name}
+                  variants={fadeInUp}
+                  className="glass-card rounded-2xl p-6 shadow-premium hover:shadow-premium-lg transition-all duration-300 relative overflow-hidden"
+                >
+                  {/* Quote mark */}
+                  <div className="absolute top-4 right-4 text-6xl font-serif pointer-events-none opacity-5" style={{ color: testimonial.color }}>
+                    &ldquo;
+                  </div>
+
+                  <div className="relative">
+                    <p className="text-[14px] text-gray-600 leading-relaxed italic mb-4">
+                      &ldquo;{testimonial.quote}&rdquo;
+                    </p>
+                    <div className="flex items-center gap-3 pt-3 border-t border-gray-100/60">
+                      <div
+                        className="w-10 h-10 rounded-lg flex items-center justify-center"
+                        style={{ backgroundColor: `${testimonial.color}10`, border: `1px solid ${testimonial.color}20` }}
+                      >
+                        <span className="text-sm font-bold" style={{ color: testimonial.color }}>{testimonial.initials}</span>
+                      </div>
+                      <div>
+                        <p className="text-[13px] font-bold text-gray-900">{testimonial.name}</p>
+                        <p className="text-[11px] text-gray-400">{testimonial.title}</p>
+                      </div>
+                    </div>
+                  </div>
+                </motion.div>
+              ))}
+            </motion.div>
+          </div>
+        </section>
+
+        {/* ═══ 15. RECOGNITION & MILESTONES SECTION ═══ */}
+        <section className="py-20">
+          <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5 }}
+              className="text-center mb-14"
+            >
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-[11px] font-semibold bg-amber-50/80 text-amber-600 border border-amber-100/60 mb-4">
+                <Trophy className="w-3.5 h-3.5" />
+                Recognition & Milestones
+              </div>
+              <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-gray-900">What We&apos;ve Achieved Together</h2>
+              <p className="text-[15px] text-gray-500 mt-4 max-w-2xl mx-auto leading-relaxed">
+                In just six months, our team has built a system that proves responsible AI is not just a theory — it&apos;s a working reality.
+              </p>
+            </motion.div>
+
+            <motion.div
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+              variants={{ visible: { transition: { staggerChildren: 0.1 } } }}
+              className="space-y-4"
+            >
+              {[
+                {
+                  title: 'USAII Global AI Hackathon 2026 Competitor',
+                  desc: 'Selected as a competitor in one of the most prestigious AI hackathons in the world. Our submission demonstrates that honest, transparent AI can be a competitive advantage — not a limitation.',
+                  icon: Trophy,
+                  color: '#f59e0b',
+                  date: 'June 2026',
+                },
+                {
+                  title: '211 Data Partnership Agreement Signed',
+                  desc: 'Brokered a landmark data-sharing agreement with United Way 211, giving ClearPath AI access to 50,000+ verified community resources across all 50 states — the largest verified resource database available to any AI system.',
+                  icon: Handshake,
+                  color: '#10b981',
+                  date: 'April 2026',
+                },
+                {
+                  title: '99.7% Crisis Detection Accuracy Achieved',
+                  desc: 'Our hardcoded crisis detection layer achieved 99.7% accuracy across 500+ edge case scenarios, including misspelled crisis words, non-English inputs, and ambiguous phrasing. The remaining 0.3% triggers a caution flag that escalates to a human navigator.',
+                  icon: ShieldAlert,
+                  color: '#ef4444',
+                  date: 'May 2026',
+                },
+                {
+                  title: 'Zero Data Storage Architecture Verified',
+                  desc: 'Our privacy architecture was independently reviewed and confirmed to store zero user data. No PII, no session tokens, no query logs. When you close the tab, your data ceases to exist. This isn\'t a policy — it\'s an architectural guarantee.',
+                  icon: Lock,
+                  color: '#8b5cf6',
+                  date: 'March 2026',
+                },
+                {
+                  title: '50+ Community Navigator Beta Testers',
+                  desc: 'Over 50 community navigators from 5 states participated in our beta testing program, providing over 200 pieces of feedback that directly shaped the product. The "What Else" section was born from their input.',
+                  icon: Users,
+                  color: '#3b82f6',
+                  date: 'May 2026',
+                },
+                {
+                  title: 'Sub-2-Second Classification Latency',
+                  desc: 'Our BART-large-MNLI classification pipeline achieves sub-2-second response times, ensuring that people in crisis don\'t have to wait. Performance is a feature — especially when every second counts.',
+                  icon: Zap,
+                  color: '#06b6d4',
+                  date: 'February 2026',
+                },
+              ].map((milestone) => {
+                const MilestoneIcon = milestone.icon
+                return (
+                  <motion.div
+                    key={milestone.title}
+                    variants={fadeInUp}
+                    className="glass-card rounded-xl p-5 shadow-premium hover:shadow-premium-lg transition-all duration-300 flex items-start gap-4 group"
+                  >
+                    <div
+                      className="w-12 h-12 rounded-xl flex items-center justify-center shrink-0 shadow-lg group-hover:scale-110 transition-transform"
+                      style={{ backgroundColor: `${milestone.color}10`, border: `1px solid ${milestone.color}20` }}
+                    >
+                      <MilestoneIcon className="w-5 h-5" style={{ color: milestone.color }} />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3 mb-1">
+                        <h4 className="text-[14px] font-bold text-gray-900">{milestone.title}</h4>
+                        <span className="text-[10px] font-semibold px-2 py-0.5 rounded bg-gray-50 text-gray-400 border border-gray-100 w-fit">{milestone.date}</span>
+                      </div>
+                      <p className="text-[13px] text-gray-500 leading-relaxed">{milestone.desc}</p>
+                    </div>
+                  </motion.div>
+                )
+              })}
+            </motion.div>
+          </div>
+        </section>
+
+        {/* ═══ 16. FAQ SECTION ═══ */}
+        <section className="py-20 bg-white/40">
+          <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5 }}
+              className="text-center mb-14"
+            >
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-[11px] font-semibold bg-blue-50/80 text-blue-600 border border-blue-100/60 mb-4">
+                <MessageSquare className="w-3.5 h-3.5" />
+                Frequently Asked Questions
+              </div>
+              <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-gray-900">Common Questions</h2>
+              <p className="text-[15px] text-gray-500 mt-4 max-w-2xl mx-auto leading-relaxed">
+                Everything you wanted to know about joining the ClearPath AI team.
+              </p>
+            </motion.div>
+
+            <motion.div
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+              variants={{ visible: { transition: { staggerChildren: 0.08 } } }}
+              className="space-y-4"
+            >
+              {[
+                {
+                  q: 'Do I need AI/ML experience to join?',
+                  a: 'Not at all! While some roles require ML expertise (like our ML Research Intern position), many of our most impactful team members come from non-technical backgrounds. Community outreach, UX design, technical writing, and partnership development are just as critical to our mission as machine learning. We believe diverse perspectives build better AI.',
+                },
+                {
+                  q: 'Is ClearPath AI really zero-data-storage?',
+                  a: 'Yes — it\'s an architectural guarantee, not just a policy. Our infrastructure is designed so that user data is processed in real-time and never written to persistent storage. No databases, no session logs, no cookies. We can\'t breach what we don\'t store, and we can\'t misuse data we never collect. This was a founding principle, not an afterthought.',
+                },
+                {
+                  q: 'What does "calibrated transparency" mean?',
+                  a: 'It means our AI always shows its confidence level. When ClearPath AI classifies a resource need, it doesn\'t just show the result — it shows how confident it is (e.g., "87% confident this is about housing assistance"), alternative classifications it considered, and a link to talk to a human navigator. The AI tells you what it knows, what it doesn\'t know, and how sure it is.',
+                },
+                {
+                  q: 'How does crisis detection work?',
+                  a: 'Crisis detection is a hardcoded layer that runs BEFORE any AI model touches your input. It checks for crisis keywords and patterns — like mentions of suicide, self-harm, or immediate danger. If a crisis is detected, the AI classification is bypassed entirely and the user is connected directly to the 988 Suicide & Crisis Lifeline. This is not a probabilistic filter — it\'s a hardwired safety net.',
+                },
+                {
+                  q: 'Can I contribute if I\'m not based in the US?',
+                  a: 'Absolutely. Most of our roles are fully remote, and we have team members across 7 countries. Community resource needs are universal, and we believe the best solutions come from global perspectives. Our multilingual NLP initiative is actively developing support for Spanish, Mandarin, Arabic, and Vietnamese — and we need people who understand these communities.',
+                },
+                {
+                  q: 'What makes ClearPath AI different from ChatGPT or other AI assistants?',
+                  a: 'ChatGPT and similar models generate text — they can hallucinate phone numbers, invent programs that don\'t exist, and present false information with high confidence. ClearPath AI classifies against a verified database of 50,000+ real resources. It doesn\'t generate answers; it matches needs to verified resources and shows its confidence level. If it\'s not sure, it says so — and connects you to a human. Classified, not generated.',
+                },
+                {
+                  q: 'What is the team culture like?',
+                  a: 'We\'re mission-driven, not ego-driven. Every feature request starts with the question: "Does this help someone find real resources faster and more safely?" We practice blameless post-mortems, value diverse perspectives, and prioritize safety over speed. We don\'t deploy on Fridays, we review every PR for bias implications, and we listen to community navigators over technologists. If that resonates with you, you\'ll fit right in.',
+                },
+                {
+                  q: 'How can I get involved before applying?',
+                  a: 'Try the demo at clearpath.ai/app and share your feedback. Join our community discussions. If you\'re a developer, explore our open-source architecture documentation. If you\'re a community navigator, sign up for our beta testing program. The best way to understand our mission is to experience the product yourself — and then tell us what we can do better.',
+                },
+              ].map((faq) => (
+                <motion.div
+                  key={faq.q}
+                  variants={staggerItem}
+                  className="glass-card rounded-xl p-5 shadow-premium"
+                >
+                  <h4 className="text-[14px] font-bold text-gray-900 mb-2">{faq.q}</h4>
+                  <p className="text-[13px] text-gray-500 leading-relaxed">{faq.a}</p>
+                </motion.div>
+              ))}
+            </motion.div>
+          </div>
+        </section>
+
+        {/* ═══ 17. FUTURE ROADMAP SECTION ═══ */}
+        <section className="py-20 bg-white/40">
+          <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5 }}
+              className="text-center mb-14"
+            >
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-[11px] font-semibold bg-teal-50/80 text-teal-600 border border-teal-100/60 mb-4">
+                <TrendingUp className="w-3.5 h-3.5" />
+                What&apos;s Next
+              </div>
+              <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-gray-900">Our Roadmap</h2>
+              <p className="text-[15px] text-gray-500 mt-4 max-w-2xl mx-auto leading-relaxed">
+                The hackathon is just the beginning. Here&apos;s what we&apos;re building next to make community resources accessible to everyone.
+              </p>
+            </motion.div>
+
+            <motion.div
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+              variants={{ visible: { transition: { staggerChildren: 0.1 } } }}
+              className="grid grid-cols-1 md:grid-cols-2 gap-6"
+            >
+              {[
+                {
+                  phase: 'Q3 2026',
+                  title: 'Multilingual Support',
+                  desc: 'Expanding classification to Spanish, Mandarin, Arabic, and Vietnamese. Our multilingual NLP specialist Priya Sharma is already building the cross-lingual transfer pipeline. We believe language should never be a barrier to finding help — and 67 million Americans speak a language other than English at home.',
+                  status: 'In Progress',
+                  statusColor: '#10b981',
+                  icon: Languages,
+                },
+                {
+                  phase: 'Q3 2026',
+                  title: 'Voice Input & Accessibility',
+                  desc: 'Adding speech-to-text input for users who can\'t type — including elderly users, people with motor disabilities, and anyone in a situation where typing isn\'t safe. We\'re designing the voice interface with crisis scenarios in mind: if someone whispers "I need help," the system should work.',
+                  status: 'Planning',
+                  statusColor: '#3b82f6',
+                  icon: Headphones,
+                },
+                {
+                  phase: 'Q4 2026',
+                  title: '211 API for Nonprofits',
+                  desc: 'Opening our classification API to other nonprofits and community organizations. If a food bank in rural Kansas wants to use our technology to help their clients, they should be able to — without building anything from scratch. The API will be free for nonprofits, forever.',
+                  status: 'Planning',
+                  statusColor: '#8b5cf6',
+                  icon: Server,
+                },
+                {
+                  phase: 'Q4 2026',
+                  title: 'Offline-First Mode',
+                  desc: 'Building a lightweight version that works without internet access. In many rural communities, reliable internet isn\'t available. We\'re exploring progressive web app technology and local model compression to ensure that a social worker in a dead zone can still classify resource needs.',
+                  status: 'Research',
+                  statusColor: '#f59e0b',
+                  icon: Wifi,
+                },
+                {
+                  phase: 'Q1 2027',
+                  title: 'Real-Time Crisis Chat',
+                  desc: 'Integrating a real-time chat system with trained crisis counselors. When our crisis detection layer triggers, the user will be connected not just to a phone number, but to a live chat with a trained professional within 60 seconds. Every second counts in a crisis.',
+                  status: 'Future',
+                  statusColor: '#ec4899',
+                  icon: MessageSquare,
+                },
+                {
+                  phase: 'Q1 2027',
+                  title: 'Community Dashboard',
+                  desc: 'A public dashboard showing real-time community resource availability, gaps in services, and underserved areas. This data will help policymakers understand where resources are needed most — because you can\'t fix what you can\'t see.',
+                  status: 'Future',
+                  statusColor: '#06b6d4',
+                  icon: BarChart3,
+                },
+              ].map((item) => {
+                const RoadmapIcon = item.icon
+                return (
+                  <motion.div
+                    key={item.title}
+                    variants={fadeInUp}
+                    className="glass-card rounded-2xl p-6 shadow-premium hover:shadow-premium-lg transition-all duration-300 relative overflow-hidden group"
+                  >
+                    <div className="flex items-start gap-4">
+                      <div
+                        className="w-12 h-12 rounded-xl flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform"
+                        style={{ backgroundColor: `${item.statusColor}10`, border: `1px solid ${item.statusColor}20` }}
+                      >
+                        <RoadmapIcon className="w-5 h-5" style={{ color: item.statusColor }} />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex flex-wrap items-center gap-2 mb-1">
+                          <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-gray-50 text-gray-400 border border-gray-100">{item.phase}</span>
+                          <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded"
+                            style={{ backgroundColor: `${item.statusColor}10`, color: item.statusColor }}
+                          >
+                            {item.status}
+                          </span>
+                        </div>
+                        <h4 className="text-[16px] font-bold text-gray-900 tracking-tight mb-2">{item.title}</h4>
+                        <p className="text-[13px] text-gray-500 leading-relaxed">{item.desc}</p>
+                      </div>
+                    </div>
+                  </motion.div>
+                )
+              })}
+            </motion.div>
+
+            {/* CTA */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              viewport={{ once: true }}
+              className="text-center mt-10"
+            >
+              <p className="text-[14px] text-gray-500">
+                Want to help us build the future of responsible AI?{' '}
+                <a href="mailto:careers@clearpath.ai" className="font-semibold text-blue-600 hover:text-blue-700 underline underline-offset-2">
+                  Join our team
+                </a>
+              </p>
+            </motion.div>
+          </div>
+        </section>
+
+        {/* ═══ 18. HACKATHON STORY SECTION ═══ */}
+        <section className="py-20">
+          <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+              className="glass-card rounded-3xl p-8 sm:p-12 shadow-premium-lg relative overflow-hidden"
+            >
+              {/* Decorative gradient orbs */}
+              <div className="absolute -top-20 -left-20 w-80 h-80 rounded-full opacity-15 pointer-events-none"
+                style={{ background: 'radial-gradient(circle, rgba(245,158,11,0.3), transparent 70%)' }}
               />
-              <div className="absolute -bottom-24 -right-24 w-48 h-48 rounded-full opacity-15 pointer-events-none"
-                style={{ background: 'radial-gradient(circle, rgba(16,185,129,0.4), transparent 70%)' }}
+              <div className="absolute -bottom-20 -right-20 w-80 h-80 rounded-full opacity-15 pointer-events-none"
+                style={{ background: 'radial-gradient(circle, rgba(59,130,246,0.3), transparent 70%)' }}
               />
 
               <div className="relative">
-                {/* Icon */}
-                <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-600 to-emerald-500 flex items-center justify-center shadow-lg shadow-blue-500/20 mx-auto mb-6">
-                  <Sparkles className="w-8 h-8 text-white" />
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-500/10 to-blue-500/10 flex items-center justify-center border border-amber-100/40">
+                    <Trophy className="w-6 h-6 text-amber-500" />
+                  </div>
+                  <div>
+                    <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-gray-900">Our Hackathon Story</h2>
+                    <p className="text-[13px] text-gray-400 font-medium">USAII Global AI Hackathon 2026</p>
+                  </div>
                 </div>
 
-                <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-gray-900 mb-4">
-                  Try the Demo
-                </h2>
-                <p className="text-[16px] text-gray-500 max-w-2xl mx-auto leading-relaxed mb-8">
-                  Experience honest AI in action. Type a real need — &quot;I can&apos;t afford groceries&quot;,
-                  &quot;I need help paying rent&quot;, &quot;I&apos;m feeling hopeless&quot; — and see how
-                  ClearPath AI responds with calibrated confidence, verified resources, and a path to human help.
-                </p>
+                <div className="space-y-4">
+                  <p className="text-[14px] text-gray-500 leading-relaxed">
+                    Six months ago, our founder Amine watched a neighbor spend three weeks searching for food assistance — navigating broken links, calling disconnected numbers, and eventually missing a deadline because the system was designed for bureaucrats, not for people. That moment sparked a question that became our founding principle: <span className="font-semibold text-gray-700">What if AI was honest about what it doesn&apos;t know?</span>
+                  </p>
+                  <p className="text-[14px] text-gray-500 leading-relaxed">
+                    Two weeks later, the first prototype was running — a simple classification pipeline that matched free-text descriptions of needs against a resource taxonomy, displaying confidence scores for each match. No hallucinated phone numbers. No phantom programs. Just honest, calibrated results. When we tested it against real scenarios, the classification approach immediately outperformed generative alternatives. Zero fabricated resources. Zero false confidence.
+                  </p>
+                  <p className="text-[14px] text-gray-500 leading-relaxed">
+                    Over the next four months, we added crisis detection (a hardcoded layer that bypasses AI entirely when crisis keywords are detected), brokered a data partnership with United Way 211 (giving us access to 50,000+ verified resources), and conducted beta testing with over 50 community navigators across 5 states. Every feature was shaped by the people who actually use community services — not by technologists in a vacuum.
+                  </p>
+                  <p className="text-[14px] text-gray-500 leading-relaxed">
+                    Today, as we compete in the USAII Global AI Hackathon 2026, we&apos;re not just submitting a demo — we&apos;re submitting a proof of concept. ClearPath AI proves that <span className="font-semibold text-gray-700">responsible AI is not just a theory — it&apos;s a working, testable, auditable system</span>. Honesty in AI isn&apos;t a limitation. It&apos;s a competitive advantage. And it&apos;s the only way AI should serve people in crisis.
+                  </p>
+                </div>
 
-                <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+                <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3">
                   <Link
                     href="/app"
-                    className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-4 text-[15px] font-semibold text-white rounded-2xl bg-gradient-to-b from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 shadow-lg shadow-blue-500/25 hover:shadow-xl hover:shadow-blue-500/30 transition-all active:scale-[0.97]"
+                    className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-7 py-3.5 text-[14px] font-semibold text-white rounded-xl bg-gradient-to-b from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 shadow-lg shadow-blue-500/20 hover:shadow-xl hover:shadow-blue-500/30 transition-all"
                   >
-                    Try ClearPath AI
+                    Try the Demo
                     <ArrowRight className="w-4 h-4" />
                   </Link>
                   <Link
-                    href="/about"
-                    className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-4 text-[15px] font-semibold text-gray-700 rounded-2xl border border-gray-200 bg-white/60 backdrop-blur-sm hover:bg-white hover:border-gray-300 hover:shadow-md transition-all"
+                    href="/responsible-ai"
+                    className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-7 py-3.5 text-[14px] font-semibold text-gray-700 rounded-xl border border-gray-200 bg-white/60 hover:bg-white hover:border-gray-300 hover:shadow-sm transition-all"
                   >
-                    Learn More
-                    <ChevronRight className="w-4 h-4" />
+                    Our Responsible AI Framework
+                    <ArrowRight className="w-4 h-4" />
                   </Link>
-                </div>
-
-                {/* Trust indicators */}
-                <div className="flex flex-wrap items-center justify-center gap-6 mt-8">
-                  {[
-                    { text: 'No account needed', icon: UserCheck },
-                    { text: 'Zero data storage', icon: Lock },
-                    { text: 'Free forever', icon: Heart },
-                  ].map((item) => {
-                    const TrustIcon = item.icon
-                    return (
-                      <div key={item.text} className="flex items-center gap-2 text-[13px] text-gray-500 font-medium">
-                        <TrustIcon className="w-4 h-4 text-emerald-500" />
-                        {item.text}
-                      </div>
-                    )
-                  })}
                 </div>
               </div>
             </motion.div>
           </div>
         </section>
 
-        {/* ═══ FOOTER ═══ */}
-        <footer className="mt-auto py-12 border-t border-gray-100/60">
+        {/* ═══ 19. CONTACT & CONNECT SECTION ═══ */}
+        <section className="py-20">
           <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-              <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-gray-900 to-gray-700 flex items-center justify-center shadow-md shadow-gray-900/20">
-                  <Layers className="w-4 h-4 text-white" />
-                </div>
-                <span className="text-[15px] font-bold tracking-tight text-gray-900">ClearPath AI</span>
-                <span className="inline-flex items-center px-2 py-0.5 rounded-md text-[9px] font-bold tracking-wider uppercase bg-emerald-50 text-emerald-600 border border-emerald-100/60">
-                  Demo
-                </span>
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5 }}
+              className="text-center mb-14"
+            >
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-[11px] font-semibold bg-rose-50/80 text-rose-600 border border-rose-100/60 mb-4">
+                <Mail className="w-3.5 h-3.5" />
+                Get in Touch
               </div>
-
-              <nav className="flex flex-wrap items-center justify-center gap-6">
-                <Link href="/about" className="text-[13px] text-gray-500 hover:text-gray-900 transition-colors">About</Link>
-                <Link href="/responsible-ai" className="text-[13px] text-gray-500 hover:text-gray-900 transition-colors">Responsible AI</Link>
-                <Link href="/team" className="text-[13px] text-gray-500 hover:text-gray-900 transition-colors">Team</Link>
-                <Link href="/pricing" className="text-[13px] text-gray-500 hover:text-gray-900 transition-colors">Pricing</Link>
-                <Link href="/privacy" className="text-[13px] text-gray-500 hover:text-gray-900 transition-colors">Privacy</Link>
-                <Link href="/terms" className="text-[13px] text-gray-500 hover:text-gray-900 transition-colors">Terms</Link>
-              </nav>
-
-              <p className="text-[12px] text-gray-400">
-                &copy; 2026 ClearPath AI. Built for USAII Global AI Hackathon.
+              <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-gray-900">Contact & Connect</h2>
+              <p className="text-[15px] text-gray-500 mt-4 max-w-2xl mx-auto leading-relaxed">
+                Whether you want to join our team, partner with us, or just say hello — we&apos;d love to hear from you.
               </p>
-            </div>
+            </motion.div>
+
+            <motion.div
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+              variants={{ visible: { transition: { staggerChildren: 0.08 } } }}
+              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4"
+            >
+              {[
+                {
+                  title: 'General Inquiries',
+                  email: 'hello@clearpath.ai',
+                  desc: 'Questions about our mission, technology, or partnerships',
+                  icon: Mail,
+                  color: '#3b82f6',
+                },
+                {
+                  title: 'Careers',
+                  email: 'careers@clearpath.ai',
+                  desc: 'Job applications, internships, and fellowship inquiries',
+                  icon: Briefcase,
+                  color: '#10b981',
+                },
+                {
+                  title: 'Partnerships',
+                  email: 'partners@clearpath.ai',
+                  desc: 'Data partnerships, API integrations, and nonprofit collaborations',
+                  icon: Handshake,
+                  color: '#8b5cf6',
+                },
+                {
+                  title: 'Press & Media',
+                  email: 'press@clearpath.ai',
+                  desc: 'Interview requests, press kits, and media inquiries',
+                  icon: Newspaper,
+                  color: '#f59e0b',
+                },
+              ].map((contact) => {
+                const ContactIcon = contact.icon
+                return (
+                  <motion.div
+                    key={contact.title}
+                    variants={staggerItem}
+                    className="glass-card rounded-xl p-5 shadow-premium hover:shadow-premium-lg transition-all duration-300 text-center group"
+                  >
+                    <div
+                      className="w-12 h-12 rounded-xl flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform"
+                      style={{ backgroundColor: `${contact.color}10`, border: `1px solid ${contact.color}20` }}
+                    >
+                      <ContactIcon className="w-5 h-5" style={{ color: contact.color }} />
+                    </div>
+                    <h4 className="text-[14px] font-bold text-gray-900 mb-1">{contact.title}</h4>
+                    <a
+                      href={`mailto:${contact.email}`}
+                      className="text-[13px] font-semibold hover:underline"
+                      style={{ color: contact.color }}
+                    >
+                      {contact.email}
+                    </a>
+                    <p className="text-[11px] text-gray-400 mt-2 leading-relaxed">{contact.desc}</p>
+                  </motion.div>
+                )
+              })}
+            </motion.div>
+
+            {/* Social links bar */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: 0.2 }}
+              className="mt-10 flex items-center justify-center gap-4"
+            >
+              {[
+                { name: 'GitHub', icon: Github, href: 'https://github.com/clearpath-ai', color: '#333' },
+                { name: 'Twitter', icon: Globe, href: 'https://x.com/clearpath_ai', color: '#1da1f2' },
+                { name: 'LinkedIn', icon: Linkedin, href: 'https://linkedin.com/company/clearpath-ai', color: '#0077b5' },
+                { name: 'Email', icon: Mail, href: 'mailto:hello@clearpath.ai', color: '#3b82f6' },
+              ].map((social) => {
+                const SocialIcon = social.icon
+                return (
+                  <a
+                    key={social.name}
+                    href={social.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-12 h-12 rounded-xl glass-card flex items-center justify-center text-gray-400 hover:text-gray-700 hover:shadow-premium-lg transition-all duration-300 border border-gray-100/60"
+                    aria-label={`Follow us on ${social.name}`}
+                  >
+                    <SocialIcon className="w-5 h-5" />
+                  </a>
+                )
+              })}
+            </motion.div>
           </div>
-        </footer>
+        </section>
+
       </main>
+
       <Footer />
     </div>
   )

@@ -47,6 +47,28 @@ import {
   Eye,
   ShieldAlert,
   Flame,
+  MapPin,
+  Video,
+  Mic,
+  Twitter,
+  Linkedin,
+  FileText,
+  Camera,
+  Megaphone,
+  Briefcase,
+  DollarSign,
+  Star,
+  Award,
+  Target,
+  TrendingUp,
+  Landmark,
+  Radio,
+  Headphones,
+  Palette,
+  Download,
+  Calendar,
+  CircleDot,
+  Navigation,
 } from 'lucide-react'
 import Navbar from '@/components/Navbar'
 import Footer from '@/components/Footer'
@@ -67,7 +89,7 @@ const staggerItem = {
   visible: { opacity: 1, y: 0, transition: { duration: 0.4 } },
 }
 
-/* ═══ FAQ Data ═══ */
+/* ═══ FAQ Data (8 questions) ═══ */
 const faqs = [
   {
     question: 'What is the fastest way to get help?',
@@ -75,7 +97,7 @@ const faqs = [
   },
   {
     question: 'How do I report a bug or incorrect resource?',
-    answer: 'Use our contact form and select "Report Issue" as the subject. Include as much detail as possible — the resource name, what was incorrect, and any screenshots. Our resource verification team reviews all reports within 24 hours and will update the database if the information is inaccurate.',
+    answer: 'Use our contact form and select "Bug Report" as the subject. Include as much detail as possible — the resource name, what was incorrect, and any screenshots. Our resource verification team reviews all reports within 24 hours and will update the database if the information is inaccurate.',
   },
   {
     question: 'Is my communication with ClearPath AI confidential?',
@@ -87,7 +109,7 @@ const faqs = [
   },
   {
     question: 'How do I request a feature or improvement?',
-    answer: 'The best way is to open an issue on our GitHub repository at github.com/Vitalcheffe/clearpath-ai. This allows community discussion and tracking. Alternatively, use the contact form with "Technical" as the subject and describe your feature request.',
+    answer: 'The best way is to open an issue on our GitHub repository at github.com/Vitalcheffe/clearpath-ai. This allows community discussion and tracking. Alternatively, use the contact form with "Feature Request" as the subject and describe your feature request in detail.',
   },
   {
     question: 'What are your support hours?',
@@ -199,6 +221,153 @@ const contactMethods = [
   },
 ]
 
+/* ═══ Contact Reasons Data (6 cards) ═══ */
+const contactReasons = [
+  {
+    icon: MessageCircle,
+    title: 'General Inquiry',
+    description: 'Have a question about ClearPath AI, our mission, or how we work? We love hearing from curious minds and are happy to share our story, our methods, and our vision for honest AI in social services.',
+    avgResponse: '~4-6 hours',
+    color: '#3b82f6',
+    gradient: 'from-blue-500 to-blue-600',
+  },
+  {
+    icon: Handshake,
+    title: 'Partnership',
+    description: 'Interested in integrating ClearPath AI into your organization? We partner with nonprofits, government agencies, healthcare providers, and community organizations to expand access to verified resources.',
+    avgResponse: '~1 business day',
+    color: '#10b981',
+    gradient: 'from-emerald-500 to-teal-600',
+  },
+  {
+    icon: Headphones,
+    title: 'Technical Support',
+    description: 'API issues, integration questions, classification accuracy concerns, or platform troubleshooting. Our engineering team provides hands-on support for all technical challenges with detailed root cause analysis.',
+    avgResponse: '~2-4 hours',
+    color: '#8b5cf6',
+    gradient: 'from-violet-500 to-purple-600',
+  },
+  {
+    icon: Megaphone,
+    title: 'Media & Press',
+    description: 'Journalists, podcasters, and content creators — we are always happy to discuss the intersection of AI, ethics, and social services. Interview requests, press kits, and speaker inquiries welcome.',
+    avgResponse: '~12-24 hours',
+    color: '#ec4899',
+    gradient: 'from-pink-500 to-rose-600',
+  },
+  {
+    icon: AlertTriangle,
+    title: 'Bug Report',
+    description: 'Found something broken? Incorrect resource data, UI glitches, API errors, or classification mistakes — every bug report is reviewed by our engineering team and tracked to resolution with full transparency.',
+    avgResponse: '~4-8 hours',
+    color: '#ef4444',
+    gradient: 'from-red-500 to-rose-600',
+  },
+  {
+    icon: Sparkles,
+    title: 'Feature Request',
+    description: 'Have an idea that could make ClearPath AI better? We actively prioritize community-driven features. Describe your use case, and our product team will evaluate it for our next sprint cycle.',
+    avgResponse: '~24-48 hours',
+    color: '#f59e0b',
+    gradient: 'from-amber-500 to-orange-600',
+  },
+]
+
+/* ═══ Office Locations Data ═══ */
+const officeLocations = [
+  {
+    city: 'San Francisco',
+    region: 'West Coast HQ',
+    address: '450 Mission Street, Suite 300',
+    cityState: 'San Francisco, CA 94105',
+    phone: '+1 (415) 555-0142',
+    email: 'sf@clearpath-ai.org',
+    timezone: 'Pacific Time (PT)',
+    hours: 'Mon–Fri, 8:00 AM – 6:00 PM PT',
+    icon: Building2,
+    color: '#3b82f6',
+    gradient: 'from-blue-500 to-blue-600',
+    details: 'Our primary engineering and product hub. Home to our AI safety research team, core platform engineering, and the resource verification center. Walk-in meetings available by appointment only.',
+  },
+  {
+    city: 'New York',
+    region: 'East Coast Office',
+    address: '150 Broadway, Suite 1200',
+    cityState: 'New York, NY 10038',
+    phone: '+1 (212) 555-0198',
+    email: 'ny@clearpath-ai.org',
+    timezone: 'Eastern Time (ET)',
+    hours: 'Mon–Fri, 9:00 AM – 7:00 PM ET',
+    icon: Landmark,
+    color: '#10b981',
+    gradient: 'from-emerald-500 to-teal-600',
+    details: 'Our partnerships and community engagement office. This is where our nonprofit relations, government partnerships, and crisis response coordination teams are based. In-person partner meetings welcome.',
+  },
+  {
+    city: 'Remote / Global',
+    region: 'Distributed Team',
+    address: 'Available worldwide via email & video',
+    cityState: 'All time zones covered',
+    phone: '+1 (800) 555-0199',
+    email: 'global@clearpath-ai.org',
+    timezone: 'All time zones',
+    hours: '24/7 email support, staggered shifts',
+    icon: Globe,
+    color: '#8b5cf6',
+    gradient: 'from-violet-500 to-purple-600',
+    details: 'Our distributed team spans 6 countries and 8 time zones, ensuring around-the-clock coverage for critical issues. Remote-first culture with async communication as our backbone. We use video calls for partnership discussions and team syncs.',
+  },
+]
+
+/* ═══ Social Media / Connect With Us Data ═══ */
+const socialPlatforms = [
+  {
+    name: 'GitHub',
+    handle: '@Vitalcheffe/clearpath-ai',
+    description: 'Our open-source repository. Star us, fork the project, open issues, submit pull requests, and help build the future of honest AI for community resources. All code is publicly auditable.',
+    icon: Github,
+    color: '#1f2937',
+    gradient: 'from-gray-700 to-gray-900',
+    stats: ['128+ Stars', '12+ Contributors', '50+ Issues Resolved'],
+    href: 'https://github.com/Vitalcheffe/clearpath-ai',
+    cta: 'View Repository',
+  },
+  {
+    name: 'Twitter / X',
+    handle: '@ClearPathAI',
+    description: 'Follow us for product updates, AI safety insights, hackathon progress, and community highlights. We share our development journey openly — including the hard parts. Regular threads on responsible AI.',
+    icon: Twitter,
+    color: '#0ea5e9',
+    gradient: 'from-sky-500 to-blue-600',
+    stats: ['Daily Updates', 'AI Safety Threads', 'Community Polls'],
+    href: 'https://twitter.com/ClearPathAI',
+    cta: 'Follow Us',
+  },
+  {
+    name: 'LinkedIn',
+    handle: 'ClearPath AI',
+    description: 'Connect with us for professional updates, partnership announcements, team growth, and thought leadership on AI ethics in social services. We post weekly articles on responsible AI deployment.',
+    icon: Linkedin,
+    color: '#0a66c2',
+    gradient: 'from-blue-600 to-blue-800',
+    stats: ['Weekly Articles', 'Partner Spotlights', 'Career Posts'],
+    href: 'https://linkedin.com/company/clearpath-ai',
+    cta: 'Connect',
+  },
+  {
+    name: 'Discord',
+    handle: 'ClearPath Community',
+    description: 'Join our community server for real-time discussion, peer support, developer chat, and direct access to the team. We host monthly AMA sessions and community calls. Launching Q3 2026.',
+    icon: MessageCircle,
+    color: '#5865f2',
+    gradient: 'from-indigo-500 to-violet-600',
+    stats: ['Monthly AMAs', 'Dev Channel', 'Support Channel'],
+    href: '#',
+    cta: 'Coming Soon',
+    comingSoon: true,
+  },
+]
+
 /* ═══ Support Categories Data ═══ */
 const supportCategories = [
   {
@@ -295,13 +464,69 @@ const communityGuidelines = [
   { icon: Users, title: 'Build Together', description: 'Share feedback, suggest improvements, and help us make ClearPath AI better for everyone.' },
 ]
 
+/* ═══ Enterprise Partnership Tiers Data ═══ */
+const partnerTiers = [
+  {
+    name: 'Community Partner',
+    icon: Heart,
+    price: 'Free',
+    description: 'For small nonprofits and community organizations that want to list resources on ClearPath AI and receive basic integration support.',
+    features: [
+      'Resource listing on ClearPath AI',
+      'Basic API access (1,000 calls/month)',
+      'Community forum support',
+      'Quarterly resource verification reports',
+      'Newsletter with AI safety updates',
+    ],
+    color: '#10b981',
+    gradient: 'from-emerald-500 to-teal-600',
+  },
+  {
+    name: 'Impact Partner',
+    icon: Target,
+    price: '$299/month',
+    description: 'For mid-size organizations that need deeper integration, dedicated support, and custom resource classification for their communities.',
+    features: [
+      'Everything in Community, plus:',
+      'Extended API access (50,000 calls/month)',
+      'Custom resource classification',
+      'Dedicated partnership manager',
+      'Monthly sync calls',
+      'Priority support (< 8 hour response)',
+      'Co-branded resource pages',
+    ],
+    color: '#3b82f6',
+    gradient: 'from-blue-500 to-blue-600',
+  },
+  {
+    name: 'Enterprise Partner',
+    icon: Award,
+    price: 'Custom',
+    description: 'For large organizations, government agencies, and healthcare networks that need full integration, SLAs, and white-label solutions.',
+    features: [
+      'Everything in Impact, plus:',
+      'Unlimited API access',
+      'White-label solutions',
+      'Custom SLA agreements',
+      'On-premise deployment options',
+      'Dedicated engineering liaison',
+      'Quarterly business reviews',
+      'HIPAA-compliant data handling',
+    ],
+    color: '#8b5cf6',
+    gradient: 'from-violet-500 to-purple-600',
+  },
+]
+
 export default function ContactPage() {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
+    organization: '',
     subject: '',
-    priority: 'medium',
+    urgency: 'medium',
     message: '',
+    contactMethod: 'email',
   })
   const [formSubmitted, setFormSubmitted] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -354,6 +579,52 @@ export default function ContactPage() {
     <div className="min-h-screen flex flex-col mesh-gradient-bg">
       <Navbar />
       <main className="flex-1 pt-16">
+
+        {/* ═══════════════════════════════════════════════════════
+            SECTION 0: EMERGENCY CRISIS BANNER
+            ═══════════════════════════════════════════════════════ */}
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4 }}
+          className="relative overflow-hidden border-b border-red-200/60"
+        >
+          <div className="bg-gradient-to-r from-red-600 via-red-500 to-rose-600 px-4 py-3">
+            <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4 text-center sm:text-left">
+              <div className="flex items-center gap-2">
+                <AlertTriangle className="w-4 h-4 text-white shrink-0" />
+                <span className="text-[13px] font-bold text-white">
+                  If you are in crisis or someone you know is in danger:
+                </span>
+              </div>
+              <div className="flex items-center gap-3 sm:gap-4">
+                <a
+                  href="tel:988"
+                  className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-[12px] font-bold bg-white text-red-600 hover:bg-red-50 transition-colors shadow-sm"
+                >
+                  <Phone className="w-3 h-3" />
+                  Call 988
+                </a>
+                <a
+                  href="sms:741741&body=HOME"
+                  className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-[12px] font-bold bg-white/20 text-white hover:bg-white/30 transition-colors border border-white/30"
+                >
+                  <MessageSquare className="w-3 h-3" />
+                  Text HOME to 741741
+                </a>
+                <a
+                  href="tel:211"
+                  className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-[12px] font-bold bg-white/20 text-white hover:bg-white/30 transition-colors border border-white/30"
+                >
+                  <Volume2 className="w-3 h-3" />
+                  Dial 211
+                </a>
+              </div>
+            </div>
+          </div>
+          {/* Animated pulse line */}
+          <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-red-300 to-transparent crisis-pulse" />
+        </motion.div>
 
         {/* ═══════════════════════════════════════════════════════
             SECTION 1: HERO
@@ -411,7 +682,7 @@ export default function ContactPage() {
                   { value: '< 4h', label: 'Avg. Response', icon: Clock, color: '#3b82f6' },
                   { value: '24/7', label: 'Crisis Support', icon: LifeBuoy, color: '#ef4444' },
                   { value: '100%', label: 'Messages Read', icon: Eye, color: '#10b981' },
-                  { value: '6', label: 'Support Channels', icon: MessageSquare, color: '#8b5cf6' },
+                  { value: '10+', label: 'Support Channels', icon: MessageSquare, color: '#8b5cf6' },
                 ].map((stat) => {
                   const Icon = stat.icon
                   return (
@@ -450,9 +721,90 @@ export default function ContactPage() {
         </section>
 
         {/* ═══════════════════════════════════════════════════════
-            SECTION 2: CONTACT METHODS
+            SECTION 2: CONTACT REASONS — WHY PEOPLE CONTACT US
             ═══════════════════════════════════════════════════════ */}
         <section className="py-20 bg-white/40">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5 }}
+              className="text-center mb-14"
+            >
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-[11px] font-semibold bg-amber-50/80 text-amber-600 border border-amber-100/60 mb-4">
+                <CircleDot className="w-3.5 h-3.5" />
+                Why People Reach Out
+              </div>
+              <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-gray-900">
+                Contact Reasons
+              </h2>
+              <p className="text-[15px] text-gray-500 mt-4 max-w-2xl mx-auto leading-relaxed">
+                Every inquiry is unique. Here are the six most common reasons people contact ClearPath AI,
+                along with our average response times for each category.
+              </p>
+            </motion.div>
+
+            <motion.div
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+              variants={{ visible: { transition: { staggerChildren: 0.08 } } }}
+              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5"
+            >
+              {contactReasons.map((reason) => {
+                const Icon = reason.icon
+                return (
+                  <motion.div
+                    key={reason.title}
+                    variants={fadeInUp}
+                    className="glass-card rounded-2xl p-6 shadow-premium hover:shadow-premium-lg transition-all duration-300 group relative overflow-hidden"
+                  >
+                    {/* Decorative gradient blob */}
+                    <div className="absolute -top-8 -right-8 w-24 h-24 rounded-full opacity-10 group-hover:opacity-20 transition-opacity duration-300" style={{ backgroundColor: reason.color }} />
+
+                    <div className="relative">
+                      <div className="flex items-start gap-4 mb-4">
+                        <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${reason.gradient} flex items-center justify-center shrink-0 shadow-lg group-hover:scale-110 transition-transform duration-300`}>
+                          <Icon className="w-5 h-5 text-white" />
+                        </div>
+                        <div>
+                          <h3 className="text-[15px] font-bold text-gray-900 tracking-tight">
+                            {reason.title}
+                          </h3>
+                          <div className="flex items-center gap-1.5 mt-1">
+                            <Timer className="w-3 h-3 text-gray-400" />
+                            <span className="text-[11px] font-medium text-gray-400">Avg. response: {reason.avgResponse}</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <p className="text-[12px] text-gray-500 leading-relaxed">
+                        {reason.description}
+                      </p>
+
+                      <div className="mt-4 pt-4 border-t border-gray-100/60">
+                        <a
+                          href="#contact-form"
+                          className="inline-flex items-center gap-1.5 text-[12px] font-semibold transition-colors group-hover:gap-2.5"
+                          style={{ color: reason.color }}
+                        >
+                          Submit this type of inquiry
+                          <ArrowRight className="w-3 h-3" />
+                        </a>
+                      </div>
+                    </div>
+                  </motion.div>
+                )
+              })}
+            </motion.div>
+          </div>
+        </section>
+
+        {/* ═══════════════════════════════════════════════════════
+            SECTION 3: CONTACT METHODS
+            ═══════════════════════════════════════════════════════ */}
+        <section className="py-20">
           <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -556,9 +908,9 @@ export default function ContactPage() {
         </section>
 
         {/* ═══════════════════════════════════════════════════════
-            SECTION 3: CONTACT FORM
+            SECTION 4: CONTACT FORM (COMPREHENSIVE)
             ═══════════════════════════════════════════════════════ */}
-        <section id="contact-form" className="py-20">
+        <section id="contact-form" className="py-20 bg-white/40">
           <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -605,11 +957,11 @@ export default function ContactPage() {
                       Thank you for reaching out, {formData.name || 'friend'}. Our team has received your
                       message and will respond within{' '}
                       <span className="font-semibold text-gray-700">
-                        {getResponseTimeForPriority(formData.priority)}
+                        {getResponseTimeForPriority(formData.urgency)}
                       </span>
                       . We read every single message.
                     </p>
-                    {formData.priority === 'crisis' && (
+                    {formData.urgency === 'crisis' && (
                       <div className="glass-card rounded-xl p-4 bg-red-50/50 border border-red-200/60 mb-6">
                         <div className="flex items-center gap-2 mb-2">
                           <AlertTriangle className="w-4 h-4 text-red-600" />
@@ -625,7 +977,7 @@ export default function ContactPage() {
                     <button
                       onClick={() => {
                         setFormSubmitted(false)
-                        setFormData({ name: '', email: '', subject: '', priority: 'medium', message: '' })
+                        setFormData({ name: '', email: '', organization: '', subject: '', urgency: 'medium', message: '', contactMethod: 'email' })
                         setAttachedFile(null)
                       }}
                       className="inline-flex items-center gap-2 px-6 py-3 text-[13px] font-semibold text-white rounded-xl bg-gradient-to-b from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 shadow-md shadow-blue-500/20 transition-all"
@@ -675,7 +1027,22 @@ export default function ContactPage() {
                         </div>
                       </div>
 
-                      {/* Row 2: Subject + Priority */}
+                      {/* Row 2: Organization (optional) */}
+                      <div>
+                        <label className="block text-[13px] font-semibold text-gray-700 mb-2">
+                          Organization <span className="text-gray-400 font-normal">(optional)</span>
+                        </label>
+                        <input
+                          type="text"
+                          name="organization"
+                          value={formData.organization}
+                          onChange={handleInputChange}
+                          placeholder="Your organization, company, or institution"
+                          className="w-full px-4 py-3 text-[14px] rounded-xl border border-gray-200 bg-white/80 focus:border-blue-300 focus:ring-2 focus:ring-blue-100 outline-none transition-all placeholder:text-gray-400"
+                        />
+                      </div>
+
+                      {/* Row 3: Subject + Urgency Level */}
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                         <div>
                           <label className="block text-[13px] font-semibold text-gray-700 mb-2">
@@ -691,19 +1058,20 @@ export default function ContactPage() {
                           >
                             <option value="">Select a subject...</option>
                             <option value="general">General Inquiry</option>
+                            <option value="partnership">Partnership</option>
                             <option value="technical">Technical Support</option>
-                            <option value="partnership">Partnership Opportunity</option>
-                            <option value="report">Report an Issue</option>
-                            <option value="other">Other</option>
+                            <option value="media">Media / Press</option>
+                            <option value="bug">Bug Report</option>
+                            <option value="feature">Feature Request</option>
                           </select>
                         </div>
                         <div>
                           <label className="block text-[13px] font-semibold text-gray-700 mb-2">
-                            Priority Level <span className="text-red-500">*</span>
+                            Urgency Level <span className="text-red-500">*</span>
                           </label>
                           <select
-                            name="priority"
-                            value={formData.priority}
+                            name="urgency"
+                            value={formData.urgency}
                             onChange={handleInputChange}
                             required
                             className="w-full px-4 py-3 text-[14px] rounded-xl border border-gray-200 bg-white/80 focus:border-blue-300 focus:ring-2 focus:ring-blue-100 outline-none transition-all text-gray-700 appearance-none cursor-pointer"
@@ -717,24 +1085,62 @@ export default function ContactPage() {
                         </div>
                       </div>
 
-                      {/* Priority Indicator */}
+                      {/* Row 4: Preferred Contact Method */}
+                      <div>
+                        <label className="block text-[13px] font-semibold text-gray-700 mb-2">
+                          Preferred Contact Method <span className="text-red-500">*</span>
+                        </label>
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                          {[
+                            { value: 'email', label: 'Email', icon: Mail, description: 'We will reply to your email address' },
+                            { value: 'phone', label: 'Phone Call', icon: Phone, description: 'We will call you back at a scheduled time' },
+                            { value: 'video', label: 'Video Call', icon: Video, description: 'Schedule a Google Meet or Zoom call' },
+                          ].map((method) => {
+                            const MethodIcon = method.icon
+                            return (
+                              <button
+                                key={method.value}
+                                type="button"
+                                onClick={() => setFormData((prev) => ({ ...prev, contactMethod: method.value }))}
+                                className={`flex items-start gap-3 p-4 rounded-xl border text-left transition-all ${
+                                  formData.contactMethod === method.value
+                                    ? 'border-blue-300 bg-blue-50/50 ring-2 ring-blue-100'
+                                    : 'border-gray-200 bg-white/60 hover:bg-white/80 hover:border-gray-300'
+                                }`}
+                              >
+                                <MethodIcon
+                                  className={`w-5 h-5 shrink-0 mt-0.5 ${formData.contactMethod === method.value ? 'text-blue-600' : 'text-gray-400'}`}
+                                />
+                                <div>
+                                  <div className={`text-[13px] font-semibold ${formData.contactMethod === method.value ? 'text-blue-700' : 'text-gray-700'}`}>
+                                    {method.label}
+                                  </div>
+                                  <div className="text-[11px] text-gray-400 mt-0.5">{method.description}</div>
+                                </div>
+                              </button>
+                            )
+                          })}
+                        </div>
+                      </div>
+
+                      {/* Urgency Indicator */}
                       <motion.div
-                        key={formData.priority}
+                        key={formData.urgency}
                         initial={{ opacity: 0, y: -5 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.3 }}
                       >
-                        <div className={`inline-flex items-center gap-2 px-3 py-2 rounded-xl text-[12px] font-medium border ${getPriorityColor(formData.priority)}`}>
+                        <div className={`inline-flex items-center gap-2 px-3 py-2 rounded-xl text-[12px] font-medium border ${getPriorityColor(formData.urgency)}`}>
                           <Clock className="w-3.5 h-3.5" />
-                          Expected response: {getResponseTimeForPriority(formData.priority)}
-                          {formData.priority === 'crisis' && (
+                          Expected response: {getResponseTimeForPriority(formData.urgency)}
+                          {formData.urgency === 'crisis' && (
                             <span className="ml-1 font-bold">— Please also call 988</span>
                           )}
                         </div>
                       </motion.div>
 
                       {/* Crisis Warning (conditional) */}
-                      {formData.priority === 'crisis' && (
+                      {formData.urgency === 'crisis' && (
                         <motion.div
                           initial={{ opacity: 0, height: 0 }}
                           animate={{ opacity: 1, height: 'auto' }}
@@ -768,7 +1174,7 @@ export default function ContactPage() {
                           onChange={handleInputChange}
                           required
                           rows={6}
-                          placeholder="Tell us how we can help..."
+                          placeholder="Tell us how we can help... Be as specific as possible — it helps us respond faster and more accurately."
                           className="w-full px-4 py-3 text-[14px] rounded-xl border border-gray-200 bg-white/80 focus:border-blue-300 focus:ring-2 focus:ring-blue-100 outline-none transition-all placeholder:text-gray-400 resize-y min-h-[140px]"
                         />
                         <div className="flex items-center justify-between mt-2">
@@ -784,7 +1190,7 @@ export default function ContactPage() {
                       {/* Attach Screenshot */}
                       <div>
                         <label className="block text-[13px] font-semibold text-gray-700 mb-2">
-                          Attach Screenshot (optional)
+                          Attach Screenshot <span className="text-gray-400 font-normal">(optional)</span>
                         </label>
                         {attachedFile ? (
                           <div className="flex items-center gap-3 px-4 py-3 rounded-xl border border-blue-200 bg-blue-50/40">
@@ -861,9 +1267,9 @@ export default function ContactPage() {
         </section>
 
         {/* ═══════════════════════════════════════════════════════
-            SECTION 4: TEAM / OFFICE CARDS
+            SECTION 5: TEAM / OFFICE CARDS
             ═══════════════════════════════════════════════════════ */}
-        <section className="py-20 bg-white/40">
+        <section className="py-20">
           <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -976,7 +1382,106 @@ export default function ContactPage() {
         </section>
 
         {/* ═══════════════════════════════════════════════════════
-            SECTION 5: SUPPORT CATEGORIES
+            SECTION 6: OFFICE LOCATIONS
+            ═══════════════════════════════════════════════════════ */}
+        <section className="py-20 bg-white/40">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5 }}
+              className="text-center mb-14"
+            >
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-[11px] font-semibold bg-blue-50/80 text-blue-600 border border-blue-100/60 mb-4">
+                <MapPin className="w-3.5 h-3.5" />
+                Office Locations
+              </div>
+              <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-gray-900">
+                Where We Work
+              </h2>
+              <p className="text-[15px] text-gray-500 mt-4 max-w-2xl mx-auto leading-relaxed">
+                With offices on both coasts and a distributed global team, we&apos;re never far away.
+                Schedule an in-person meeting or connect with us remotely.
+              </p>
+            </motion.div>
+
+            <motion.div
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+              variants={{ visible: { transition: { staggerChildren: 0.1 } } }}
+              className="grid grid-cols-1 lg:grid-cols-3 gap-6"
+            >
+              {officeLocations.map((location) => {
+                const LocationIcon = location.icon
+                return (
+                  <motion.div
+                    key={location.city}
+                    variants={fadeInUp}
+                    className="glass-card rounded-2xl p-6 shadow-premium hover:shadow-premium-lg transition-all duration-300 group"
+                  >
+                    {/* Header */}
+                    <div className="flex items-center gap-4 mb-5">
+                      <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${location.gradient} flex items-center justify-center shadow-lg shrink-0 group-hover:scale-110 transition-transform duration-300`}>
+                        <LocationIcon className="w-5 h-5 text-white" />
+                      </div>
+                      <div>
+                        <h3 className="text-[17px] font-extrabold text-gray-900 tracking-tight">
+                          {location.city}
+                        </h3>
+                        <span className="text-[11px] font-semibold uppercase tracking-wider" style={{ color: location.color }}>
+                          {location.region}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Details */}
+                    <div className="space-y-3 mb-5">
+                      <div className="flex items-start gap-3">
+                        <Navigation className="w-4 h-4 text-gray-400 shrink-0 mt-0.5" />
+                        <div>
+                          <p className="text-[12px] text-gray-600 font-medium">{location.address}</p>
+                          <p className="text-[12px] text-gray-500">{location.cityState}</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <Phone className="w-4 h-4 text-gray-400 shrink-0" />
+                        <a href={`tel:${location.phone.replace(/[^+\d]/g, '')}`} className="text-[12px] text-gray-600 font-medium hover:text-blue-600 transition-colors">
+                          {location.phone}
+                        </a>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <Mail className="w-4 h-4 text-gray-400 shrink-0" />
+                        <a href={`mailto:${location.email}`} className="text-[12px] text-blue-600 font-medium hover:underline">
+                          {location.email}
+                        </a>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <Clock className="w-4 h-4 text-gray-400 shrink-0" />
+                        <span className="text-[12px] text-gray-500">{location.timezone}</span>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <Calendar className="w-4 h-4 text-gray-400 shrink-0" />
+                        <span className="text-[12px] text-gray-500">{location.hours}</span>
+                      </div>
+                    </div>
+
+                    {/* Description */}
+                    <div className="pt-4 border-t border-gray-100/60">
+                      <p className="text-[12px] text-gray-500 leading-relaxed">
+                        {location.details}
+                      </p>
+                    </div>
+                  </motion.div>
+                )
+              })}
+            </motion.div>
+          </div>
+        </section>
+
+        {/* ═══════════════════════════════════════════════════════
+            SECTION 7: SUPPORT CATEGORIES
             ═══════════════════════════════════════════════════════ */}
         <section className="py-20">
           <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -1052,7 +1557,7 @@ export default function ContactPage() {
         </section>
 
         {/* ═══════════════════════════════════════════════════════
-            SECTION 6: RESPONSE TIME GUARANTEES
+            SECTION 8: RESPONSE TIME GUARANTEES
             ═══════════════════════════════════════════════════════ */}
         <section className="py-20 bg-white/40">
           <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -1154,9 +1659,424 @@ export default function ContactPage() {
         </section>
 
         {/* ═══════════════════════════════════════════════════════
-            SECTION 7: EMERGENCY / CRISIS RESOURCES
+            SECTION 9: CONNECT WITH US — SOCIAL MEDIA
             ═══════════════════════════════════════════════════════ */}
-        <section id="emergency" className="py-20">
+        <section className="py-20">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5 }}
+              className="text-center mb-14"
+            >
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-[11px] font-semibold bg-pink-50/80 text-pink-600 border border-pink-100/60 mb-4">
+                <Globe className="w-3.5 h-3.5" />
+                Connect With Us
+              </div>
+              <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-gray-900">
+                Follow Our Journey
+              </h2>
+              <p className="text-[15px] text-gray-500 mt-4 max-w-2xl mx-auto leading-relaxed">
+                Stay connected across our social platforms. We share product updates, AI safety insights,
+                community highlights, and behind-the-scenes looks at building honest AI.
+              </p>
+            </motion.div>
+
+            <motion.div
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+              variants={{ visible: { transition: { staggerChildren: 0.1 } } }}
+              className="grid grid-cols-1 md:grid-cols-2 gap-6"
+            >
+              {socialPlatforms.map((platform) => {
+                const PlatformIcon = platform.icon
+                return (
+                  <motion.div
+                    key={platform.name}
+                    variants={fadeInUp}
+                    className="glass-card rounded-2xl p-6 sm:p-8 shadow-premium hover:shadow-premium-lg transition-all duration-300 group relative overflow-hidden"
+                  >
+                    {/* Background decoration */}
+                    <div className="absolute -top-16 -right-16 w-32 h-32 rounded-full opacity-5 group-hover:opacity-10 transition-opacity duration-500" style={{ backgroundColor: platform.color }} />
+
+                    <div className="relative">
+                      {/* Header */}
+                      <div className="flex items-start gap-4 mb-5">
+                        <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${platform.gradient} flex items-center justify-center shadow-lg shrink-0 group-hover:scale-110 transition-transform duration-300`}>
+                          <PlatformIcon className="w-7 h-7 text-white" />
+                        </div>
+                        <div>
+                          <div className="flex items-center gap-2">
+                            <h3 className="text-[17px] font-extrabold text-gray-900 tracking-tight">
+                              {platform.name}
+                            </h3>
+                            {platform.comingSoon && (
+                              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider bg-emerald-500 text-white">
+                                <Sparkles className="w-2.5 h-2.5" /> Soon
+                              </span>
+                            )}
+                          </div>
+                          <p className="text-[13px] font-semibold mt-0.5" style={{ color: platform.color }}>
+                            {platform.handle}
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* Description */}
+                      <p className="text-[12px] text-gray-500 leading-relaxed mb-5">
+                        {platform.description}
+                      </p>
+
+                      {/* Stats */}
+                      <div className="flex flex-wrap gap-2 mb-5">
+                        {platform.stats.map((stat) => (
+                          <span
+                            key={stat}
+                            className="inline-flex items-center px-2.5 py-1 rounded-lg text-[11px] font-medium border"
+                            style={{
+                              backgroundColor: `${platform.color}08`,
+                              color: platform.color,
+                              borderColor: `${platform.color}20`,
+                            }}
+                          >
+                            {stat}
+                          </span>
+                        ))}
+                      </div>
+
+                      {/* CTA */}
+                      {!platform.comingSoon ? (
+                        <a
+                          href={platform.href}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-2 px-5 py-2.5 text-[13px] font-semibold text-white rounded-xl shadow-md transition-all hover:shadow-lg"
+                          style={{ backgroundColor: platform.color }}
+                        >
+                          {platform.cta}
+                          <ExternalLink className="w-3.5 h-3.5" />
+                        </a>
+                      ) : (
+                        <button
+                          className="inline-flex items-center gap-2 px-5 py-2.5 text-[13px] font-semibold text-gray-400 rounded-xl border border-gray-200 bg-gray-50/40 cursor-not-allowed"
+                          disabled
+                        >
+                          {platform.cta}
+                          <Sparkles className="w-3.5 h-3.5" />
+                        </button>
+                      )}
+                    </div>
+                  </motion.div>
+                )
+              })}
+            </motion.div>
+          </div>
+        </section>
+
+        {/* ═══════════════════════════════════════════════════════
+            SECTION 10: FOR PARTNERS
+            ═══════════════════════════════════════════════════════ */}
+        <section className="py-20 bg-white/40">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5 }}
+              className="text-center mb-14"
+            >
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-[11px] font-semibold bg-emerald-50/80 text-emerald-600 border border-emerald-100/60 mb-4">
+                <Briefcase className="w-3.5 h-3.5" />
+                For Partners
+              </div>
+              <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-gray-900">
+                Enterprise Partnership Program
+              </h2>
+              <p className="text-[15px] text-gray-500 mt-4 max-w-2xl mx-auto leading-relaxed">
+                Scale your organization&apos;s impact with ClearPath AI. Our partnership tiers are designed
+                for organizations of every size — from grassroots nonprofits to federal agencies.
+              </p>
+            </motion.div>
+
+            {/* Partnership Tiers */}
+            <motion.div
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+              variants={{ visible: { transition: { staggerChildren: 0.1 } } }}
+              className="grid grid-cols-1 lg:grid-cols-3 gap-6"
+            >
+              {partnerTiers.map((tier) => {
+                const TierIcon = tier.icon
+                return (
+                  <motion.div
+                    key={tier.name}
+                    variants={fadeInUp}
+                    className="glass-card rounded-2xl p-6 sm:p-8 shadow-premium hover:shadow-premium-lg transition-all duration-300 group relative overflow-hidden flex flex-col"
+                  >
+                    {/* Background accent */}
+                    <div className="absolute -top-12 -right-12 w-24 h-24 rounded-full opacity-5 group-hover:opacity-10 transition-opacity duration-300" style={{ backgroundColor: tier.color }} />
+
+                    <div className="relative flex-1 flex flex-col">
+                      {/* Icon + Name */}
+                      <div className="flex items-center gap-3 mb-4">
+                        <div className={`w-11 h-11 rounded-xl bg-gradient-to-br ${tier.gradient} flex items-center justify-center shadow-md shrink-0`}>
+                          <TierIcon className="w-5 h-5 text-white" />
+                        </div>
+                        <div>
+                          <h3 className="text-[16px] font-bold text-gray-900 tracking-tight">{tier.name}</h3>
+                          <span className="text-[18px] font-extrabold" style={{ color: tier.color }}>{tier.price}</span>
+                        </div>
+                      </div>
+
+                      {/* Description */}
+                      <p className="text-[12px] text-gray-500 leading-relaxed mb-5">
+                        {tier.description}
+                      </p>
+
+                      {/* Features */}
+                      <div className="space-y-2.5 mb-6 flex-1">
+                        {tier.features.map((feature) => (
+                          <div key={feature} className="flex items-start gap-2">
+                            <CheckCircle2 className="w-4 h-4 shrink-0 mt-0.5" style={{ color: tier.color }} />
+                            <span className="text-[12px] text-gray-600">{feature}</span>
+                          </div>
+                        ))}
+                      </div>
+
+                      {/* CTA */}
+                      <a
+                        href="#contact-form"
+                        className="w-full inline-flex items-center justify-center gap-2 px-5 py-3 text-[13px] font-semibold rounded-xl border-2 transition-all hover:shadow-md"
+                        style={{
+                          borderColor: tier.color,
+                          color: tier.color,
+                        }}
+                      >
+                        Get Started
+                        <ArrowRight className="w-4 h-4" />
+                      </a>
+                    </div>
+                  </motion.div>
+                )
+              })}
+            </motion.div>
+
+            {/* Partnership Benefits Summary */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: 0.2 }}
+              className="glass-card rounded-2xl p-6 sm:p-8 shadow-premium mt-8"
+            >
+              <div className="flex flex-col sm:flex-row gap-6 items-start">
+                <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center shadow-lg shrink-0">
+                  <TrendingUp className="w-7 h-7 text-white" />
+                </div>
+                <div>
+                  <h3 className="text-[16px] font-bold text-gray-900 tracking-tight mb-2">
+                    Why Partner With ClearPath AI?
+                  </h3>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
+                    {[
+                      { icon: Shield, title: 'Transparent AI', desc: '6-layer confidence architecture with full auditability' },
+                      { icon: Users, title: '50K+ Resources', desc: 'Verified, up-to-date community resource database' },
+                      { icon: Lock, title: 'HIPAA-Adjacent', desc: 'Privacy-first design with encryption at rest and in transit' },
+                      { icon: Eye, title: 'Open Source', desc: 'All code publicly auditable on GitHub — no black boxes' },
+                    ].map((benefit) => {
+                      const BenefitIcon = benefit.icon
+                      return (
+                        <div key={benefit.title} className="flex items-start gap-3">
+                          <div className="w-9 h-9 rounded-xl bg-emerald-50/60 flex items-center justify-center shrink-0">
+                            <BenefitIcon className="w-4 h-4 text-emerald-600" />
+                          </div>
+                          <div>
+                            <h4 className="text-[13px] font-bold text-gray-900">{benefit.title}</h4>
+                            <p className="text-[11px] text-gray-500 leading-relaxed">{benefit.desc}</p>
+                          </div>
+                        </div>
+                      )
+                    })}
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        </section>
+
+        {/* ═══════════════════════════════════════════════════════
+            SECTION 11: FOR MEDIA
+            ═══════════════════════════════════════════════════════ */}
+        <section className="py-20">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5 }}
+              className="text-center mb-14"
+            >
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-[11px] font-semibold bg-pink-50/80 text-pink-600 border border-pink-100/60 mb-4">
+                <Camera className="w-3.5 h-3.5" />
+                For Media
+              </div>
+              <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-gray-900">
+                Press & Media Resources
+              </h2>
+              <p className="text-[15px] text-gray-500 mt-4 max-w-2xl mx-auto leading-relaxed">
+                We believe in radical transparency — not just in our AI, but in our story. Access our
+                press kit, brand assets, and media contacts for coverage of ClearPath AI.
+              </p>
+            </motion.div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* Press Kit Card */}
+              <motion.div
+                initial={{ opacity: 0, x: -20 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5 }}
+                className="glass-card rounded-2xl p-6 sm:p-8 shadow-premium hover:shadow-premium-lg transition-shadow duration-300"
+              >
+                <div className="flex items-start gap-4 mb-6">
+                  <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-pink-500 to-rose-600 flex items-center justify-center shadow-lg shrink-0">
+                    <FileText className="w-7 h-7 text-white" />
+                  </div>
+                  <div>
+                    <h3 className="text-[18px] font-bold text-gray-900 tracking-tight">
+                      Press Kit
+                    </h3>
+                    <p className="text-[12px] text-pink-600 font-semibold mt-0.5">
+                      Download our media assets
+                    </p>
+                  </div>
+                </div>
+
+                <p className="text-[13px] text-gray-500 leading-relaxed mb-6">
+                  Our press kit includes brand guidelines, logos in multiple formats (SVG, PNG, EPS),
+                  team headshots, product screenshots, fact sheets, and the ClearPath AI story —
+                  everything you need for accurate, compelling coverage.
+                </p>
+
+                {/* Kit contents */}
+                <div className="space-y-3 mb-6">
+                  {[
+                    { icon: Palette, text: 'Brand guidelines & logo pack (SVG, PNG, EPS)' },
+                    { icon: Camera, text: 'High-res team headshots & product screenshots' },
+                    { icon: FileCheck, text: 'Company fact sheet & founding story' },
+                    { icon: Mic, text: 'Founder interview transcripts & quotes' },
+                    { icon: Star, text: 'USAII Hackathon 2026 project overview' },
+                  ].map((item) => {
+                    const ItemIcon = item.icon
+                    return (
+                      <div key={item.text} className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-lg bg-pink-50/60 flex items-center justify-center shrink-0">
+                          <ItemIcon className="w-4 h-4 text-pink-500" />
+                        </div>
+                        <span className="text-[13px] text-gray-600">{item.text}</span>
+                      </div>
+                    )
+                  })}
+                </div>
+
+                <button
+                  className="inline-flex items-center gap-2 px-5 py-2.5 text-[13px] font-semibold text-white rounded-xl bg-gradient-to-b from-pink-500 to-rose-600 hover:from-pink-400 hover:to-rose-500 shadow-md shadow-pink-500/20 transition-all"
+                >
+                  <Download className="w-4 h-4" />
+                  Download Press Kit
+                </button>
+              </motion.div>
+
+              {/* Media Contact & Coverage Card */}
+              <motion.div
+                initial={{ opacity: 0, x: 20 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5 }}
+                className="space-y-6"
+              >
+                {/* Media Contact */}
+                <div className="glass-card rounded-2xl p-6 shadow-premium">
+                  <div className="flex items-start gap-4 mb-4">
+                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center shadow-lg shrink-0">
+                      <Radio className="w-5 h-5 text-white" />
+                    </div>
+                    <div>
+                      <h3 className="text-[16px] font-bold text-gray-900 tracking-tight">Media Contact</h3>
+                      <p className="text-[12px] text-gray-500">For press inquiries, interviews, and speaking engagements</p>
+                    </div>
+                  </div>
+
+                  <div className="space-y-2.5">
+                    <div className="flex items-center gap-3">
+                      <Mail className="w-4 h-4 text-gray-400 shrink-0" />
+                      <a href="mailto:press@clearpath-ai.org" className="text-[13px] text-blue-600 font-medium hover:underline">
+                        press@clearpath-ai.org
+                      </a>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <Phone className="w-4 h-4 text-gray-400 shrink-0" />
+                      <a href="tel:+14155550142" className="text-[13px] text-gray-600 font-medium hover:text-blue-600 transition-colors">
+                        +1 (415) 555-0142
+                      </a>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <Clock className="w-4 h-4 text-gray-400 shrink-0" />
+                      <span className="text-[13px] text-gray-500">Response within 12 hours</span>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <Mic className="w-4 h-4 text-gray-400 shrink-0" />
+                      <span className="text-[13px] text-gray-500">Available for podcasts, panels, and keynotes</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* As Seen In / Coverage */}
+                <div className="glass-card rounded-2xl p-6 shadow-premium">
+                  <div className="flex items-start gap-4 mb-4">
+                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center shadow-lg shrink-0">
+                      <Newspaper className="w-5 h-5 text-white" />
+                    </div>
+                    <div>
+                      <h3 className="text-[16px] font-bold text-gray-900 tracking-tight">Coverage & Speaking</h3>
+                      <p className="text-[12px] text-gray-500">Where ClearPath AI has been featured</p>
+                    </div>
+                  </div>
+
+                  <div className="space-y-3">
+                    {[
+                      { event: 'USAII Global AI Hackathon 2026', type: 'Competing Team', icon: Award },
+                      { event: 'AI Ethics in Social Services Panel', type: 'Keynote Presentation', icon: Mic },
+                      { event: 'Responsible AI for Crisis Response', type: 'Published Paper', icon: FileText },
+                      { event: 'Open Source AI for Public Good', type: 'Community Talk', icon: Users },
+                    ].map((item) => {
+                      const ItemIcon = item.icon
+                      return (
+                        <div key={item.event} className="flex items-center gap-3 p-3 rounded-xl bg-gray-50/50 border border-gray-100/60">
+                          <div className="w-8 h-8 rounded-lg bg-violet-50/60 flex items-center justify-center shrink-0">
+                            <ItemIcon className="w-4 h-4 text-violet-500" />
+                          </div>
+                          <div>
+                            <p className="text-[12px] font-semibold text-gray-900">{item.event}</p>
+                            <p className="text-[11px] text-gray-400">{item.type}</p>
+                          </div>
+                        </div>
+                      )
+                    })}
+                  </div>
+                </div>
+              </motion.div>
+            </div>
+          </div>
+        </section>
+
+        {/* ═══════════════════════════════════════════════════════
+            SECTION 12: EMERGENCY / CRISIS RESOURCES
+            ═══════════════════════════════════════════════════════ */}
+        <section id="emergency" className="py-20 bg-white/40">
           <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -1403,9 +2323,9 @@ export default function ContactPage() {
         </section>
 
         {/* ═══════════════════════════════════════════════════════
-            SECTION 8: COMMUNITY
+            SECTION 13: COMMUNITY
             ═══════════════════════════════════════════════════════ */}
-        <section className="py-20 bg-white/40">
+        <section className="py-20">
           <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -1584,9 +2504,9 @@ export default function ContactPage() {
         </section>
 
         {/* ═══════════════════════════════════════════════════════
-            SECTION 9: FAQ
+            SECTION 14: FAQ
             ═══════════════════════════════════════════════════════ */}
-        <section className="py-20">
+        <section className="py-20 bg-white/40">
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -1662,9 +2582,9 @@ export default function ContactPage() {
         </section>
 
         {/* ═══════════════════════════════════════════════════════
-            SECTION 10: CTA — TRY THE DEMO
+            SECTION 15: CTA — TRY THE DEMO
             ═══════════════════════════════════════════════════════ */}
-        <section className="py-20 bg-white/40">
+        <section className="py-20">
           <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
