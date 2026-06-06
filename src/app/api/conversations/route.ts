@@ -1,22 +1,30 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
+import { getAuthenticatedUserId } from "@/lib/auth-helpers";
 
 // GET /api/conversations — list conversations, optionally filtered
 // Query params: userId, search, category, skip, take
+// Graceful auth: if authenticated, use session userId; if not, return empty (guest mode)
 export async function GET(request: NextRequest) {
   try {
+    const sessionUserId = await getAuthenticatedUserId(request);
+
+    // If not authenticated, return empty list for guest mode
+    if (!sessionUserId) {
+      return NextResponse.json({
+        conversations: [],
+        total: 0,
+      });
+    }
+
     const { searchParams } = new URL(request.url);
-    const userId = searchParams.get("userId");
     const search = searchParams.get("search");
     const category = searchParams.get("category");
     const skip = parseInt(searchParams.get("skip") || "0", 10);
     const take = parseInt(searchParams.get("take") || "0", 10);
 
-    // Build where clause
-    const where: Record<string, unknown> = {};
-    if (userId) {
-      where.userId = userId;
-    }
+    // Always use the authenticated session userId (ignore query param)
+    const where: Record<string, unknown> = { userId: sessionUserId };
     if (category && category !== "all") {
       where.category = category;
     }
@@ -92,8 +100,10 @@ export async function GET(request: NextRequest) {
 }
 
 // POST /api/conversations — create a new conversation
+// Graceful auth: if authenticated, use session userId; if not, allow guest creation
 export async function POST(request: NextRequest) {
   try {
+    const sessionUserId = await getAuthenticatedUserId(request);
     const body = await request.json();
     const { title, preview, category, categoryColor, confidence, isCrisis, userId } = body;
 
@@ -104,6 +114,9 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // If authenticated, always use session userId (ignore the one from body)
+    const effectiveUserId = sessionUserId || userId || null;
+
     const conversation = await db.conversation.create({
       data: {
         title,
@@ -112,8 +125,8 @@ export async function POST(request: NextRequest) {
         categoryColor: categoryColor || null,
         confidence: confidence || 0,
         isCrisis: isCrisis || false,
-        isGuest: !userId,
-        userId: userId || null,
+        isGuest: !effectiveUserId,
+        userId: effectiveUserId,
       },
     });
 

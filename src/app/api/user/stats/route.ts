@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
+import { requireSameUser } from "@/lib/auth-helpers";
 
 // GET /api/user/stats — Get user stats
 export async function GET(request: NextRequest) {
@@ -22,6 +23,10 @@ export async function GET(request: NextRequest) {
         monthlyTrend: [],
       });
     }
+
+    // Verify the authenticated user matches the requested userId
+    const authError = await requireSameUser(request, userId);
+    if (authError) return authError;
 
     // Verify user exists
     const user = await db.user.findUnique({ where: { id: userId } });

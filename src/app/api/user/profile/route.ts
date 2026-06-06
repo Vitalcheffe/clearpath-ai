@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
+import bcrypt from "bcryptjs";
 import { db } from "@/lib/db";
+import { requireSameUser, getAuthenticatedUserId } from "@/lib/auth-helpers";
 
 // GET /api/user/profile — Get user profile with settings and stats
 export async function GET(request: NextRequest) {
@@ -13,6 +15,10 @@ export async function GET(request: NextRequest) {
         { status: 400 }
       );
     }
+
+    // Verify the authenticated user matches the requested userId
+    const authError = await requireSameUser(request, userId);
+    if (authError) return authError;
 
     const user = await db.user.findUnique({
       where: { id: userId },
@@ -90,6 +96,10 @@ export async function PUT(request: NextRequest) {
       );
     }
 
+    // Verify the authenticated user matches the requested userId
+    const authError = await requireSameUser(request, userId);
+    if (authError) return authError;
+
     // Verify user exists
     const existingUser = await db.user.findUnique({ where: { id: userId } });
     if (!existingUser) {
@@ -138,12 +148,27 @@ export async function PUT(request: NextRequest) {
 
     // Handle password change
     if (currentPassword && newPassword) {
-      // For hackathon: accept any current password and update
-      // In production, you'd verify currentPassword against the hash
       const existingUserData = await db.user.findUnique({ where: { id: userId } });
-      if (existingUserData) {
-        updateData.password = newPassword; // In production, hash this with bcrypt
+      if (!existingUserData?.password) {
+        return NextResponse.json(
+          { error: "No password set for this account. Use OAuth instead." },
+          { status: 400 }
+        );
       }
+      const passwordMatch = await bcrypt.compare(currentPassword, existingUserData.password);
+      if (!passwordMatch) {
+        return NextResponse.json(
+          { error: "Current password is incorrect" },
+          { status: 401 }
+        );
+      }
+      if (newPassword.length < 8) {
+        return NextResponse.json(
+          { error: "New password must be at least 8 characters" },
+          { status: 400 }
+        );
+      }
+      updateData.password = await bcrypt.hash(newPassword, 12);
     }
 
     const updatedUser = await db.user.update({

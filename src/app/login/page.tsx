@@ -299,8 +299,8 @@ export default function LoginPage() {
               <div className="flex gap-1 p-1 bg-gray-100/60 rounded-xl mb-6">
                 {[
                   { key: 'password' as const, label: 'Password', icon: Lock },
-                  { key: 'magic' as const, label: 'Magic Link', icon: Sparkles },
-                  { key: 'otp' as const, label: 'Passcode', icon: KeyRound },
+                  { key: 'magic' as const, label: 'Magic Link', icon: Sparkles, comingSoon: true },
+                  { key: 'otp' as const, label: 'Passcode', icon: KeyRound, comingSoon: true },
                 ].map((method) => (
                   <button
                     key={method.key}
@@ -313,6 +313,9 @@ export default function LoginPage() {
                   >
                     <method.icon className="w-3.5 h-3.5" />
                     {method.label}
+                    {'comingSoon' in method && (
+                      <span className="ml-0.5 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider rounded-full bg-amber-100 text-amber-700 border border-amber-200">Soon</span>
+                    )}
                   </button>
                 ))}
               </div>
@@ -464,11 +467,13 @@ export default function LoginPage() {
                       <motion.button
                         whileHover={{ scale: 1.005 }}
                         whileTap={{ scale: 0.995 }}
-                        className="w-full flex items-center justify-center gap-2 px-4 py-3.5 text-[14px] font-semibold text-white rounded-xl bg-gradient-to-b from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 shadow-lg shadow-blue-500/20 hover:shadow-xl hover:shadow-blue-500/30 transition-all mt-2"
+                        disabled
+                        className="w-full flex items-center justify-center gap-2 px-4 py-3.5 text-[14px] font-semibold text-white rounded-xl bg-gradient-to-b from-blue-600 to-blue-700 shadow-lg shadow-blue-500/20 transition-all mt-2 cursor-not-allowed opacity-50"
                       >
                         Send magic link
                         <Sparkles className="w-4 h-4" />
                       </motion.button>
+                      <p className="text-[12px] text-gray-400 text-center mt-2">This login method is coming soon. Use password login for now.</p>
                     </motion.div>
                   )}
 
@@ -505,11 +510,13 @@ export default function LoginPage() {
                       <motion.button
                         whileHover={{ scale: 1.005 }}
                         whileTap={{ scale: 0.995 }}
-                        className="w-full flex items-center justify-center gap-2 px-4 py-3.5 text-[14px] font-semibold text-white rounded-xl bg-gradient-to-b from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 shadow-lg shadow-blue-500/20 hover:shadow-xl hover:shadow-blue-500/30 transition-all mt-2"
+                        disabled
+                        className="w-full flex items-center justify-center gap-2 px-4 py-3.5 text-[14px] font-semibold text-white rounded-xl bg-gradient-to-b from-blue-600 to-blue-700 shadow-lg shadow-blue-500/20 transition-all mt-2 cursor-not-allowed opacity-50"
                       >
                         Send passcode
                         <KeyRound className="w-4 h-4" />
                       </motion.button>
+                      <p className="text-[12px] text-gray-400 text-center mt-2">This login method is coming soon. Use password login for now.</p>
                     </motion.div>
                   )}
                 </AnimatePresence>

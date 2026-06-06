@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
+import { getAuthenticatedUserId } from "@/lib/auth-helpers";
 
 // POST /api/conversations/[id]/messages — add a message to a conversation
 export async function POST(
@@ -8,6 +9,7 @@ export async function POST(
 ) {
   try {
     const { id } = await params;
+    const sessionUserId = await getAuthenticatedUserId(request);
     const body = await request.json();
     const { role, text, category, confidence, isCrisis, resources, why, also, warning, alternatives } = body;
 
@@ -27,6 +29,14 @@ export async function POST(
       return NextResponse.json(
         { error: "Conversation not found" },
         { status: 404 }
+      );
+    }
+
+    // If conversation belongs to a user, verify the session user owns it
+    if (conversation.userId && conversation.userId !== sessionUserId) {
+      return NextResponse.json(
+        { error: "You can only add messages to your own conversations" },
+        { status: 403 }
       );
     }
 

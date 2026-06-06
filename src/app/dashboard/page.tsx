@@ -92,67 +92,13 @@ function getCategoryIcon(category: string): typeof HomeIcon {
 }
 
 // ─── RESOURCE STATUS TRACKER DATA ───────────────────────
-const resourceStatuses = [
-  { label: 'Applied', count: 8, icon: CircleCheck, colorHex: '#10b981', bgColor: 'rgba(16,185,129,0.08)', description: 'Resources you have applied to' },
-  { label: 'In Progress', count: 5, icon: RefreshCw, colorHex: '#3b82f6', bgColor: 'rgba(59,130,246,0.08)', description: 'Applications being processed' },
-  { label: 'To Apply', count: 12, icon: ClipboardList, colorHex: '#f59e0b', bgColor: 'rgba(245,158,11,0.08)', description: 'Resources saved for later' },
-]
+// Computed dynamically inside the component from savedResourcesData and conversationsData
 
 // ─── ACHIEVEMENTS DATA ──────────────────────────────────
-const achievements = [
-  {
-    id: '1',
-    name: 'First Conversation',
-    description: 'Started your first conversation with ClearPath AI',
-    icon: MessageCircle,
-    colorHex: '#3b82f6',
-    bgColor: 'rgba(59,130,246,0.08)',
-    earned: true,
-    earnedDate: 'Jun 1, 2026',
-  },
-  {
-    id: '2',
-    name: 'Crisis Averted',
-    description: 'Helped someone in crisis connect with the right support',
-    icon: Shield,
-    colorHex: '#ef4444',
-    bgColor: 'rgba(239,68,68,0.08)',
-    earned: true,
-    earnedDate: 'Jun 3, 2026',
-  },
-  {
-    id: '3',
-    name: 'Resource Connector',
-    description: 'Found 5 or more resources through conversations',
-    icon: Zap,
-    colorHex: '#f59e0b',
-    bgColor: 'rgba(245,158,11,0.08)',
-    earned: true,
-    earnedDate: 'Jun 5, 2026',
-  },
-  {
-    id: '4',
-    name: 'Community Champion',
-    description: 'Completed 10 conversations to build your community knowledge',
-    icon: Users,
-    colorHex: '#8b5cf6',
-    bgColor: 'rgba(139,92,246,0.08)',
-    earned: true,
-    earnedDate: 'Jun 8, 2026',
-  },
-  {
-    id: '5',
-    name: 'Transparency Advocate',
-    description: 'Viewed confidence details and "Why" explanations in conversations',
-    icon: Eye,
-    colorHex: '#10b981',
-    bgColor: 'rgba(16,185,129,0.08)',
-    earned: false,
-    earnedDate: null,
-  },
-]
+// Computed dynamically inside the component from statsData and conversationsData
 
 // ─── RECENT RESOURCE UPDATES DATA ───────────────────────
+// Static informational content — not derived from user data
 const recentResourceUpdates = [
   {
     id: '1',
@@ -184,6 +130,7 @@ const recentResourceUpdates = [
 ]
 
 // ─── COMMUNITY FEED DATA ────────────────────────────────
+// Static informational content — not derived from user data
 const communityFeed = [
   { id: '1', text: '47 people found housing help this week', icon: HomeIcon, colorHex: '#3b82f6', bgColor: 'rgba(59,130,246,0.06)' },
   { id: '2', text: '12 crisis interventions successfully connected', icon: Shield, colorHex: '#ef4444', bgColor: 'rgba(239,68,68,0.06)' },
@@ -251,6 +198,7 @@ const proTips = [
 ]
 
 // ─── UPCOMING EVENTS DATA ───────────────────────────────
+// Static informational content — not derived from user data
 const upcomingEvents = [
   {
     id: '1',
@@ -708,6 +656,99 @@ export default function DashboardPage() {
       { label: 'Crisis protocol awareness', percentage: Math.min(91, 60 + crisisCount * 10), colorHex: '#8b5cf6', bgColor: 'rgba(139,92,246,0.08)' },
     ]
   }, [statsData])
+
+  // ── Resource Status Tracker (computed from real data) ──
+  const resourceStatuses = useMemo(() => {
+    const totalSaved = savedResourcesData.length
+    const appliedCount = savedResourcesData.filter(
+      (r) => r.action && /applied/i.test(r.action)
+    ).length
+    const inProgressCount = savedResourcesData.filter(
+      (r) => r.action && /progress|pending|processing|submitted/i.test(r.action)
+    ).length
+    const toApplyCount = totalSaved - appliedCount - inProgressCount
+    return [
+      { label: 'Applied', count: appliedCount, icon: CircleCheck, colorHex: '#10b981', bgColor: 'rgba(16,185,129,0.08)', description: 'Resources you have applied to' },
+      { label: 'In Progress', count: inProgressCount, icon: RefreshCw, colorHex: '#3b82f6', bgColor: 'rgba(59,130,246,0.08)', description: 'Applications being processed' },
+      { label: 'To Apply', count: toApplyCount, icon: ClipboardList, colorHex: '#f59e0b', bgColor: 'rgba(245,158,11,0.08)', description: 'Resources saved for later' },
+    ]
+  }, [savedResourcesData])
+
+  // ── Achievements (computed from real data) ──
+  const achievements = useMemo(() => {
+    const totalConv = statsData?.totalConversations ?? 0
+    const crisisCount = statsData?.crisisCount ?? 0
+    const totalResources = statsData?.totalResources ?? 0
+    // Find the earliest conversation date for "First Conversation" earned date
+    const firstConvDate = conversationsData.length > 0
+      ? conversationsData.reduce((earliest, c) => {
+          const d = new Date(c.createdAt)
+          return d < earliest ? d : earliest
+        }, new Date(conversationsData[0].createdAt))
+      : null
+    // Find the earliest crisis conversation date
+    const firstCrisisDate = conversationsData.filter((c) => c.isCrisis).length > 0
+      ? conversationsData.filter((c) => c.isCrisis).reduce((earliest, c) => {
+          const d = new Date(c.createdAt)
+          return d < earliest ? d : earliest
+        }, new Date())
+      : null
+    const formatDate = (d: Date | null) =>
+      d ? d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : null
+
+    return [
+      {
+        id: '1',
+        name: 'First Conversation',
+        description: 'Started your first conversation with ClearPath AI',
+        icon: MessageCircle,
+        colorHex: '#3b82f6',
+        bgColor: 'rgba(59,130,246,0.08)',
+        earned: totalConv >= 1,
+        earnedDate: totalConv >= 1 ? formatDate(firstConvDate) : null,
+      },
+      {
+        id: '2',
+        name: 'Crisis Averted',
+        description: 'Helped someone in crisis connect with the right support',
+        icon: Shield,
+        colorHex: '#ef4444',
+        bgColor: 'rgba(239,68,68,0.08)',
+        earned: crisisCount >= 1,
+        earnedDate: crisisCount >= 1 ? formatDate(firstCrisisDate) : null,
+      },
+      {
+        id: '3',
+        name: 'Resource Connector',
+        description: 'Found 5 or more resources through conversations',
+        icon: Zap,
+        colorHex: '#f59e0b',
+        bgColor: 'rgba(245,158,11,0.08)',
+        earned: totalResources >= 5,
+        earnedDate: totalResources >= 5 ? formatDate(firstConvDate) : null,
+      },
+      {
+        id: '4',
+        name: 'Community Champion',
+        description: 'Completed 10 conversations to build your community knowledge',
+        icon: Users,
+        colorHex: '#8b5cf6',
+        bgColor: 'rgba(139,92,246,0.08)',
+        earned: totalConv >= 10,
+        earnedDate: totalConv >= 10 ? formatDate(firstConvDate) : null,
+      },
+      {
+        id: '5',
+        name: 'Transparency Advocate',
+        description: 'Viewed confidence details and "Why" explanations in conversations',
+        icon: Eye,
+        colorHex: '#10b981',
+        bgColor: 'rgba(16,185,129,0.08)',
+        earned: false,
+        earnedDate: null,
+      },
+    ]
+  }, [statsData, conversationsData])
 
   // ── Computed values ──
   const maxActivityValue = useMemo(() => Math.max(...weeklyActivity.map((d) => d.value), 1), [weeklyActivity])
@@ -1530,7 +1571,7 @@ export default function DashboardPage() {
                       <div className="w-full h-1.5 bg-gray-100/80 rounded-full overflow-hidden">
                         <motion.div
                           initial={{ width: 0 }}
-                          animate={{ width: `${(status.count / 25) * 100}%` }}
+                          animate={{ width: `${Math.min((status.count / Math.max(savedResourcesData.length, 1)) * 100, 100)}%` }}
                           transition={{ duration: 0.8, delay: 0.3 + i * 0.1 }}
                           className="h-full rounded-full"
                           style={{ backgroundColor: status.colorHex }}
@@ -1636,8 +1677,11 @@ export default function DashboardPage() {
                 <Megaphone className="w-5 h-5 text-orange-600" />
               </div>
               <div>
-                <h2 className="text-[18px] font-bold tracking-tight text-gray-900">Recent Resource Updates</h2>
-                <p className="text-[13px] text-gray-500 mt-0.5">Changes to resources you&apos;ve saved or viewed</p>
+                <div className="flex items-center gap-2">
+                  <h2 className="text-[18px] font-bold tracking-tight text-gray-900">Recent Resource Updates</h2>
+                  <span className="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider bg-gray-100/80 text-gray-500 border border-gray-200/60">Informational</span>
+                </div>
+                <p className="text-[13px] text-gray-500 mt-0.5">General resource updates — not personalized</p>
               </div>
             </motion.div>
 
@@ -1704,8 +1748,11 @@ export default function DashboardPage() {
                   <Heart className="w-5 h-5 text-rose-600" />
                 </div>
                 <div>
-                  <h2 className="text-[18px] font-bold tracking-tight text-gray-900">Community Impact</h2>
-                  <p className="text-[13px] text-gray-500 mt-0.5">Anonymized community activity this week</p>
+                  <div className="flex items-center gap-2">
+                    <h2 className="text-[18px] font-bold tracking-tight text-gray-900">Community Impact</h2>
+                    <span className="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider bg-gray-100/80 text-gray-500 border border-gray-200/60">Informational</span>
+                  </div>
+                  <p className="text-[13px] text-gray-500 mt-0.5">Example community activity — not live data</p>
                 </div>
               </div>
 
@@ -2030,8 +2077,11 @@ export default function DashboardPage() {
                 <Calendar className="w-5 h-5 text-violet-600" />
               </div>
               <div>
-                <h2 className="text-[18px] font-bold tracking-tight text-gray-900">Upcoming Events</h2>
-                <p className="text-[13px] text-gray-500 mt-0.5">Community sessions and webinars</p>
+                <div className="flex items-center gap-2">
+                  <h2 className="text-[18px] font-bold tracking-tight text-gray-900">Upcoming Events</h2>
+                  <span className="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider bg-gray-100/80 text-gray-500 border border-gray-200/60">Informational</span>
+                </div>
+                <p className="text-[13px] text-gray-500 mt-0.5">Sample community sessions and webinars</p>
               </div>
             </motion.div>
 

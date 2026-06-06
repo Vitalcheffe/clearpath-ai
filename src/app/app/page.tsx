@@ -105,42 +105,7 @@ const starters = [
   { id: 'veteran', label: 'Complex', description: "I'm a veteran dealing with PTSD and housing issues", icon: 'star' }
 ]
 
-// ─── RESOURCE DATABASE ────────────────────────────────────
-const resourceDb: Record<string, Resource[]> = {
-  'Housing Assistance': [
-    { name: 'Section 8 Emergency Transfer', detail: '2 locations near you. Application takes ~15 min.', verified: 'May 2026' },
-    { name: 'Emergency Rental Assistance', detail: 'Up to 12 months rent support', verified: 'May 2026' },
-    { name: 'Emergency Shelter Network', detail: '4 locations with availability. Walk-ins accepted until 8 PM.', verified: 'May 2026' },
-  ],
-  'Food Assistance': [
-    { name: 'Community Food Bank', detail: 'Next distribution: Thursday 9AM. No ID required.', verified: 'May 2026', distance: '1.2 mi' },
-    { name: 'SNAP Benefits', detail: 'Monthly EBT card for groceries', verified: 'May 2026' },
-    { name: 'SNAP Benefits Enrollment', detail: 'You may qualify for $250/month. Apply online in 10 min.', verified: 'May 2026' },
-  ],
-  'Mental Health': [
-    { name: 'Community Counseling Center', detail: 'Sliding scale — $0 if uninsured', verified: 'May 2026', distance: '1.5 mi' },
-    { name: 'NAMI Support Group', detail: 'Free, weekly, no registration', verified: 'May 2026' },
-  ],
-  'Employment Services': [
-    { name: 'Workforce Center', detail: 'Job placement + training. Walk-ins welcome Mon-Fri.', verified: 'May 2026', distance: '2.4 mi' },
-    { name: 'Vocational Rehabilitation', detail: 'Job training + placement for veterans with service-connected disabilities.', verified: 'May 2026' },
-  ],
-  'Legal Aid': [
-    { name: 'Legal Aid Society', detail: 'Free consultations for housing, immigration, and benefits cases.', verified: 'May 2026' },
-  ],
-  'Healthcare': [
-    { name: 'Community Health Center', detail: 'Sliding scale fees. Walk-ins welcome.', verified: 'May 2026', distance: '1.8 mi' },
-    { name: 'Medicaid Enrollment', detail: 'Free or low-cost health coverage', verified: 'May 2026' },
-  ],
-  'Substance Abuse': [
-    { name: 'SAMHSA Helpline', detail: 'Free referrals 24/7. Call 1-800-662-4357.', verified: 'May 2026' },
-    { name: 'Local Recovery Center', detail: 'Detox, rehab, and outpatient services.', verified: 'May 2026' },
-  ],
-  'Senior Services': [
-    { name: 'Meals on Wheels', detail: 'Free grocery delivery for seniors 60+. Call (555) 234-5678 to enroll. No internet needed.', verified: 'May 2026' },
-    { name: 'Area Agency on Aging', detail: 'Transportation, home repairs, legal aid, and social activities', verified: 'May 2026' },
-  ],
-}
+// ─── RESOURCE DATABASE (fetched from API) ──────────────────
 
 const whyMap: Record<string, string> = {
   'Housing Assistance': 'Housing or shelter need identified',
@@ -164,11 +129,11 @@ const alsoMap: Record<string, string> = {
   'Senior Services': 'SNAP Online, Congregate meals, Medicare counseling',
 }
 
-function enrichCategories(rawCategories: { label: string; confidence: number }[]): Category[] {
+function enrichCategories(rawCategories: { label: string; confidence: number }[], resourcesMap: Record<string, Resource[]> = {}): Category[] {
   return rawCategories.map(c => ({
     label: c.label,
     confidence: c.confidence,
-    resources: resourceDb[c.label] || [],
+    resources: resourcesMap[c.label] || [],
     why: whyMap[c.label] || `Matched to ${c.label} category`,
     also: alsoMap[c.label],
     warning: c.confidence < 70 ? `${c.confidence}% confidence — consider providing more detail for better matches` : undefined,
@@ -1480,6 +1445,32 @@ export default function Home() {
   const [showCrisisOverlay, setShowCrisisOverlay] = useState(false)
   const [crisisOverlayLines, setCrisisOverlayLines] = useState<CrisisLine[]>([])
 
+  // DB resources fetched from /api/community-resources, grouped by category
+  const [dbResources, setDbResources] = useState<Record<string, Resource[]>>({})
+
+  // Fetch community resources on mount
+  useEffect(() => {
+    fetch('/api/community-resources')
+      .then(res => res.json())
+      .then(data => {
+        if (Array.isArray(data)) {
+          const grouped: Record<string, Resource[]> = {}
+          for (const r of data) {
+            const cat = r.category
+            if (!grouped[cat]) grouped[cat] = []
+            grouped[cat].push({
+              name: r.name,
+              detail: r.description + (r.phone ? ` Call ${r.phone}` : '') + (r.hours ? ` Hours: ${r.hours}` : ''),
+              verified: r.lastVerified || undefined,
+              distance: r.address || undefined,
+            })
+          }
+          setDbResources(grouped)
+        }
+      })
+      .catch(() => {}) // silent fail, fallback to empty
+  }, [])
+
   // Fetch conversations from API
   const fetchConversations = useCallback(async () => {
     setIsLoadingConversations(true)
@@ -1564,7 +1555,7 @@ export default function Home() {
       }
 
       // Enrich categories with resources, why, also, warning
-      const enrichedCategories = enrichCategories(data.categories)
+      const enrichedCategories = enrichCategories(data.categories, dbResources)
 
       // Determine status badge and type
       let statusBadge: 'crisis' | 'clarify' | 'verified' | 'upgrade' | undefined

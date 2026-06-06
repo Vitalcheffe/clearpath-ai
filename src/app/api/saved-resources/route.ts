@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
+import { requireSameUser } from "@/lib/auth-helpers";
 
 // POST /api/saved-resources — Save a resource
 export async function POST(request: NextRequest) {
@@ -13,6 +14,10 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       );
     }
+
+    // Verify the authenticated user matches the requested userId
+    const authError = await requireSameUser(request, userId);
+    if (authError) return authError;
 
     // Verify user exists
     const user = await db.user.findUnique({ where: { id: userId } });
@@ -55,6 +60,10 @@ export async function GET(request: NextRequest) {
     if (!userId) {
       return NextResponse.json([]);
     }
+
+    // Verify the authenticated user matches the requested userId
+    const authError = await requireSameUser(request, userId);
+    if (authError) return authError;
 
     // Verify user exists
     const user = await db.user.findUnique({ where: { id: userId } });

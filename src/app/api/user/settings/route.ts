@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
+import { requireSameUser } from "@/lib/auth-helpers";
 
 // GET /api/user/settings — Get user settings
 export async function GET(request: NextRequest) {
@@ -13,6 +14,10 @@ export async function GET(request: NextRequest) {
         { status: 400 }
       );
     }
+
+    // Verify the authenticated user matches the requested userId
+    const authError = await requireSameUser(request, userId);
+    if (authError) return authError;
 
     const settings = await db.userSettings.findUnique({
       where: { userId },
@@ -47,6 +52,10 @@ export async function PUT(request: NextRequest) {
         { status: 400 }
       );
     }
+
+    // Verify the authenticated user matches the requested userId
+    const authError = await requireSameUser(request, userId);
+    if (authError) return authError;
 
     // Verify settings exist
     const existingSettings = await db.userSettings.findUnique({

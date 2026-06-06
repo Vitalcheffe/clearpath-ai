@@ -1,13 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
+import { getAuthenticatedUserId } from "@/lib/auth-helpers";
 
 // GET /api/conversations/[id] — Get conversation with messages
 export async function GET(
-  _request: NextRequest,
+  request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const { id } = await params;
+    const sessionUserId = await getAuthenticatedUserId(request);
 
     const conversation = await db.conversation.findUnique({
       where: { id },
@@ -22,6 +24,14 @@ export async function GET(
       return NextResponse.json(
         { error: "Conversation not found" },
         { status: 404 }
+      );
+    }
+
+    // If conversation belongs to a user, verify the session user owns it
+    if (conversation.userId && conversation.userId !== sessionUserId) {
+      return NextResponse.json(
+        { error: "You can only access your own conversations" },
+        { status: 403 }
       );
     }
 
@@ -67,11 +77,12 @@ export async function GET(
 
 // DELETE /api/conversations/[id] — Delete a conversation and its messages
 export async function DELETE(
-  _request: NextRequest,
+  request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const { id } = await params;
+    const sessionUserId = await getAuthenticatedUserId(request);
 
     // Verify conversation exists
     const conversation = await db.conversation.findUnique({
@@ -82,6 +93,14 @@ export async function DELETE(
       return NextResponse.json(
         { error: "Conversation not found" },
         { status: 404 }
+      );
+    }
+
+    // If conversation belongs to a user, verify the session user owns it
+    if (conversation.userId && conversation.userId !== sessionUserId) {
+      return NextResponse.json(
+        { error: "You can only delete your own conversations" },
+        { status: 403 }
       );
     }
 
