@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Layers, Menu, X, ChevronDown, Shield } from 'lucide-react'
+import Image from 'next/image'
 
 interface NavbarProps {
   scrolled?: boolean
@@ -44,8 +45,8 @@ export default function Navbar({ scrolled: scrolledProp }: NavbarProps) {
           <div className="flex items-center justify-between h-16">
             {/* Logo */}
             <Link href="/" className="flex items-center gap-2.5 group">
-              <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-gray-900 to-gray-700 flex items-center justify-center shadow-md shadow-gray-900/20 group-hover:shadow-lg group-hover:shadow-gray-900/30 transition-shadow">
-                <Layers className="w-4 h-4 text-white" />
+              <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-gray-900 to-gray-700 flex items-center justify-center shadow-md shadow-gray-900/20 group-hover:shadow-lg group-hover:shadow-gray-900/30 transition-shadow overflow-hidden">
+                <Image src="/logo.svg" alt="CP" width={20} height={20} className="w-5 h-5" priority />
               </div>
               <span className="text-[15px] font-bold tracking-tight text-gray-900">
                 ClearPath AI

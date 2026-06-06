@@ -11,22 +11,29 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://clearpath-ai.vercel.app"),
   title: "ClearPath AI — Community Resource Navigator",
   description: "Verified community resources with calibrated transparency. Classified, not generated. Every result shows confidence, reasoning, and alternatives.",
-  keywords: ["ClearPath AI", "community resources", "211", "social services", "crisis support", "calibrated transparency", "zero-shot classification"],
-  authors: [{ name: "ClearPath AI Team" }],
+  keywords: ["ClearPath AI", "community resources", "211", "social services", "crisis support", "calibrated transparency", "zero-shot classification", "BART-large-MNLI", "responsible AI"],
+  authors: [{ name: "ClearPath AI Team" }, { name: "Amine Harch El Korane" }],
   icons: {
-    icon: "/logo.svg",
+    icon: [
+      { url: "/logo.svg", type: "image/svg+xml" },
+      { url: "/clearpath-logo.png", type: "image/png", sizes: "1024x1024" },
+    ],
+    apple: "/clearpath-logo.png",
   },
   openGraph: {
     title: "ClearPath AI — Community Resource Navigator",
     description: "Verified community resources with calibrated transparency. Classified, not generated.",
     type: "website",
+    images: [{ url: "/clearpath-logo.png", width: 1024, height: 1024, alt: "ClearPath AI Logo" }],
   },
   twitter: {
     card: "summary_large_image",
     title: "ClearPath AI — Community Resource Navigator",
-    description: "Verified community resources with calibrated transparency.",
+    description: "Verified community resources with calibrated transparency. Classified, not generated.",
+    images: ["/clearpath-logo.png"],
   },
 };
 

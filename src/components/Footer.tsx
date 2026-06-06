@@ -35,6 +35,7 @@ import {
   ExternalLink,
   MessageSquare,
 } from 'lucide-react'
+import Image from 'next/image'
 
 // ─── CUSTOM ICON: Shield Alert ══════════════════════════
 function ShieldAlertIcon({ className }: { className?: string }) {
@@ -388,8 +389,8 @@ export default function Footer() {
                 {/* Logo + Tagline */}
                 <div className="space-y-4">
                   <Link href="/" className="inline-flex items-center gap-2.5 group">
-                    <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-gray-700 to-gray-800 flex items-center justify-center shadow-lg shadow-black/30 group-hover:shadow-blue-500/10 transition-shadow border border-gray-700/50">
-                      <Layers className="w-[18px] h-[18px] text-white" />
+                    <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-gray-700 to-gray-800 flex items-center justify-center shadow-lg shadow-black/30 group-hover:shadow-blue-500/10 transition-shadow border border-gray-700/50 overflow-hidden">
+                      <Image src="/logo.svg" alt="CP" width={22} height={22} className="w-[22px] h-[22px]" />
                     </div>
                     <div>
                       <span className="text-[16px] font-bold tracking-tight text-white block leading-tight">
