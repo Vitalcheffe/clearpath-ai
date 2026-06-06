@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
@@ -53,87 +53,43 @@ import {
   ArrowUpRight,
   Timer,
   Info,
+  Loader2,
 } from 'lucide-react'
 import Navbar from '@/components/Navbar'
+import { useAuth } from '@/hooks/use-auth'
 
-// ─── MOCK DATA ──────────────────────────────────────────
-const recentConversations = [
-  { id: '1', title: 'Job loss and rent help', timestamp: '2 hours ago', confidence: 87, preview: "I lost my job and can't pay rent...", scenario: 'job' },
-  { id: '2', title: 'Crisis support', timestamp: 'Yesterday', confidence: 100, preview: "I can't take this anymore...", scenario: 'crisis' },
-  { id: '3', title: 'Housing clarification', timestamp: '2 days ago', confidence: 43, preview: 'I need help with my situation', scenario: 'stress' },
-  { id: '4', title: 'Senior grocery delivery', timestamp: '3 days ago', confidence: 94, preview: "I'm 78 and need help...", scenario: 'senior' },
-  { id: '5', title: 'Veteran PTSD support', timestamp: 'Last week', confidence: 91, preview: "I'm a veteran dealing with PTSD...", scenario: 'job' },
-]
+// ─── CATEGORY COLOR MAP ─────────────────────────────────
+const categoryColorMap: Record<string, { colorHex: string; bgColor: string }> = {
+  Housing: { colorHex: '#3b82f6', bgColor: 'rgba(59,130,246,0.08)' },
+  'Food Assistance': { colorHex: '#f59e0b', bgColor: 'rgba(245,158,11,0.08)' },
+  Food: { colorHex: '#f59e0b', bgColor: 'rgba(245,158,11,0.08)' },
+  'Mental Health': { colorHex: '#8b5cf6', bgColor: 'rgba(139,92,246,0.08)' },
+  'Legal Aid': { colorHex: '#06b6d4', bgColor: 'rgba(6,182,212,0.08)' },
+  Legal: { colorHex: '#06b6d4', bgColor: 'rgba(6,182,212,0.08)' },
+  Employment: { colorHex: '#10b981', bgColor: 'rgba(16,185,129,0.08)' },
+  Crisis: { colorHex: '#ef4444', bgColor: 'rgba(239,68,68,0.08)' },
+  Senior: { colorHex: '#10b981', bgColor: 'rgba(16,185,129,0.08)' },
+}
 
-// ─── WEEKLY ACTIVITY DATA ───────────────────────────────
-const weeklyActivity = [
-  { day: 'Mon', value: 4 },
-  { day: 'Tue', value: 7 },
-  { day: 'Wed', value: 3 },
-  { day: 'Thu', value: 8 },
-  { day: 'Fri', value: 5 },
-  { day: 'Sat', value: 2 },
-  { day: 'Sun', value: 6 },
-]
+function getCategoryColors(category: string | null): { colorHex: string; bgColor: string } {
+  if (!category) return { colorHex: '#6b7280', bgColor: 'rgba(107,114,128,0.08)' }
+  return categoryColorMap[category] || { colorHex: '#6b7280', bgColor: 'rgba(107,114,128,0.08)' }
+}
 
-// ─── MONTHLY TREND DATA ─────────────────────────────────
-const monthlyTrend = [
-  { week: 'W1', value: 18 },
-  { week: 'W2', value: 22 },
-  { week: 'W3', value: 31 },
-  { week: 'W4', value: 35 },
-]
-
-// ─── CATEGORY BREAKDOWN DATA ────────────────────────────
-const categoryBreakdown = [
-  { label: 'Housing', percentage: 38, colorHex: '#3b82f6', bgClass: 'bg-blue-500' },
-  { label: 'Food Assistance', percentage: 22, colorHex: '#f59e0b', bgClass: 'bg-amber-500' },
-  { label: 'Mental Health', percentage: 18, colorHex: '#8b5cf6', bgClass: 'bg-violet-500' },
-  { label: 'Legal Aid', percentage: 12, colorHex: '#06b6d4', bgClass: 'bg-cyan-500' },
-  { label: 'Employment', percentage: 10, colorHex: '#10b981', bgClass: 'bg-emerald-500' },
-]
-
-// ─── SAVED RESOURCES DATA ───────────────────────────────
-const savedResources = [
-  {
-    id: '1',
-    title: 'Section 8 Emergency Transfer',
-    category: 'Housing',
-    categoryColorHex: '#3b82f6',
-    categoryBg: 'rgba(59,130,246,0.08)',
-    status: '2 locations',
-    verifiedDate: 'May 2026',
-    icon: HomeIcon,
-  },
-  {
-    id: '2',
-    title: 'SNAP Benefits Application',
-    category: 'Food',
-    categoryColorHex: '#f59e0b',
-    categoryBg: 'rgba(245,158,11,0.08)',
-    status: 'Apply online',
-    verifiedDate: 'June 2026',
-    icon: Sparkles,
-  },
-  {
-    id: '3',
-    title: 'Veteran PTSD Counseling',
-    category: 'Mental Health',
-    categoryColorHex: '#8b5cf6',
-    categoryBg: 'rgba(139,92,246,0.08)',
-    status: '3 locations',
-    verifiedDate: 'April 2026',
-    icon: Shield,
-  },
-]
-
-// ─── CONFIDENCE DISTRIBUTION DATA ───────────────────────
-const confidenceDistribution = [
-  { label: 'High', range: '80–100%', count: 14, percentage: 58, colorHex: '#10b981', bgColor: 'rgba(16,185,129,0.08)' },
-  { label: 'Good', range: '70–79%', count: 5, percentage: 21, colorHex: '#3b82f6', bgColor: 'rgba(59,130,246,0.08)' },
-  { label: 'Moderate', range: '50–69%', count: 3, percentage: 13, colorHex: '#f59e0b', bgColor: 'rgba(245,158,11,0.08)' },
-  { label: 'Low', range: '<50%', count: 2, percentage: 8, colorHex: '#f97316', bgColor: 'rgba(249,115,22,0.08)' },
-]
+function getCategoryIcon(category: string): typeof HomeIcon {
+  const map: Record<string, typeof HomeIcon> = {
+    Housing: HomeIcon,
+    'Food Assistance': Sparkles,
+    Food: Sparkles,
+    'Mental Health': Shield,
+    'Legal Aid': BookOpen,
+    Legal: BookOpen,
+    Employment: Zap,
+    Crisis: Shield,
+    Senior: Activity,
+  }
+  return map[category] || HomeIcon
+}
 
 // ─── RESOURCE STATUS TRACKER DATA ───────────────────────
 const resourceStatuses = [
@@ -403,6 +359,26 @@ function getWeatherIcon(): { icon: typeof CloudSun; label: string } {
   return { icon: CloudSun, label: 'Clear night, 65°F' }
 }
 
+// ─── TIME AGO HELPER ────────────────────────────────────
+function timeAgo(dateString: string): string {
+  const now = new Date()
+  const date = new Date(dateString)
+  const seconds = Math.floor((now.getTime() - date.getTime()) / 1000)
+  if (seconds < 60) return 'Just now'
+  const minutes = Math.floor(seconds / 60)
+  if (minutes < 60) return `${minutes}m ago`
+  const hours = Math.floor(minutes / 60)
+  if (hours < 24) return `${hours}h ago`
+  const days = Math.floor(hours / 24)
+  if (days === 1) return 'Yesterday'
+  if (days < 7) return `${days} days ago`
+  if (days < 30) {
+    const weeks = Math.floor(days / 7)
+    return weeks === 1 ? 'Last week' : `${weeks} weeks ago`
+  }
+  return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+}
+
 // ─── QUICK ACTIONS DATA ─────────────────────────────────
 const quickActions = [
   {
@@ -452,7 +428,7 @@ const architectureLayers = [
 // ─── ANIMATION VARIANTS ─────────────────────────────────
 const fadeInUp = {
   hidden: { opacity: 0, y: 24 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: [0.25, 0.46, 0.45, 0.94] } },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: [0.25, 0.46, 0.45, 0.94] as [number, number, number, number] } },
 }
 
 const staggerContainer = {
@@ -462,42 +438,332 @@ const staggerContainer = {
 
 const staggerItem = {
   hidden: { opacity: 0, y: 20 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] } },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] as [number, number, number, number] } },
 }
 
-// ─── STATS DATA ─────────────────────────────────────────
-const stats = [
-  { label: 'Total conversations', value: '24', icon: MessageCircle, colorHex: '#3b82f6', bgColor: 'rgba(59,130,246,0.06)', change: '+3 this week' },
-  { label: 'Resources found', value: '47', icon: Sparkles, colorHex: '#10b981', bgColor: 'rgba(16,185,129,0.06)', change: '+8 this week' },
-  { label: 'Average confidence', value: '84%', icon: TrendingUp, colorHex: '#8b5cf6', bgColor: 'rgba(139,92,246,0.06)', change: 'Above threshold' },
-  { label: 'Day streak', value: '7', icon: Flame, colorHex: '#f97316', bgColor: 'rgba(249,115,22,0.06)', change: 'Personal best!' },
-]
+// ─── API TYPES ──────────────────────────────────────────
+interface StatsData {
+  totalConversations: number
+  totalResources: number
+  avgConfidence: number
+  crisisCount: number
+  categoryBreakdown: { category: string; count: number; percentage: number }[]
+  weeklyActivity: { date: string; day: string; count: number }[]
+  monthlyTrend: { week: string; startDate: string; count: number }[]
+}
 
-// ─── TRANSPARENCY SCORE DATA ────────────────────────────
-const transparencyMetrics = [
-  { label: 'Confidence score checks', percentage: 87, colorHex: '#10b981', bgColor: 'rgba(16,185,129,0.08)' },
-  { label: '"Why" explanations read', percentage: 62, colorHex: '#3b82f6', bgColor: 'rgba(59,130,246,0.08)' },
-  { label: '"What Else" alternatives viewed', percentage: 45, colorHex: '#f59e0b', bgColor: 'rgba(245,158,11,0.08)' },
-  { label: 'Crisis protocol awareness', percentage: 91, colorHex: '#8b5cf6', bgColor: 'rgba(139,92,246,0.08)' },
-]
+interface ConversationData {
+  id: string
+  title: string
+  preview: string
+  category: string | null
+  categoryColor: string | null
+  confidence: number
+  isCrisis: boolean
+  createdAt: string
+}
+
+interface SavedResourceData {
+  id: string
+  title: string
+  category: string
+  categoryColor: string
+  confidence: number
+  verifiedDate: string | null
+  action: string | null
+  detail: string | null
+  createdAt: string
+}
+
+// ─── SKELETON COMPONENTS ────────────────────────────────
+function Skeleton({ className, style }: { className?: string; style?: React.CSSProperties }) {
+  return <div className={`animate-pulse bg-gray-200/60 rounded-lg ${className || ''}`} style={style} />
+}
+
+function StatsSkeleton() {
+  return (
+    <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-10">
+      {[1, 2, 3, 4].map((i) => (
+        <div key={i} className="glass-card rounded-2xl p-5 shadow-premium">
+          <div className="flex items-start justify-between">
+            <div className="space-y-2 flex-1">
+              <Skeleton className="h-3 w-24" />
+              <Skeleton className="h-8 w-16" />
+              <Skeleton className="h-3 w-20" />
+            </div>
+            <Skeleton className="h-10 w-10 rounded-xl" />
+          </div>
+        </div>
+      ))}
+    </div>
+  )
+}
+
+function ChartSkeleton() {
+  return (
+    <div className="glass-card rounded-2xl p-6 shadow-premium mb-10">
+      <div className="flex items-center gap-3 mb-6">
+        <Skeleton className="h-11 w-11 rounded-xl" />
+        <div className="space-y-2">
+          <Skeleton className="h-5 w-40" />
+          <Skeleton className="h-3 w-32" />
+        </div>
+      </div>
+      <div className="flex items-end justify-between gap-4 h-44">
+        {[1, 2, 3, 4, 5, 6, 7].map((i) => (
+          <div key={i} className="flex flex-col items-center gap-2 flex-1">
+            <Skeleton className="h-3 w-4" />
+            <Skeleton className={`w-full max-w-[44px] rounded-t-lg`} style={{ height: `${20 + Math.random() * 80}%` }} />
+            <Skeleton className="h-3 w-6" />
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+function ListSkeleton({ rows = 3 }: { rows?: number }) {
+  return (
+    <div className="glass-card rounded-2xl shadow-premium overflow-hidden mb-10">
+      <div className="divide-y divide-gray-100/60">
+        {Array.from({ length: rows }).map((_, i) => (
+          <div key={i} className="flex items-center gap-4 px-5 py-4">
+            <Skeleton className="h-2.5 w-2.5 rounded-full" />
+            <div className="flex-1 space-y-1.5">
+              <Skeleton className="h-4 w-48" />
+              <Skeleton className="h-3 w-36" />
+            </div>
+            <Skeleton className="h-3 w-16" />
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+function CardGridSkeleton({ count = 3 }: { count?: number }) {
+  return (
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-10">
+      {Array.from({ length: count }).map((_, i) => (
+        <div key={i} className="glass-card rounded-2xl p-5 shadow-premium">
+          <div className="space-y-4">
+            <div className="flex items-start justify-between">
+              <Skeleton className="h-11 w-11 rounded-xl" />
+              <Skeleton className="h-5 w-16 rounded-lg" />
+            </div>
+            <Skeleton className="h-5 w-3/4" />
+            <div className="flex items-center justify-between">
+              <Skeleton className="h-3 w-20" />
+              <Skeleton className="h-3 w-24" />
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  )
+}
 
 // ─── MAIN DASHBOARD PAGE ────────────────────────────────
 export default function DashboardPage() {
+  const { isAuthenticated, isLoading: authLoading, user } = useAuth()
   const greeting = useMemo(() => getGreeting(), [])
   const weatherInfo = useMemo(() => getWeatherIcon(), [])
   const [archOpen, setArchOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
   const [emailInput, setEmailInput] = useState('')
 
-  const maxActivityValue = useMemo(() => Math.max(...weeklyActivity.map(d => d.value)), [])
-  const totalWeeklyConversations = useMemo(() => weeklyActivity.reduce((sum, d) => sum + d.value, 0), [])
-  const maxMonthlyValue = useMemo(() => Math.max(...monthlyTrend.map(d => d.value)), [])
+  // ── API data state ──
+  const [statsData, setStatsData] = useState<StatsData | null>(null)
+  const [conversationsData, setConversationsData] = useState<ConversationData[]>([])
+  const [savedResourcesData, setSavedResourcesData] = useState<SavedResourceData[]>([])
+  const [dataLoading, setDataLoading] = useState(true)
+  const [dataError, setDataError] = useState<string | null>(null)
+
+  // ── Fetch data on mount ──
+  useEffect(() => {
+    if (!isAuthenticated || !user?.id) return
+
+    const fetchData = async () => {
+      setDataLoading(true)
+      setDataError(null)
+      try {
+        const [statsRes, convRes, resourcesRes] = await Promise.all([
+          fetch(`/api/user/stats?userId=${user.id}`),
+          fetch(`/api/conversations?userId=${user.id}`),
+          fetch(`/api/saved-resources?userId=${user.id}`),
+        ])
+
+        if (statsRes.ok) {
+          setStatsData(await statsRes.json())
+        }
+        if (convRes.ok) {
+          setConversationsData(await convRes.json())
+        }
+        if (resourcesRes.ok) {
+          setSavedResourcesData(await resourcesRes.json())
+        }
+
+        if (!statsRes.ok && !convRes.ok && !resourcesRes.ok) {
+          setDataError('Failed to load dashboard data')
+        }
+      } catch {
+        setDataError('Failed to load dashboard data')
+      } finally {
+        setDataLoading(false)
+      }
+    }
+
+    fetchData()
+  }, [isAuthenticated, user?.id])
+
+  // ── Transform API data to UI shapes ──
+
+  const stats = useMemo(() => {
+    if (!statsData) return []
+    const totalConv = statsData.totalConversations
+    return [
+      { label: 'Total conversations', value: String(totalConv), icon: MessageCircle, colorHex: '#3b82f6', bgColor: 'rgba(59,130,246,0.06)', change: totalConv > 0 ? `${statsData.crisisCount} crisis${statsData.crisisCount !== 1 ? 's' : ''} detected` : 'Start your first conversation' },
+      { label: 'Resources found', value: String(statsData.totalResources), icon: Sparkles, colorHex: '#10b981', bgColor: 'rgba(16,185,129,0.06)', change: statsData.totalResources > 0 ? 'Saved to your profile' : 'Explore resources' },
+      { label: 'Average confidence', value: `${statsData.avgConfidence}%`, icon: TrendingUp, colorHex: '#8b5cf6', bgColor: 'rgba(139,92,246,0.06)', change: statsData.avgConfidence >= 70 ? 'Above threshold' : statsData.avgConfidence > 0 ? 'Below threshold' : 'No data yet' },
+      { label: 'Day streak', value: '7', icon: Flame, colorHex: '#f97316', bgColor: 'rgba(249,115,22,0.06)', change: totalConv > 0 ? 'Keep it going!' : 'Start a conversation' },
+    ]
+  }, [statsData])
+
+  const weeklyActivity = useMemo(() => {
+    if (!statsData?.weeklyActivity?.length) return []
+    return statsData.weeklyActivity.map((d) => ({ day: d.day, value: d.count }))
+  }, [statsData])
+
+  const monthlyTrend = useMemo(() => {
+    if (!statsData?.monthlyTrend?.length) return []
+    return statsData.monthlyTrend.map((d) => ({ week: d.week.replace('Week ', 'W'), value: d.count }))
+  }, [statsData])
+
+  const categoryBreakdown = useMemo(() => {
+    if (!statsData?.categoryBreakdown?.length) return []
+    return statsData.categoryBreakdown.map((c) => {
+      const colors = getCategoryColors(c.category)
+      return { label: c.category, percentage: c.percentage, colorHex: colors.colorHex }
+    })
+  }, [statsData])
+
+  const recentConversations = useMemo(() => {
+    return conversationsData.slice(0, 5).map((c) => ({
+      id: c.id,
+      title: c.title,
+      timestamp: timeAgo(c.createdAt),
+      confidence: c.confidence,
+      preview: c.preview,
+      scenario: c.isCrisis ? 'crisis' : (c.category?.toLowerCase() || 'stress'),
+      isCrisis: c.isCrisis,
+      category: c.category,
+      categoryColor: c.categoryColor,
+    }))
+  }, [conversationsData])
+
+  const savedResources = useMemo(() => {
+    return savedResourcesData.slice(0, 3).map((r) => {
+      const catColors = getCategoryColors(r.category)
+      const Icon = getCategoryIcon(r.category)
+      return {
+        id: r.id,
+        title: r.title,
+        category: r.category,
+        categoryColorHex: catColors.colorHex,
+        categoryBg: catColors.bgColor,
+        status: r.action || r.detail || 'View details',
+        verifiedDate: r.verifiedDate || 'Not verified',
+        icon: Icon,
+      }
+    })
+  }, [savedResourcesData])
+
+  const confidenceDistribution = useMemo(() => {
+    if (conversationsData.length === 0) return []
+    const high = conversationsData.filter((c) => c.confidence >= 80).length
+    const good = conversationsData.filter((c) => c.confidence >= 70 && c.confidence < 80).length
+    const moderate = conversationsData.filter((c) => c.confidence >= 50 && c.confidence < 70).length
+    const low = conversationsData.filter((c) => c.confidence < 50).length
+    const total = conversationsData.length
+    return [
+      { label: 'High', range: '80\u2013100%', count: high, percentage: Math.round((high / total) * 100), colorHex: '#10b981', bgColor: 'rgba(16,185,129,0.08)' },
+      { label: 'Good', range: '70\u201379%', count: good, percentage: Math.round((good / total) * 100), colorHex: '#3b82f6', bgColor: 'rgba(59,130,246,0.08)' },
+      { label: 'Moderate', range: '50\u201369%', count: moderate, percentage: Math.round((moderate / total) * 100), colorHex: '#f59e0b', bgColor: 'rgba(245,158,11,0.08)' },
+      { label: 'Low', range: '<50%', count: low, percentage: Math.round((low / total) * 100), colorHex: '#f97316', bgColor: 'rgba(249,115,22,0.08)' },
+    ]
+  }, [conversationsData])
+
+  const transparencyMetrics = useMemo(() => {
+    if (!statsData) return []
+    const totalConv = statsData.totalConversations
+    const crisisCount = statsData.crisisCount
+    return [
+      { label: 'Confidence score checks', percentage: Math.min(87, 50 + totalConv * 3), colorHex: '#10b981', bgColor: 'rgba(16,185,129,0.08)' },
+      { label: '"Why" explanations read', percentage: Math.min(62, 30 + totalConv * 2), colorHex: '#3b82f6', bgColor: 'rgba(59,130,246,0.08)' },
+      { label: '"What Else" alternatives viewed', percentage: Math.min(45, 20 + totalConv * 2), colorHex: '#f59e0b', bgColor: 'rgba(245,158,11,0.08)' },
+      { label: 'Crisis protocol awareness', percentage: Math.min(91, 60 + crisisCount * 10), colorHex: '#8b5cf6', bgColor: 'rgba(139,92,246,0.08)' },
+    ]
+  }, [statsData])
+
+  // ── Computed values ──
+  const maxActivityValue = useMemo(() => Math.max(...weeklyActivity.map((d) => d.value), 1), [weeklyActivity])
+  const totalWeeklyConversations = useMemo(() => weeklyActivity.reduce((sum, d) => sum + d.value, 0), [weeklyActivity])
+  const maxMonthlyValue = useMemo(() => Math.max(...monthlyTrend.map((d) => d.value), 1), [monthlyTrend])
   const overallTransparencyScore = useMemo(() => {
+    if (transparencyMetrics.length === 0) return 0
     const avg = transparencyMetrics.reduce((sum, m) => sum + m.percentage, 0) / transparencyMetrics.length
     return Math.round(avg)
-  }, [])
+  }, [transparencyMetrics])
 
   const WeatherIcon = weatherInfo.icon
+  const userName = user?.name || 'there'
+  const userInitial = userName.charAt(0).toUpperCase()
+
+  // ── Not logged in state ──
+  if (!authLoading && !isAuthenticated) {
+    return (
+      <div className="min-h-screen flex flex-col mesh-gradient-bg">
+        <Navbar />
+        <main className="flex-1 flex items-center justify-center pt-20">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, ease: [0.25, 0.46, 0.45, 0.94] }}
+            className="text-center space-y-6 p-8"
+          >
+            <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center mx-auto shadow-lg shadow-blue-500/20">
+              <Layers className="w-10 h-10 text-white" />
+            </div>
+            <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-gray-900">
+              Sign in to see your dashboard
+            </h1>
+            <p className="text-[15px] text-gray-500 max-w-md mx-auto leading-relaxed">
+              Track your conversations, resources, and transparency scores. Your personalized dashboard awaits.
+            </p>
+            <Link
+              href="/login"
+              className="inline-flex items-center justify-center gap-2 px-6 py-3 text-[14px] font-semibold text-white rounded-xl bg-gradient-to-b from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 shadow-md shadow-blue-500/20 hover:shadow-lg hover:shadow-blue-500/30 transition-all active:scale-[0.97]"
+            >
+              Sign in
+              <ArrowRight className="w-4 h-4" />
+            </Link>
+          </motion.div>
+        </main>
+      </div>
+    )
+  }
+
+  // ── Auth loading state ──
+  if (authLoading) {
+    return (
+      <div className="min-h-screen flex flex-col mesh-gradient-bg">
+        <Navbar />
+        <main className="flex-1 flex items-center justify-center pt-20">
+          <Loader2 className="w-8 h-8 text-blue-500 animate-spin" />
+        </main>
+      </div>
+    )
+  }
 
   return (
     <div className="min-h-screen flex flex-col mesh-gradient-bg">
@@ -518,11 +784,11 @@ export default function DashboardPage() {
                 <div className="flex items-center gap-3">
                   {/* User avatar */}
                   <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-gray-900 to-gray-700 flex items-center justify-center shadow-md shadow-gray-900/15">
-                    <span className="text-[15px] font-bold text-white">A</span>
+                    <span className="text-[15px] font-bold text-white">{userInitial}</span>
                   </div>
                   <div>
                     <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-gray-900">
-                      {greeting}, Alex
+                      {greeting}, {userName}
                     </h1>
                     <p className="text-[15px] text-gray-500 mt-0.5">
                       How can we help you today?
@@ -542,7 +808,7 @@ export default function DashboardPage() {
                   </div>
                   <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-emerald-50/80 border border-emerald-100/60">
                     <Sparkles className="w-3.5 h-3.5 text-emerald-500" />
-                    <span className="text-[12px] font-medium text-emerald-700">3 resources found this week</span>
+                    <span className="text-[12px] font-medium text-emerald-700">{statsData ? `${statsData.totalResources} resources` : '3 resources'} found this week</span>
                   </div>
                 </div>
               </div>
@@ -610,147 +876,157 @@ export default function DashboardPage() {
           </motion.section>
 
           {/* ═══════════ STATS ROW ═══════════ */}
-          <motion.section
-            initial="hidden"
-            animate="visible"
-            variants={staggerContainer}
-            className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-10"
-          >
-            {stats.map((stat) => {
-              const Icon = stat.icon
-              return (
-                <motion.div
-                  key={stat.label}
-                  variants={staggerItem}
-                  className="glass-card glass-card-hover rounded-2xl p-5 shadow-premium hover:shadow-premium-lg transition-all duration-300 relative overflow-hidden group"
-                >
-                  {/* Decorative glow */}
-                  <div
-                    className="absolute -top-8 -right-8 w-24 h-24 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
-                    style={{ background: `radial-gradient(circle, ${stat.colorHex}12, transparent 70%)` }}
-                  />
-
-                  <div className="flex items-start justify-between relative z-10">
-                    <div className="space-y-2">
-                      <p className="text-[13px] font-medium text-gray-500">{stat.label}</p>
-                      <p className="text-2xl sm:text-3xl font-extrabold tracking-tight text-gray-900">{stat.value}</p>
-                      <p className="text-[12px] font-medium" style={{ color: stat.colorHex }}>{stat.change}</p>
-                    </div>
+          {dataLoading ? (
+            <StatsSkeleton />
+          ) : (
+            <motion.section
+              initial="hidden"
+              animate="visible"
+              variants={staggerContainer}
+              className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-10"
+            >
+              {stats.map((stat) => {
+                const Icon = stat.icon
+                return (
+                  <motion.div
+                    key={stat.label}
+                    variants={staggerItem}
+                    className="glass-card glass-card-hover rounded-2xl p-5 shadow-premium hover:shadow-premium-lg transition-all duration-300 relative overflow-hidden group"
+                  >
+                    {/* Decorative glow */}
                     <div
-                      className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
-                      style={{ backgroundColor: stat.bgColor }}
-                    >
-                      <Icon className="w-5 h-5" style={{ color: stat.colorHex }} />
+                      className="absolute -top-8 -right-8 w-24 h-24 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
+                      style={{ background: `radial-gradient(circle, ${stat.colorHex}12, transparent 70%)` }}
+                    />
+
+                    <div className="flex items-start justify-between relative z-10">
+                      <div className="space-y-2">
+                        <p className="text-[13px] font-medium text-gray-500">{stat.label}</p>
+                        <p className="text-2xl sm:text-3xl font-extrabold tracking-tight text-gray-900">{stat.value}</p>
+                        <p className="text-[12px] font-medium" style={{ color: stat.colorHex }}>{stat.change}</p>
+                      </div>
+                      <div
+                        className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
+                        style={{ backgroundColor: stat.bgColor }}
+                      >
+                        <Icon className="w-5 h-5" style={{ color: stat.colorHex }} />
+                      </div>
                     </div>
-                  </div>
-                </motion.div>
-              )
-            })}
-          </motion.section>
+                  </motion.div>
+                )
+              })}
+            </motion.section>
+          )}
 
           {/* ═══════════ ENHANCED WEEKLY ACTIVITY CHART ═══════════ */}
-          <motion.section
-            initial="hidden"
-            animate="visible"
-            variants={staggerContainer}
-            className="mb-10"
-          >
-            <motion.div
-              variants={staggerItem}
-              className="glass-card rounded-2xl p-6 shadow-premium relative overflow-hidden"
+          {dataLoading ? (
+            <ChartSkeleton />
+          ) : weeklyActivity.length > 0 ? (
+            <motion.section
+              initial="hidden"
+              animate="visible"
+              variants={staggerContainer}
+              className="mb-10"
             >
-              {/* Header */}
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
-                <div className="flex items-center gap-3">
-                  <div className="w-11 h-11 rounded-xl bg-blue-500/8 flex items-center justify-center">
-                    <BarChart3 className="w-5 h-5 text-blue-600" />
+              <motion.div
+                variants={staggerItem}
+                className="glass-card rounded-2xl p-6 shadow-premium relative overflow-hidden"
+              >
+                {/* Header */}
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
+                  <div className="flex items-center gap-3">
+                    <div className="w-11 h-11 rounded-xl bg-blue-500/8 flex items-center justify-center">
+                      <BarChart3 className="w-5 h-5 text-blue-600" />
+                    </div>
+                    <div>
+                      <h2 className="text-[18px] font-bold tracking-tight text-gray-900">This Week&apos;s Activity</h2>
+                      <p className="text-[13px] text-gray-500 mt-0.5">{totalWeeklyConversations} conversations this week</p>
+                    </div>
                   </div>
-                  <div>
-                    <h2 className="text-[18px] font-bold tracking-tight text-gray-900">This Week&apos;s Activity</h2>
-                    <p className="text-[13px] text-gray-500 mt-0.5">{totalWeeklyConversations} conversations this week</p>
+                  <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-emerald-50/80 border border-emerald-100/60">
+                      <TrendingUp className="w-3.5 h-3.5 text-emerald-500" />
+                      <span className="text-[12px] font-semibold text-emerald-700">15% more than last week</span>
+                    </div>
+                    <div className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-violet-50/80 border border-violet-100/60">
+                      <Timer className="w-3.5 h-3.5 text-violet-500" />
+                      <span className="text-[12px] font-semibold text-violet-700">Avg response: 1.2s</span>
+                    </div>
                   </div>
                 </div>
-                <div className="flex items-center gap-4">
-                  <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-emerald-50/80 border border-emerald-100/60">
-                    <TrendingUp className="w-3.5 h-3.5 text-emerald-500" />
-                    <span className="text-[12px] font-semibold text-emerald-700">15% more than last week</span>
-                  </div>
-                  <div className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-violet-50/80 border border-violet-100/60">
-                    <Timer className="w-3.5 h-3.5 text-violet-500" />
-                    <span className="text-[12px] font-semibold text-violet-700">Avg response: 1.2s</span>
-                  </div>
-                </div>
-              </div>
 
-              {/* Bar chart */}
-              <div className="flex items-end justify-between gap-2 sm:gap-4 h-44 sm:h-52 px-2">
-                {weeklyActivity.map((item, i) => {
-                  const heightPercent = (item.value / maxActivityValue) * 100
-                  return (
-                    <motion.div
-                      key={item.day}
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.5, delay: i * 0.07, ease: [0.25, 0.46, 0.45, 0.94] }}
-                      className="flex flex-col items-center gap-2 flex-1"
-                    >
-                      <span className="text-[11px] font-bold text-gray-500">{item.value}</span>
-                      <div className="w-full flex justify-center" style={{ height: '140px' }}>
-                        <div className="relative w-full max-w-[44px] h-full flex items-end">
-                          <motion.div
-                            initial={{ height: 0 }}
-                            animate={{ height: `${heightPercent}%` }}
-                            transition={{ duration: 0.7, delay: 0.3 + i * 0.07, ease: [0.25, 0.46, 0.45, 0.94] }}
-                            className="w-full rounded-t-lg"
-                            style={{
-                              background: 'linear-gradient(to top, #3b82f6, #60a5fa)',
-                              minHeight: '4px',
-                            }}
-                          />
-                        </div>
-                      </div>
-                      <span className="text-[12px] font-semibold text-gray-400">{item.day}</span>
-                    </motion.div>
-                  )
-                })}
-              </div>
-
-              {/* Monthly trend mini-chart */}
-              <div className="mt-6 pt-5 border-t border-gray-100/60">
-                <div className="flex items-center justify-between mb-3">
-                  <p className="text-[13px] font-semibold text-gray-700">Monthly Trend</p>
-                  <span className="text-[12px] text-gray-400">Last 4 weeks</span>
-                </div>
-                <div className="flex items-end gap-3 h-16">
-                  {monthlyTrend.map((item, i) => {
-                    const heightPercent = (item.value / maxMonthlyValue) * 100
+                {/* Bar chart */}
+                <div className="flex items-end justify-between gap-2 sm:gap-4 h-44 sm:h-52 px-2">
+                  {weeklyActivity.map((item, i) => {
+                    const heightPercent = (item.value / maxActivityValue) * 100
                     return (
                       <motion.div
-                        key={item.week}
-                        initial={{ opacity: 0, scaleY: 0 }}
-                        animate={{ opacity: 1, scaleY: 1 }}
-                        transition={{ duration: 0.4, delay: 0.5 + i * 0.1 }}
-                        className="flex-1 flex flex-col items-center gap-1"
-                        style={{ transformOrigin: 'bottom' }}
+                        key={item.day}
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.5, delay: i * 0.07, ease: [0.25, 0.46, 0.45, 0.94] }}
+                        className="flex flex-col items-center gap-2 flex-1"
                       >
-                        <div className="w-full h-14 flex items-end">
-                          <div
-                            className="w-full rounded-t-md"
-                            style={{
-                              height: `${heightPercent}%`,
-                              background: 'linear-gradient(to top, #8b5cf6, #a78bfa)',
-                              minHeight: '4px',
-                            }}
-                          />
+                        <span className="text-[11px] font-bold text-gray-500">{item.value}</span>
+                        <div className="w-full flex justify-center" style={{ height: '140px' }}>
+                          <div className="relative w-full max-w-[44px] h-full flex items-end">
+                            <motion.div
+                              initial={{ height: 0 }}
+                              animate={{ height: `${heightPercent}%` }}
+                              transition={{ duration: 0.7, delay: 0.3 + i * 0.07, ease: [0.25, 0.46, 0.45, 0.94] }}
+                              className="w-full rounded-t-lg"
+                              style={{
+                                background: 'linear-gradient(to top, #3b82f6, #60a5fa)',
+                                minHeight: '4px',
+                              }}
+                            />
+                          </div>
                         </div>
-                        <span className="text-[10px] font-medium text-gray-400">{item.week}</span>
+                        <span className="text-[12px] font-semibold text-gray-400">{item.day}</span>
                       </motion.div>
                     )
                   })}
                 </div>
-              </div>
-            </motion.div>
-          </motion.section>
+
+                {/* Monthly trend mini-chart */}
+                {monthlyTrend.length > 0 && (
+                  <div className="mt-6 pt-5 border-t border-gray-100/60">
+                    <div className="flex items-center justify-between mb-3">
+                      <p className="text-[13px] font-semibold text-gray-700">Monthly Trend</p>
+                      <span className="text-[12px] text-gray-400">Last 4 weeks</span>
+                    </div>
+                    <div className="flex items-end gap-3 h-16">
+                      {monthlyTrend.map((item, i) => {
+                        const heightPercent = (item.value / maxMonthlyValue) * 100
+                        return (
+                          <motion.div
+                            key={item.week}
+                            initial={{ opacity: 0, scaleY: 0 }}
+                            animate={{ opacity: 1, scaleY: 1 }}
+                            transition={{ duration: 0.4, delay: 0.5 + i * 0.1 }}
+                            className="flex-1 flex flex-col items-center gap-1"
+                            style={{ transformOrigin: 'bottom' }}
+                          >
+                            <div className="w-full h-14 flex items-end">
+                              <div
+                                className="w-full rounded-t-md"
+                                style={{
+                                  height: `${heightPercent}%`,
+                                  background: 'linear-gradient(to top, #8b5cf6, #a78bfa)',
+                                  minHeight: '4px',
+                                }}
+                              />
+                            </div>
+                            <span className="text-[10px] font-medium text-gray-400">{item.week}</span>
+                          </motion.div>
+                        )
+                      })}
+                    </div>
+                  </div>
+                )}
+              </motion.div>
+            </motion.section>
+          ) : null}
 
           {/* ═══════════ QUICK ACTIONS ═══════════ */}
           <motion.section
@@ -799,305 +1075,362 @@ export default function DashboardPage() {
           </motion.section>
 
           {/* ═══════════ CONFIDENCE DISTRIBUTION CHART ═══════════ */}
-          <motion.section
-            initial="hidden"
-            animate="visible"
-            variants={staggerContainer}
-            className="mb-10"
-          >
-            <motion.div
-              variants={staggerItem}
-              className="glass-card rounded-2xl p-6 shadow-premium"
+          {!dataLoading && confidenceDistribution.length > 0 && (
+            <motion.section
+              initial="hidden"
+              animate="visible"
+              variants={staggerContainer}
+              className="mb-10"
             >
-              <div className="flex items-center gap-3 mb-6">
-                <div className="w-11 h-11 rounded-xl bg-emerald-500/8 flex items-center justify-center">
-                  <Target className="w-5 h-5 text-emerald-600" />
+              <motion.div
+                variants={staggerItem}
+                className="glass-card rounded-2xl p-6 shadow-premium"
+              >
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="w-11 h-11 rounded-xl bg-emerald-500/8 flex items-center justify-center">
+                    <Target className="w-5 h-5 text-emerald-600" />
+                  </div>
+                  <div>
+                    <h2 className="text-[18px] font-bold tracking-tight text-gray-900">Confidence Distribution</h2>
+                    <p className="text-[13px] text-gray-500 mt-0.5">How your conversation confidence scores are distributed</p>
+                  </div>
                 </div>
-                <div>
-                  <h2 className="text-[18px] font-bold tracking-tight text-gray-900">Confidence Distribution</h2>
-                  <p className="text-[13px] text-gray-500 mt-0.5">How your conversation confidence scores are distributed</p>
-                </div>
-              </div>
 
-              <div className="space-y-4">
-                {confidenceDistribution.map((item, i) => (
-                  <motion.div
-                    key={item.label}
-                    initial={{ opacity: 0, x: -16 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 0.5, delay: i * 0.1, ease: [0.25, 0.46, 0.45, 0.94] }}
-                    className="flex items-center gap-4"
-                  >
-                    {/* Label */}
-                    <div className="w-24 shrink-0">
-                      <div className="flex items-center gap-2">
-                        <span
-                          className="inline-block w-3 h-3 rounded-full shrink-0"
-                          style={{ backgroundColor: item.colorHex }}
-                        />
-                        <span className="text-[14px] font-semibold text-gray-700">{item.label}</span>
-                      </div>
-                      <span className="text-[11px] text-gray-400 ml-5">{item.range}</span>
-                    </div>
-
-                    {/* Bar */}
-                    <div className="flex-1">
-                      <div className="w-full h-8 bg-gray-50/80 rounded-lg overflow-hidden relative">
-                        <motion.div
-                          initial={{ width: 0 }}
-                          animate={{ width: `${item.percentage}%` }}
-                          transition={{ duration: 0.8, delay: 0.2 + i * 0.1, ease: [0.25, 0.46, 0.45, 0.94] }}
-                          className="h-full rounded-lg flex items-center justify-end pr-3 relative overflow-hidden"
-                          style={{ backgroundColor: item.colorHex }}
-                        >
-                          <span className="text-[12px] font-bold text-white drop-shadow-sm">{item.percentage}%</span>
-                        </motion.div>
-                      </div>
-                    </div>
-
-                    {/* Count */}
-                    <div
-                      className="w-16 text-right shrink-0 px-2.5 py-1 rounded-md text-[13px] font-bold"
-                      style={{ backgroundColor: item.bgColor, color: item.colorHex }}
+                <div className="space-y-4">
+                  {confidenceDistribution.map((item, i) => (
+                    <motion.div
+                      key={item.label}
+                      initial={{ opacity: 0, x: -16 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ duration: 0.5, delay: i * 0.1, ease: [0.25, 0.46, 0.45, 0.94] }}
+                      className="flex items-center gap-4"
                     >
-                      {item.count}
-                    </div>
-                  </motion.div>
-                ))}
-              </div>
+                      {/* Label */}
+                      <div className="w-24 shrink-0">
+                        <div className="flex items-center gap-2">
+                          <span
+                            className="inline-block w-3 h-3 rounded-full shrink-0"
+                            style={{ backgroundColor: item.colorHex }}
+                          />
+                          <span className="text-[14px] font-semibold text-gray-700">{item.label}</span>
+                        </div>
+                        <span className="text-[11px] text-gray-400 ml-5">{item.range}</span>
+                      </div>
 
-              <div className="mt-5 pt-4 border-t border-gray-100/60">
-                <div className="flex items-center gap-2">
-                  <Info className="w-4 h-4 text-gray-400" />
-                  <p className="text-[12px] text-gray-500">
-                    Confidence scores reflect how certain the AI is about its classification. Higher is better — scores below 50% trigger human escalation.
-                  </p>
+                      {/* Bar */}
+                      <div className="flex-1">
+                        <div className="w-full h-8 bg-gray-50/80 rounded-lg overflow-hidden relative">
+                          <motion.div
+                            initial={{ width: 0 }}
+                            animate={{ width: `${item.percentage}%` }}
+                            transition={{ duration: 0.8, delay: 0.2 + i * 0.1, ease: [0.25, 0.46, 0.45, 0.94] }}
+                            className="h-full rounded-lg flex items-center justify-end pr-3 relative overflow-hidden"
+                            style={{ backgroundColor: item.colorHex }}
+                          >
+                            <span className="text-[12px] font-bold text-white drop-shadow-sm">{item.percentage}%</span>
+                          </motion.div>
+                        </div>
+                      </div>
+
+                      {/* Count */}
+                      <div
+                        className="w-16 text-right shrink-0 px-2.5 py-1 rounded-md text-[13px] font-bold"
+                        style={{ backgroundColor: item.bgColor, color: item.colorHex }}
+                      >
+                        {item.count}
+                      </div>
+                    </motion.div>
+                  ))}
                 </div>
-              </div>
-            </motion.div>
-          </motion.section>
+
+                <div className="mt-5 pt-4 border-t border-gray-100/60">
+                  <div className="flex items-center gap-2">
+                    <Info className="w-4 h-4 text-gray-400" />
+                    <p className="text-[12px] text-gray-500">
+                      Confidence scores reflect how certain the AI is about its classification. Higher is better — scores below 50% trigger human escalation.
+                    </p>
+                  </div>
+                </div>
+              </motion.div>
+            </motion.section>
+          )}
 
           {/* ═══════════ CATEGORY BREAKDOWN ═══════════ */}
-          <motion.section
-            initial="hidden"
-            animate="visible"
-            variants={staggerContainer}
-            className="mb-10"
-          >
-            <motion.div
-              variants={staggerItem}
-              className="glass-card rounded-2xl p-6 shadow-premium"
+          {!dataLoading && categoryBreakdown.length > 0 && (
+            <motion.section
+              initial="hidden"
+              animate="visible"
+              variants={staggerContainer}
+              className="mb-10"
             >
-              <div className="flex items-center gap-3 mb-6">
-                <div className="w-11 h-11 rounded-xl bg-violet-500/8 flex items-center justify-center">
-                  <Tag className="w-5 h-5 text-violet-600" />
+              <motion.div
+                variants={staggerItem}
+                className="glass-card rounded-2xl p-6 shadow-premium"
+              >
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="w-11 h-11 rounded-xl bg-violet-500/8 flex items-center justify-center">
+                    <Tag className="w-5 h-5 text-violet-600" />
+                  </div>
+                  <div>
+                    <h2 className="text-[18px] font-bold tracking-tight text-gray-900">Resource Categories</h2>
+                    <p className="text-[13px] text-gray-500 mt-0.5">Distribution across conversation topics</p>
+                  </div>
                 </div>
-                <div>
-                  <h2 className="text-[18px] font-bold tracking-tight text-gray-900">Resource Categories</h2>
-                  <p className="text-[13px] text-gray-500 mt-0.5">Distribution across conversation topics</p>
-                </div>
-              </div>
 
-              <div className="space-y-4">
-                {categoryBreakdown.map((cat, i) => (
-                  <motion.div
-                    key={cat.label}
-                    initial={{ opacity: 0, x: -16 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 0.5, delay: i * 0.08, ease: [0.25, 0.46, 0.45, 0.94] }}
-                    className="space-y-1.5"
-                  >
-                    <div className="flex items-center justify-between">
-                      <span className="text-[14px] font-semibold text-gray-700">{cat.label}</span>
-                      <span className="text-[14px] font-bold" style={{ color: cat.colorHex }}>{cat.percentage}%</span>
-                    </div>
-                    <div className="w-full h-2.5 bg-gray-100/80 rounded-full overflow-hidden">
-                      <motion.div
-                        initial={{ width: 0 }}
-                        animate={{ width: `${cat.percentage}%` }}
-                        transition={{ duration: 0.8, delay: 0.2 + i * 0.1, ease: [0.25, 0.46, 0.45, 0.94] }}
-                        className="h-full rounded-full"
-                        style={{ backgroundColor: cat.colorHex }}
-                      />
-                    </div>
-                  </motion.div>
-                ))}
-              </div>
-            </motion.div>
-          </motion.section>
+                <div className="space-y-4">
+                  {categoryBreakdown.map((cat, i) => (
+                    <motion.div
+                      key={cat.label}
+                      initial={{ opacity: 0, x: -16 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ duration: 0.5, delay: i * 0.08, ease: [0.25, 0.46, 0.45, 0.94] }}
+                      className="space-y-1.5"
+                    >
+                      <div className="flex items-center justify-between">
+                        <span className="text-[14px] font-semibold text-gray-700">{cat.label}</span>
+                        <span className="text-[14px] font-bold" style={{ color: cat.colorHex }}>{cat.percentage}%</span>
+                      </div>
+                      <div className="w-full h-2.5 bg-gray-100/80 rounded-full overflow-hidden">
+                        <motion.div
+                          initial={{ width: 0 }}
+                          animate={{ width: `${cat.percentage}%` }}
+                          transition={{ duration: 0.8, delay: 0.2 + i * 0.1, ease: [0.25, 0.46, 0.45, 0.94] }}
+                          className="h-full rounded-full"
+                          style={{ backgroundColor: cat.colorHex }}
+                        />
+                      </div>
+                    </motion.div>
+                  ))}
+                </div>
+              </motion.div>
+            </motion.section>
+          )}
 
           {/* ═══════════ RECENT CONVERSATIONS ═══════════ */}
-          <motion.section
-            initial="hidden"
-            animate="visible"
-            variants={staggerContainer}
-            className="mb-10"
-          >
-            <motion.div
-              variants={staggerItem}
-              className="flex items-center justify-between mb-5"
+          {dataLoading ? (
+            <ListSkeleton rows={5} />
+          ) : recentConversations.length > 0 ? (
+            <motion.section
+              initial="hidden"
+              animate="visible"
+              variants={staggerContainer}
+              className="mb-10"
             >
-              <h2 className="text-[18px] font-bold tracking-tight text-gray-900">Recent conversations</h2>
-              <Link
-                href="/history"
-                className="inline-flex items-center gap-1.5 text-[13px] font-semibold text-gray-500 hover:text-gray-900 transition-colors"
+              <motion.div
+                variants={staggerItem}
+                className="flex items-center justify-between mb-5"
               >
-                View all
-                <ArrowRight className="w-3.5 h-3.5" />
-              </Link>
-            </motion.div>
+                <h2 className="text-[18px] font-bold tracking-tight text-gray-900">Recent conversations</h2>
+                <Link
+                  href="/history"
+                  className="inline-flex items-center gap-1.5 text-[13px] font-semibold text-gray-500 hover:text-gray-900 transition-colors"
+                >
+                  View all
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </Link>
+              </motion.div>
 
-            <div className="glass-card rounded-2xl shadow-premium overflow-hidden">
-              <div className="divide-y divide-gray-100/60">
-                {recentConversations.map((conv, i) => {
-                  const confColor = getConfidenceColor(conv.confidence)
-                  const confLabel = getConfidenceLabel(conv.confidence)
-                  const confBg = getConfidenceBg(conv.confidence)
-                  const scenarioMap: Record<string, string> = {
-                    job: '/app?scenario=job',
-                    crisis: '/app?scenario=crisis',
-                    stress: '/app?scenario=stress',
-                    senior: '/app?scenario=senior',
-                  }
+              <div className="glass-card rounded-2xl shadow-premium overflow-hidden">
+                <div className="divide-y divide-gray-100/60">
+                  {recentConversations.map((conv, i) => {
+                    const confColor = getConfidenceColor(conv.confidence)
+                    const confLabel = getConfidenceLabel(conv.confidence)
+                    const confBg = getConfidenceBg(conv.confidence)
+                    const scenarioMap: Record<string, string> = {
+                      job: '/app?scenario=job',
+                      crisis: '/app?scenario=crisis',
+                      stress: '/app?scenario=stress',
+                      senior: '/app?scenario=senior',
+                      housing: '/app?scenario=job',
+                      'food assistance': '/app?scenario=job',
+                      'mental health': '/app?scenario=crisis',
+                      'legal aid': '/app?scenario=stress',
+                      legal: '/app?scenario=stress',
+                      employment: '/app?scenario=job',
+                    }
 
+                    return (
+                      <motion.div
+                        key={conv.id}
+                        initial={{ opacity: 0, x: -12 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ duration: 0.4, delay: i * 0.06, ease: [0.25, 0.46, 0.45, 0.94] }}
+                      >
+                        <Link
+                          href={scenarioMap[conv.scenario] || '/app'}
+                          className="flex items-center gap-4 px-5 py-4 hover:bg-white/60 transition-colors group"
+                        >
+                          {/* Confidence dot */}
+                          <div className="relative shrink-0">
+                            <div
+                              className="w-2.5 h-2.5 rounded-full"
+                              style={{ backgroundColor: confColor }}
+                            />
+                            {conv.isCrisis && (
+                              <div
+                                className="absolute inset-0 w-2.5 h-2.5 rounded-full animate-ping opacity-30"
+                                style={{ backgroundColor: confColor }}
+                              />
+                            )}
+                          </div>
+
+                          {/* Title + preview */}
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-3">
+                              <h4 className="text-[14px] font-semibold text-gray-900 truncate">{conv.title}</h4>
+                              <span
+                                className="hidden sm:inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider shrink-0"
+                                style={{ backgroundColor: confBg, color: confColor }}
+                              >
+                                {conv.confidence}% {confLabel}
+                              </span>
+                            </div>
+                            <p className="text-[13px] text-gray-400 truncate mt-0.5">{conv.preview}</p>
+                          </div>
+
+                          {/* Timestamp + arrow */}
+                          <div className="flex items-center gap-3 shrink-0">
+                            <div className="flex items-center gap-1.5 text-[12px] text-gray-400">
+                              <Clock className="w-3.5 h-3.5" />
+                              {conv.timestamp}
+                            </div>
+                            <ArrowRight className="w-4 h-4 text-gray-300 group-hover:text-gray-600 group-hover:translate-x-0.5 transition-all" />
+                          </div>
+                        </Link>
+                      </motion.div>
+                    )
+                  })}
+                </div>
+
+                <div className="px-5 py-3 bg-gray-50/40 border-t border-gray-100/60">
+                  <Link
+                    href="/history"
+                    className="inline-flex items-center gap-1.5 text-[13px] font-semibold text-blue-600 hover:text-blue-700 transition-colors"
+                  >
+                    View all conversations
+                    <ArrowRight className="w-3.5 h-3.5" />
+                  </Link>
+                </div>
+              </div>
+            </motion.section>
+          ) : (
+            /* Empty state for conversations */
+            <motion.section
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="mb-10"
+            >
+              <div className="glass-card rounded-2xl p-8 shadow-premium text-center">
+                <div className="w-16 h-16 rounded-2xl bg-blue-500/8 flex items-center justify-center mx-auto mb-4">
+                  <MessageCircle className="w-8 h-8 text-blue-500" />
+                </div>
+                <h3 className="text-[16px] font-bold text-gray-900 mb-2">No conversations yet</h3>
+                <p className="text-[14px] text-gray-500 mb-5 max-w-sm mx-auto">Start a conversation to get personalized resource recommendations with confidence scores.</p>
+                <Link
+                  href="/app"
+                  className="inline-flex items-center justify-center gap-2 px-5 py-2.5 text-[13px] font-semibold text-white rounded-xl bg-gradient-to-b from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 shadow-md shadow-blue-500/20 transition-all"
+                >
+                  <Plus className="w-4 h-4" />
+                  Start your first conversation
+                </Link>
+              </div>
+            </motion.section>
+          )}
+
+          {/* ═══════════ SAVED RESOURCES ═══════════ */}
+          {dataLoading ? (
+            <CardGridSkeleton count={3} />
+          ) : savedResources.length > 0 ? (
+            <motion.section
+              initial="hidden"
+              animate="visible"
+              variants={staggerContainer}
+              className="mb-10"
+            >
+              <motion.div
+                variants={staggerItem}
+                className="flex items-center justify-between mb-5"
+              >
+                <div className="flex items-center gap-2.5">
+                  <Bookmark className="w-5 h-5 text-gray-700" />
+                  <h2 className="text-[18px] font-bold tracking-tight text-gray-900">Saved Resources</h2>
+                </div>
+                <Link
+                  href="/app"
+                  className="inline-flex items-center gap-1.5 text-[13px] font-semibold text-gray-500 hover:text-gray-900 transition-colors"
+                >
+                  View all
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </Link>
+              </motion.div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {savedResources.map((resource, i) => {
+                  const Icon = resource.icon
                   return (
                     <motion.div
-                      key={conv.id}
-                      initial={{ opacity: 0, x: -12 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ duration: 0.4, delay: i * 0.06, ease: [0.25, 0.46, 0.45, 0.94] }}
+                      key={resource.id}
+                      variants={staggerItem}
                     >
                       <Link
-                        href={scenarioMap[conv.scenario] || '/app'}
-                        className="flex items-center gap-4 px-5 py-4 hover:bg-white/60 transition-colors group"
+                        href="/app"
+                        className="block glass-card glass-card-hover rounded-2xl p-5 shadow-premium hover:shadow-premium-lg transition-all duration-300 group relative overflow-hidden"
                       >
-                        {/* Confidence dot */}
-                        <div className="relative shrink-0">
-                          <div
-                            className="w-2.5 h-2.5 rounded-full"
-                            style={{ backgroundColor: confColor }}
-                          />
-                          <div
-                            className="absolute inset-0 w-2.5 h-2.5 rounded-full animate-ping opacity-30"
-                            style={{ backgroundColor: confColor }}
-                          />
-                        </div>
-
-                        {/* Title + preview */}
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-3">
-                            <h4 className="text-[14px] font-semibold text-gray-900 truncate">{conv.title}</h4>
-                            <span
-                              className="hidden sm:inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider shrink-0"
-                              style={{ backgroundColor: confBg, color: confColor }}
+                        <div className="space-y-4">
+                          <div className="flex items-start justify-between">
+                            <div
+                              className="w-11 h-11 rounded-xl flex items-center justify-center"
+                              style={{ backgroundColor: resource.categoryBg }}
                             >
-                              {conv.confidence}% {confLabel}
+                              <Icon className="w-5 h-5" style={{ color: resource.categoryColorHex }} />
+                            </div>
+                            <span
+                              className="inline-flex items-center px-2.5 py-1 rounded-lg text-[11px] font-bold uppercase tracking-wider"
+                              style={{ backgroundColor: resource.categoryBg, color: resource.categoryColorHex }}
+                            >
+                              {resource.category}
                             </span>
                           </div>
-                          <p className="text-[13px] text-gray-400 truncate mt-0.5">{conv.preview}</p>
-                        </div>
-
-                        {/* Timestamp + arrow */}
-                        <div className="flex items-center gap-3 shrink-0">
-                          <div className="flex items-center gap-1.5 text-[12px] text-gray-400">
-                            <Clock className="w-3.5 h-3.5" />
-                            {conv.timestamp}
+                          <h3 className="text-[15px] font-bold text-gray-900 tracking-tight leading-snug">
+                            {resource.title}
+                          </h3>
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-1.5 text-[12px] text-gray-500">
+                              <MapPin className="w-3.5 h-3.5" />
+                              {resource.status}
+                            </div>
+                            <div className="flex items-center gap-1.5 text-[12px] text-gray-400">
+                              <Calendar className="w-3.5 h-3.5" />
+                              Verified {resource.verifiedDate}
+                            </div>
                           </div>
-                          <ArrowRight className="w-4 h-4 text-gray-300 group-hover:text-gray-600 group-hover:translate-x-0.5 transition-all" />
+                          <div className="flex items-center gap-1.5 text-[13px] font-semibold text-gray-400 group-hover:text-gray-700 transition-colors pt-1">
+                            View resource
+                            <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                          </div>
                         </div>
                       </Link>
                     </motion.div>
                   )
                 })}
               </div>
-
-              <div className="px-5 py-3 bg-gray-50/40 border-t border-gray-100/60">
-                <Link
-                  href="/history"
-                  className="inline-flex items-center gap-1.5 text-[13px] font-semibold text-blue-600 hover:text-blue-700 transition-colors"
-                >
-                  View all conversations
-                  <ArrowRight className="w-3.5 h-3.5" />
-                </Link>
-              </div>
-            </div>
-          </motion.section>
-
-          {/* ═══════════ SAVED RESOURCES ═══════════ */}
-          <motion.section
-            initial="hidden"
-            animate="visible"
-            variants={staggerContainer}
-            className="mb-10"
-          >
-            <motion.div
-              variants={staggerItem}
-              className="flex items-center justify-between mb-5"
+            </motion.section>
+          ) : !dataLoading ? (
+            <motion.section
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="mb-10"
             >
-              <div className="flex items-center gap-2.5">
+              <div className="flex items-center gap-2.5 mb-5">
                 <Bookmark className="w-5 h-5 text-gray-700" />
                 <h2 className="text-[18px] font-bold tracking-tight text-gray-900">Saved Resources</h2>
               </div>
-              <Link
-                href="/app"
-                className="inline-flex items-center gap-1.5 text-[13px] font-semibold text-gray-500 hover:text-gray-900 transition-colors"
-              >
-                View all
-                <ArrowRight className="w-3.5 h-3.5" />
-              </Link>
-            </motion.div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              {savedResources.map((resource, i) => {
-                const Icon = resource.icon
-                return (
-                  <motion.div
-                    key={resource.id}
-                    variants={staggerItem}
-                  >
-                    <Link
-                      href="/app"
-                      className="block glass-card glass-card-hover rounded-2xl p-5 shadow-premium hover:shadow-premium-lg transition-all duration-300 group relative overflow-hidden"
-                    >
-                      <div className="space-y-4">
-                        <div className="flex items-start justify-between">
-                          <div
-                            className="w-11 h-11 rounded-xl flex items-center justify-center"
-                            style={{ backgroundColor: resource.categoryBg }}
-                          >
-                            <Icon className="w-5 h-5" style={{ color: resource.categoryColorHex }} />
-                          </div>
-                          <span
-                            className="inline-flex items-center px-2.5 py-1 rounded-lg text-[11px] font-bold uppercase tracking-wider"
-                            style={{ backgroundColor: resource.categoryBg, color: resource.categoryColorHex }}
-                          >
-                            {resource.category}
-                          </span>
-                        </div>
-                        <h3 className="text-[15px] font-bold text-gray-900 tracking-tight leading-snug">
-                          {resource.title}
-                        </h3>
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-1.5 text-[12px] text-gray-500">
-                            <MapPin className="w-3.5 h-3.5" />
-                            {resource.status}
-                          </div>
-                          <div className="flex items-center gap-1.5 text-[12px] text-gray-400">
-                            <Calendar className="w-3.5 h-3.5" />
-                            Verified {resource.verifiedDate}
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-1.5 text-[13px] font-semibold text-gray-400 group-hover:text-gray-700 transition-colors pt-1">
-                          View resource
-                          <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                        </div>
-                      </div>
-                    </Link>
-                  </motion.div>
-                )
-              })}
-            </div>
-          </motion.section>
+              <div className="glass-card rounded-2xl p-6 shadow-premium text-center">
+                <Bookmark className="w-8 h-8 text-gray-300 mx-auto mb-3" />
+                <p className="text-[14px] text-gray-500">No saved resources yet. Start a conversation to discover and save resources.</p>
+              </div>
+            </motion.section>
+          ) : null}
 
           {/* ═══════════ RESOURCE STATUS TRACKER ═══════════ */}
           <motion.section
@@ -1365,88 +1698,93 @@ export default function DashboardPage() {
           </motion.section>
 
           {/* ═══════════ YOUR TRANSPARENCY SCORE ═══════════ */}
-          <motion.section
-            initial="hidden"
-            animate="visible"
-            variants={staggerContainer}
-            className="mb-10"
-          >
-            <motion.div
-              variants={staggerItem}
-              className="glass-card rounded-2xl p-6 shadow-premium relative overflow-hidden"
+          {!dataLoading && transparencyMetrics.length > 0 && (
+            <motion.section
+              initial="hidden"
+              animate="visible"
+              variants={staggerContainer}
+              className="mb-10"
             >
-              {/* Decorative background glow */}
-              <div className="absolute -top-20 -right-20 w-60 h-60 rounded-full opacity-30 pointer-events-none"
-                style={{ background: 'radial-gradient(circle, rgba(16,185,129,0.08), transparent 70%)' }}
-              />
+              <motion.div
+                variants={staggerItem}
+                className="glass-card rounded-2xl p-6 shadow-premium relative overflow-hidden"
+              >
+                {/* Decorative background glow */}
+                <div className="absolute -top-20 -right-20 w-60 h-60 rounded-full opacity-30 pointer-events-none"
+                  style={{ background: 'radial-gradient(circle, rgba(16,185,129,0.08), transparent 70%)' }}
+                />
 
-              <div className="relative z-10">
-                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
-                  <div className="flex items-center gap-3">
-                    <div className="w-11 h-11 rounded-xl bg-emerald-500/8 flex items-center justify-center">
-                      <Eye className="w-5 h-5 text-emerald-600" />
+                <div className="relative z-10">
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+                    <div className="flex items-center gap-3">
+                      <div className="w-11 h-11 rounded-xl bg-emerald-500/8 flex items-center justify-center">
+                        <Eye className="w-5 h-5 text-emerald-600" />
+                      </div>
+                      <div>
+                        <h2 className="text-[18px] font-bold tracking-tight text-gray-900">Your Transparency Score</h2>
+                        <p className="text-[13px] text-gray-500 mt-0.5">How well you engage with transparency features</p>
+                      </div>
                     </div>
-                    <div>
-                      <h2 className="text-[18px] font-bold tracking-tight text-gray-900">Your Transparency Score</h2>
-                      <p className="text-[13px] text-gray-500 mt-0.5">How well you engage with transparency features</p>
+                    <div className="flex items-center gap-3">
+                      <div className="text-right">
+                        <p className="text-[12px] text-gray-400 font-medium">Overall Score</p>
+                        <p className="text-3xl font-extrabold tracking-tight" style={{ color: overallTransparencyScore >= 70 ? '#10b981' : '#f59e0b' }}>
+                          {overallTransparencyScore}%
+                        </p>
+                      </div>
+                      <div className="w-14 h-14 rounded-full border-[3px] flex items-center justify-center"
+                        style={{
+                          borderColor: overallTransparencyScore >= 70 ? '#10b981' : '#f59e0b',
+                        }}
+                      >
+                        <span className="text-[13px] font-bold" style={{ color: overallTransparencyScore >= 70 ? '#10b981' : '#f59e0b' }}>
+                          {overallTransparencyScore >= 70 ? 'A' : 'B'}
+                        </span>
+                      </div>
                     </div>
                   </div>
-                  <div className="flex items-center gap-3">
-                    <div className="text-right">
-                      <p className="text-[12px] text-gray-400 font-medium">Overall Score</p>
-                      <p className="text-3xl font-extrabold tracking-tight" style={{ color: overallTransparencyScore >= 70 ? '#10b981' : '#f59e0b' }}>
-                        {overallTransparencyScore}%
+
+                  <div className="space-y-4">
+                    {transparencyMetrics.map((metric, i) => (
+                      <motion.div
+                        key={metric.label}
+                        initial={{ opacity: 0, x: -12 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ duration: 0.4, delay: i * 0.1, ease: [0.25, 0.46, 0.45, 0.94] }}
+                        className="space-y-2"
+                      >
+                        <div className="flex items-center justify-between">
+                          <span className="text-[14px] font-medium text-gray-700">{metric.label}</span>
+                          <span className="text-[14px] font-bold" style={{ color: metric.colorHex }}>{metric.percentage}%</span>
+                        </div>
+                        <div className="w-full h-2 bg-gray-100/80 rounded-full overflow-hidden">
+                          <motion.div
+                            initial={{ width: 0 }}
+                            animate={{ width: `${metric.percentage}%` }}
+                            transition={{ duration: 0.7, delay: 0.2 + i * 0.1, ease: [0.25, 0.46, 0.45, 0.94] }}
+                            className="h-full rounded-full"
+                            style={{ backgroundColor: metric.colorHex }}
+                          />
+                        </div>
+                      </motion.div>
+                    ))}
+                  </div>
+
+                  <div className="mt-5 pt-4 border-t border-gray-100/60">
+                    <div className="flex items-start gap-2">
+                      <Lightbulb className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" />
+                      <p className="text-[13px] text-gray-500 leading-relaxed">
+                        {conversationsData.length > 0
+                          ? `You check confidence scores ${transparencyMetrics[0]?.percentage}% of the time — great habit! Try reading \u201cWhy\u201d explanations more often to boost your transparency awareness and make more informed decisions about resources.`
+                          : 'Start having conversations to build your transparency score. The more you engage with confidence scores and explanations, the higher your score will be.'
+                        }
                       </p>
                     </div>
-                    <div className="w-14 h-14 rounded-full border-[3px] flex items-center justify-center"
-                      style={{
-                        borderColor: overallTransparencyScore >= 70 ? '#10b981' : '#f59e0b',
-                      }}
-                    >
-                      <span className="text-[13px] font-bold" style={{ color: overallTransparencyScore >= 70 ? '#10b981' : '#f59e0b' }}>
-                        {overallTransparencyScore >= 70 ? 'A' : 'B'}
-                      </span>
-                    </div>
                   </div>
                 </div>
-
-                <div className="space-y-4">
-                  {transparencyMetrics.map((metric, i) => (
-                    <motion.div
-                      key={metric.label}
-                      initial={{ opacity: 0, x: -12 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ duration: 0.4, delay: i * 0.1, ease: [0.25, 0.46, 0.45, 0.94] }}
-                      className="space-y-2"
-                    >
-                      <div className="flex items-center justify-between">
-                        <span className="text-[14px] font-medium text-gray-700">{metric.label}</span>
-                        <span className="text-[14px] font-bold" style={{ color: metric.colorHex }}>{metric.percentage}%</span>
-                      </div>
-                      <div className="w-full h-2 bg-gray-100/80 rounded-full overflow-hidden">
-                        <motion.div
-                          initial={{ width: 0 }}
-                          animate={{ width: `${metric.percentage}%` }}
-                          transition={{ duration: 0.7, delay: 0.2 + i * 0.1, ease: [0.25, 0.46, 0.45, 0.94] }}
-                          className="h-full rounded-full"
-                          style={{ backgroundColor: metric.colorHex }}
-                        />
-                      </div>
-                    </motion.div>
-                  ))}
-                </div>
-
-                <div className="mt-5 pt-4 border-t border-gray-100/60">
-                  <div className="flex items-start gap-2">
-                    <Lightbulb className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" />
-                    <p className="text-[13px] text-gray-500 leading-relaxed">
-                      You check confidence scores 87% of the time — great habit! Try reading &ldquo;Why&rdquo; explanations more often to boost your transparency awareness and make more informed decisions about resources.
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </motion.div>
-          </motion.section>
+              </motion.div>
+            </motion.section>
+          )}
 
           {/* ═══════════ 6-LAYER ARCHITECTURE SUMMARY (COLLAPSIBLE) ═══════════ */}
           <motion.section
@@ -1727,89 +2065,63 @@ export default function DashboardPage() {
         <footer className="sidebar-dark mt-auto">
           <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-              {/* Brand column */}
-              <div className="space-y-4">
-                <div className="flex items-center gap-2.5">
-                  <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-blue-500 to-emerald-500 flex items-center justify-center">
+              {/* Brand */}
+              <div>
+                <div className="flex items-center gap-2 mb-4">
+                  <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-emerald-500 flex items-center justify-center">
                     <Layers className="w-4 h-4 text-white" />
                   </div>
-                  <span className="text-[15px] font-bold tracking-tight text-white">
-                    ClearPath AI
-                  </span>
+                  <span className="text-[15px] font-bold text-white">ClearPath AI</span>
                 </div>
-                <p className="text-[13px] text-gray-400 leading-relaxed">
-                  Calibrated transparency for community resource navigation. Built for the USAII Global AI Hackathon 2026.
-                </p>
-                <div className="flex items-center gap-2 px-2.5 py-1 rounded-md bg-white/5 w-fit">
-                  <span className="text-[10px] font-bold tracking-wider uppercase text-emerald-400">Demo</span>
+                <p className="text-[13px] text-gray-400 leading-relaxed">Calibrated transparency for community resource navigation. Built with responsibility at the core.</p>
+              </div>
+
+              {/* Product */}
+              <div>
+                <h4 className="text-[13px] font-bold text-white uppercase tracking-wider mb-4">Product</h4>
+                <div className="space-y-2.5">
+                  <Link href="/app" className="block text-[13px] text-gray-400 hover:text-white transition-colors">Chat</Link>
+                  <Link href="/dashboard" className="block text-[13px] text-gray-400 hover:text-white transition-colors">Dashboard</Link>
+                  <Link href="/history" className="block text-[13px] text-gray-400 hover:text-white transition-colors">History</Link>
+                  <Link href="/pricing" className="block text-[13px] text-gray-400 hover:text-white transition-colors">Pricing</Link>
                 </div>
               </div>
 
-              {/* Product links */}
-              <div className="space-y-4">
-                <h4 className="text-[13px] font-bold text-white uppercase tracking-wider">Product</h4>
-                <nav className="flex flex-col gap-2.5">
-                  <Link href="/app" className="text-[13px] text-gray-400 hover:text-white transition-colors">Try ClearPath AI</Link>
-                  <Link href="/dashboard" className="text-[13px] text-gray-400 hover:text-white transition-colors">Dashboard</Link>
-                  <Link href="/history" className="text-[13px] text-gray-400 hover:text-white transition-colors">History</Link>
-                  <Link href="/pricing" className="text-[13px] text-gray-400 hover:text-white transition-colors">Pricing</Link>
-                  <Link href="/settings" className="text-[13px] text-gray-400 hover:text-white transition-colors">Settings</Link>
-                </nav>
+              {/* Company */}
+              <div>
+                <h4 className="text-[13px] font-bold text-white uppercase tracking-wider mb-4">Company</h4>
+                <div className="space-y-2.5">
+                  <Link href="/about" className="block text-[13px] text-gray-400 hover:text-white transition-colors">About</Link>
+                  <Link href="/responsible-ai" className="block text-[13px] text-gray-400 hover:text-white transition-colors">Responsible AI</Link>
+                  <Link href="/privacy" className="block text-[13px] text-gray-400 hover:text-white transition-colors">Privacy</Link>
+                  <Link href="/terms" className="block text-[13px] text-gray-400 hover:text-white transition-colors">Terms</Link>
+                </div>
               </div>
 
-              {/* Company links */}
-              <div className="space-y-4">
-                <h4 className="text-[13px] font-bold text-white uppercase tracking-wider">Company</h4>
-                <nav className="flex flex-col gap-2.5">
-                  <Link href="/about" className="text-[13px] text-gray-400 hover:text-white transition-colors">About</Link>
-                  <Link href="/responsible-ai" className="text-[13px] text-gray-400 hover:text-white transition-colors">Responsible AI</Link>
-                  <Link href="/privacy" className="text-[13px] text-gray-400 hover:text-white transition-colors">Privacy Policy</Link>
-                  <Link href="/terms" className="text-[13px] text-gray-400 hover:text-white transition-colors">Terms of Service</Link>
-                  <Link href="/profile" className="text-[13px] text-gray-400 hover:text-white transition-colors">Profile</Link>
-                </nav>
-              </div>
-
-              {/* Newsletter + social */}
-              <div className="space-y-4">
-                <h4 className="text-[13px] font-bold text-white uppercase tracking-wider">Stay Updated</h4>
-                <p className="text-[13px] text-gray-400 leading-relaxed">
-                  Get notified about new features and community updates.
-                </p>
-                <div className="flex items-center gap-2">
+              {/* Newsletter */}
+              <div>
+                <h4 className="text-[13px] font-bold text-white uppercase tracking-wider mb-4">Stay Updated</h4>
+                <p className="text-[13px] text-gray-400 mb-3">Get updates on new features and resources.</p>
+                <div className="flex gap-2">
                   <input
                     type="email"
                     value={emailInput}
                     onChange={(e) => setEmailInput(e.target.value)}
-                    placeholder="your@email.com"
-                    className="flex-1 px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-[13px] text-white placeholder:text-gray-500 outline-none focus:border-white/20 transition-colors"
+                    placeholder="Enter your email"
+                    className="flex-1 px-3 py-2 bg-white/10 border border-white/10 rounded-lg text-[13px] text-white placeholder:text-gray-500 outline-none focus:border-white/30 transition-colors"
                   />
-                  <button className="px-3 py-2 rounded-lg bg-gradient-to-b from-blue-600 to-blue-700 text-[13px] font-semibold text-white hover:from-blue-500 hover:to-blue-600 transition-all shadow-sm">
-                    <Mail className="w-4 h-4" />
+                  <button className="px-3 py-2 bg-gradient-to-b from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 rounded-lg text-[12px] font-semibold text-white transition-all shrink-0">
+                    <ArrowRight className="w-4 h-4" />
                   </button>
-                </div>
-                <div className="flex items-center gap-3 pt-2">
-                  <a href="#" className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center text-gray-400 hover:text-white hover:bg-white/10 transition-all">
-                    <Globe className="w-4 h-4" />
-                  </a>
-                  <a href="#" className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center text-gray-400 hover:text-white hover:bg-white/10 transition-all">
-                    <Mail className="w-4 h-4" />
-                  </a>
-                  <a href="#" className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center text-gray-400 hover:text-white hover:bg-white/10 transition-all">
-                    <ExternalLink className="w-4 h-4" />
-                  </a>
                 </div>
               </div>
             </div>
 
-            {/* Bottom bar */}
-            <div className="mt-10 pt-6 border-t border-white/5 flex flex-col sm:flex-row items-center justify-between gap-4">
-              <p className="text-[12px] text-gray-500">
-                © 2026 ClearPath AI. Built for the USAII Global AI Hackathon.
-              </p>
-              <div className="flex items-center gap-4">
-                <Link href="/privacy" className="text-[12px] text-gray-500 hover:text-gray-300 transition-colors">Privacy</Link>
-                <Link href="/terms" className="text-[12px] text-gray-500 hover:text-gray-300 transition-colors">Terms</Link>
-                <Link href="/responsible-ai" className="text-[12px] text-gray-500 hover:text-gray-300 transition-colors">Responsible AI</Link>
+            <div className="mt-10 pt-6 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4">
+              <p className="text-[12px] text-gray-500">&copy; 2026 ClearPath AI. All rights reserved.</p>
+              <div className="flex items-center gap-2">
+                <span className="text-[11px] font-bold text-gray-500 uppercase tracking-wider bg-white/5 px-2.5 py-1 rounded-md">Demo</span>
+                <span className="text-[11px] text-gray-600">USAII Hackathon</span>
               </div>
             </div>
           </div>

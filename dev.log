@@ -4,32 +4,8 @@
 - Environments: .env
 
 ✓ Starting...
-Attention: Next.js now collects completely anonymous telemetry regarding usage.
-This information is used to shape Next.js' roadmap and prioritize features.
-You can learn more, including how to opt-out if you'd not like to participate in this anonymous program, by visiting the following URL:
-https://nextjs.org/telemetry
-
-✓ Ready in 514ms
-○ Compiling / ...
- GET / 200 in 3.8s (compile: 3.5s, render: 351ms)
- GET / 200 in 3.3s (compile: 2.9s, render: 399ms)
- GET / 200 in 96ms (compile: 4ms, render: 91ms)
- GET / 200 in 143ms (compile: 4ms, render: 138ms)
- GET / 200 in 143ms (compile: 4ms, render: 139ms)
- GET / 200 in 115ms (compile: 3ms, render: 112ms)
- GET / 200 in 89ms (compile: 3ms, render: 86ms)
- GET / 200 in 91ms (compile: 3ms, render: 88ms)
- GET / 200 in 95ms (compile: 3ms, render: 92ms)
-✓ Compiled in 344ms
- GET / 200 in 131ms (compile: 4ms, render: 126ms)
- GET / 200 in 110ms (compile: 3ms, render: 107ms)
-✓ Compiled in 318ms
- GET / 200 in 117ms (compile: 4ms, render: 113ms)
- GET / 200 in 108ms (compile: 3ms, render: 105ms)
-✓ Compiled in 279ms
- GET /team 200 in 868ms (compile: 756ms, render: 111ms)
- GET /team 200 in 345ms (compile: 99ms, render: 246ms)
- GET / 200 in 159ms (compile: 4ms, render: 154ms)
- GET / 200 in 151ms (compile: 3ms, render: 148ms)
- GET /team 200 in 402ms (compile: 101ms, render: 300ms)
-✓ Compiled in 307ms
+✓ Ready in 580ms
+ GET / 200 in 1823ms (compile: 1503ms, render: 320ms)
+ GET / 200 in 121ms (compile: 7ms, render: 115ms)
+ GET /api/auth/session 200 in 585ms (compile: 564ms, render: 20ms)
+ POST /api/classify 200 in 143ms (compile: 136ms, render: 7ms)

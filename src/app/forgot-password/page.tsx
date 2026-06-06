@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   Layers, Mail, ArrowRight, ArrowLeft, ShieldCheck, Lock, CheckCircle, Eye, EyeOff,
-  Check, Shield, Clock, AlertTriangle, HelpCircle, RefreshCw, KeyRound, LogOut
+  Check, Shield, Clock, AlertTriangle, HelpCircle, RefreshCw, KeyRound, LogOut, Loader2
 } from 'lucide-react'
 import Navbar from '@/components/Navbar'
 
@@ -58,6 +58,8 @@ export default function ForgotPasswordPage() {
   const [signOutAllDevices, setSignOutAllDevices] = useState(true)
   const [expandedTip, setExpandedTip] = useState<number | null>(null)
   const [captchaChecked, setCaptchaChecked] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
+  const [apiError, setApiError] = useState('')
 
   const strength = useMemo(() => getPasswordStrength(newPassword), [newPassword])
 
@@ -68,11 +70,29 @@ export default function ForgotPasswordPage() {
     }
   }, [resendCountdown])
 
-  const handleEmailSubmit = (e: React.FormEvent) => {
+  const handleEmailSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (email && captchaChecked) {
+    if (!email || !captchaChecked) return
+    setIsLoading(true)
+    setApiError('')
+    try {
+      const res = await fetch('/api/auth/forgot-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      })
+      const data = await res.json()
+      if (!res.ok) {
+        setApiError(data.error || 'Something went wrong. Please try again.')
+        setIsLoading(false)
+        return
+      }
       setCurrentStep(2)
       setResendCountdown(60)
+      setIsLoading(false)
+    } catch {
+      setApiError('An unexpected error occurred. Please try again.')
+      setIsLoading(false)
     }
   }
 
@@ -234,20 +254,41 @@ export default function ForgotPasswordPage() {
                     </div>
                   </div>
 
+                  {/* Error message */}
+                  {apiError && (
+                    <motion.div
+                      initial={{ opacity: 0, y: -4 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="flex items-center gap-2 px-4 py-3 rounded-xl bg-red-50 border border-red-100"
+                    >
+                      <AlertTriangle className="w-4 h-4 text-red-500 shrink-0" />
+                      <span className="text-[13px] text-red-600 font-medium">{apiError}</span>
+                    </motion.div>
+                  )}
+
                   {/* Submit */}
                   <motion.button
                     type="submit"
                     whileHover={{ scale: 1.005 }}
                     whileTap={{ scale: 0.995 }}
-                    disabled={!captchaChecked || !email}
+                    disabled={!captchaChecked || !email || isLoading}
                     className={`w-full flex items-center justify-center gap-2 px-4 py-3.5 text-[14px] font-semibold rounded-xl transition-all mt-2 ${
-                      captchaChecked && email
+                      captchaChecked && email && !isLoading
                         ? 'text-white bg-gradient-to-b from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 shadow-lg shadow-blue-500/20 hover:shadow-xl hover:shadow-blue-500/30'
                         : 'text-white/60 bg-gray-300 cursor-not-allowed'
                     }`}
                   >
-                    Send reset link
-                    <ArrowRight className="w-4 h-4" />
+                    {isLoading ? (
+                      <>
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                        Sending...
+                      </>
+                    ) : (
+                      <>
+                        Send reset link
+                        <ArrowRight className="w-4 h-4" />
+                      </>
+                    )}
                   </motion.button>
                 </form>
 

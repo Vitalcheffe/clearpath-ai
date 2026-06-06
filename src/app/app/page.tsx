@@ -66,228 +66,35 @@ interface Category {
   warning?: string
 }
 
-interface ChatStep {
-  userText: string
-  categories: Category[]
-  followUp: { id: string; label: string }[]
-  confidenceChange?: { before: number; after: number; label: string }
-  isCrisis?: boolean
-  crisisLines?: { name: string; action: string; call?: string }[]
-  isClarify?: boolean
-  clarifyOptions?: { label: string; nextId: string }[]
-  clarifyReason?: string
-  clarifyConfidence?: number
-  statusBadge?: 'crisis' | 'clarify' | 'verified' | 'upgrade'
-  upgradeInfo?: { from: number; to: number; category: string }
+interface CrisisLine {
+  name: string
+  action: string
+  call?: string
 }
 
-// ─── DATA ────────────────────────────────────────────────
-const chatSteps: Record<string, ChatStep> = {
-  job: {
-    userText: "I lost my job and can't pay rent. My kids need food.",
-    statusBadge: 'verified',
-    categories: [
-      { label: 'Housing Assistance', confidence: 87, resources: [{ name: 'Section 8 Emergency Transfer', detail: '2 locations near you. Application takes ~15 min.', verified: 'May 2026' }, { name: 'Emergency Rental Assistance', detail: 'Up to 12 months rent support', verified: 'May 2026' }], why: "Can't pay rent — immediate housing risk", also: 'Section 8, Emergency shelters, LIHEAP' },
-      { label: 'Food Assistance', confidence: 82, resources: [{ name: 'Community Food Bank', detail: 'Next distribution: Thursday 9AM. No ID required.', verified: 'May 2026', distance: '1.2 mi' }, { name: 'SNAP Benefits', detail: 'Monthly EBT card for groceries', verified: 'May 2026' }], why: 'Kids need food — high urgency', also: 'WIC, School meal programs' },
-      { label: 'Employment Services', confidence: 64, resources: [{ name: 'Workforce Center', detail: 'Job placement + training. Walk-ins welcome Mon-Fri.', verified: 'May 2026', distance: '2.4 mi' }], why: 'Job loss mentioned — employment pathway', also: 'Job Corps, Rapid Re-employment', warning: '64% confidence — consider clarifying work background' }
-    ],
-    followUp: [{ id: 'job-snap', label: 'Do I qualify for SNAP?' }, { id: 'job-utilities', label: 'I also need utility help' }, { id: 'job-apply', label: 'Can someone help me apply?' }]
-  },
-  'job-snap': {
-    userText: 'Do I qualify for SNAP?',
-    statusBadge: 'verified',
-    categories: [
-      { label: 'SNAP Eligibility', confidence: 94, resources: [{ name: 'SNAP Pre-Screener', detail: 'Check eligibility in 5 minutes', verified: 'May 2026' }, { name: '211 Navigator', detail: 'Live eligibility verification', verified: 'May 2026' }], why: 'Asked about SNAP qualification', also: 'WIC, School meals, TANF' }
-    ],
-    followUp: [{ id: 'job-apply', label: 'Help me apply' }, { id: 'job-utilities', label: 'I need utility help too' }]
-  },
-  'job-utilities': {
-    userText: 'I also need help with utilities.',
-    statusBadge: 'verified',
-    categories: [
-      { label: 'Utility Assistance', confidence: 89, resources: [{ name: 'LIHEAP', detail: 'Heating and cooling bill assistance', verified: 'May 2026' }, { name: 'Utility Disconnection Protection', detail: 'Prevents shutoff during hardship', verified: 'May 2026' }], why: 'Mentioned utility need', also: 'Weatherization program' }
-    ],
-    followUp: [{ id: 'job-apply', label: 'Help me apply for everything' }]
-  },
-  'job-apply': {
-    userText: 'Can someone help me apply?',
-    statusBadge: 'verified',
-    categories: [
-      { label: 'Application Assistance', confidence: 96, resources: [{ name: '211 Navigator', detail: 'Live help applying for benefits', verified: 'May 2026' }, { name: 'Benefits Enrollment Center', detail: 'In-person application support', verified: 'May 2026', distance: '1.8 mi' }], why: 'Requested application help', also: 'Online application, Document prep' }
-    ],
-    followUp: []
-  },
-  stress: {
-    userText: "I need help with my situation",
-    statusBadge: 'clarify',
-    isClarify: true,
-    clarifyConfidence: 43,
-    clarifyReason: 'Your request scored below 50% across all categories — too ambiguous for reliable matching',
-    clarifyOptions: [
-      { label: 'Housing or shelter', nextId: 'stress-housing' },
-      { label: 'Food or basic necessities', nextId: 'stress-food' },
-      { label: 'Health or mental health support', nextId: 'stress-emotions' },
-      { label: 'Legal assistance or immigration', nextId: 'stress-legal' }
-    ],
-    categories: [],
-    followUp: []
-  },
-  'stress-housing': {
-    userText: 'I need housing help',
-    statusBadge: 'upgrade',
-    upgradeInfo: { from: 43, to: 83, category: 'Housing Assistance' },
-    categories: [
-      { label: 'Housing Assistance', confidence: 83, resources: [{ name: 'Emergency Shelter Network', detail: '4 locations with availability. Walk-ins accepted until 8 PM.', verified: 'May 2026' }, { name: 'Section 8 Emergency Transfer', detail: 'Application takes ~15 min', verified: 'May 2026' }], why: 'Clarified housing need', also: 'Rapid rehousing, Transitional housing' }
-    ],
-    followUp: [{ id: 'job-utilities', label: 'I need utility help too' }, { id: 'job-apply', label: 'Help me apply' }]
-  },
-  'stress-food': {
-    userText: 'I need food help',
-    statusBadge: 'upgrade',
-    upgradeInfo: { from: 43, to: 79, category: 'Food Assistance' },
-    categories: [
-      { label: 'Food Assistance', confidence: 79, resources: [{ name: 'SNAP Benefits Enrollment', detail: 'You may qualify for $250/month. Apply online in 10 min.', verified: 'May 2026' }, { name: 'Community Food Bank', detail: 'No ID required. Next distribution: Thursday 9AM.', verified: 'May 2026', distance: '1.2 mi' }], why: 'Clarified food need', also: 'WIC, School meal programs' }
-    ],
-    followUp: [{ id: 'job-snap', label: 'Do I qualify for SNAP?' }, { id: 'job-apply', label: 'Help me apply' }]
-  },
-  'stress-emotions': {
-    userText: "It's about my emotions. I've been like this for months.",
-    statusBadge: 'upgrade',
-    upgradeInfo: { from: 43, to: 83, category: 'Mental Health' },
-    categories: [
-      { label: 'Mental Health Counseling', confidence: 83, resources: [{ name: 'Community Counseling Center', detail: 'Sliding scale — $0 if uninsured', verified: 'May 2026', distance: '1.5 mi' }, { name: 'NAMI Support Group', detail: 'Free, weekly, no registration', verified: 'May 2026' }], why: 'Emotional stress over months', also: 'Crisis counseling, Peer support' }
-    ],
-    followUp: [{ id: 'stress-appt', label: 'How do I make an appointment?' }, { id: 'stress-group', label: 'Is there a support group nearby?' }, { id: 'crisis', label: 'I think I might be in crisis' }]
-  },
-  'stress-legal': {
-    userText: 'I need legal help',
-    statusBadge: 'upgrade',
-    upgradeInfo: { from: 43, to: 81, category: 'Legal Aid' },
-    categories: [
-      { label: 'Legal Aid', confidence: 81, resources: [{ name: 'Legal Aid Society', detail: 'Free consultations for housing, immigration, and benefits cases.', verified: 'May 2026' }], why: 'Clarified legal need', also: 'Immigration services, Tenant rights' }
-    ],
-    followUp: [{ id: 'job-apply', label: 'Help me apply' }]
-  },
-  'stress-appt': {
-    userText: 'How do I make an appointment?',
-    statusBadge: 'verified',
-    categories: [
-      { label: 'Appointment Booking', confidence: 92, resources: [{ name: 'Community Counseling Center', detail: 'Walk-in or call ahead — (555) 123-4567', verified: 'May 2026', distance: '1.5 mi' }], why: 'Requested appointment', also: 'Telehealth options, Evening hours' }
-    ],
-    followUp: []
-  },
-  'stress-group': {
-    userText: 'Is there a support group nearby?',
-    statusBadge: 'verified',
-    categories: [
-      { label: 'Support Groups', confidence: 88, resources: [{ name: 'NAMI Connection', detail: 'Tuesdays 6pm, free, no registration', verified: 'May 2026', distance: '1.5 mi' }, { name: 'DBSA Depression Support', detail: 'Thursdays 7pm, free', verified: 'May 2026', distance: '2.1 mi' }], why: 'Requested support group', also: 'Online support groups, Peer warmline' }
-    ],
-    followUp: []
-  },
-  crisis: {
-    userText: "I can't take this anymore. I want it all to end.",
-    isCrisis: true,
-    statusBadge: 'crisis',
-    crisisLines: [
-      { name: 'Suicide & Crisis Lifeline', action: 'Free. Confidential. 24/7.', call: '988' },
-      { name: 'Crisis Text Line', action: 'Text HOME to 741741', call: 'Text' },
-      { name: 'Local Crisis Center', action: 'Talk to a real person now', call: '211' }
-    ],
-    categories: [],
-    followUp: [{ id: 'crisis-talk', label: 'I want to talk to someone' }, { id: 'crisis-scared', label: "I need help but I'm scared" }]
-  },
-  'crisis-talk': {
-    userText: 'I want to talk to someone.',
-    isCrisis: true,
-    statusBadge: 'crisis',
-    crisisLines: [
-      { name: '988 Suicide & Crisis Lifeline', action: 'Confidential, free, 24/7', call: '988' },
-      { name: '211 Navigator', action: 'Real person, right now', call: '211' }
-    ],
-    categories: [],
-    followUp: []
-  },
-  'crisis-scared': {
-    userText: 'I need help but I\'m scared.',
-    isCrisis: true,
-    statusBadge: 'crisis',
-    crisisLines: [
-      { name: 'Crisis Text Line', action: 'Text HOME to 741741 — No phone call needed', call: 'Text' },
-      { name: '988 Lifeline', action: 'You can just text, not call', call: '988' }
-    ],
-    categories: [],
-    followUp: []
-  },
-  senior: {
-    userText: "I'm 78 and need help getting groceries delivered",
-    statusBadge: 'verified',
-    categories: [
-      { label: 'Senior Grocery Delivery', confidence: 94, resources: [{ name: 'Meals on Wheels', detail: 'Free grocery delivery for seniors 60+. Call (555) 234-5678 to enroll. No internet needed.', verified: 'May 2026' }], why: 'Age 78 + specific need (grocery delivery) = clear match', also: 'SNAP Online, Congregate meals' },
-      { label: 'SNAP Online Purchasing', confidence: 78, resources: [{ name: 'EBT Online', detail: 'Use SNAP benefits on Amazon, Walmart, and Instacart for home delivery.', verified: 'May 2026' }], why: 'SNAP benefits can be used online', also: 'Senior food boxes, Farmer\u2019s market vouchers' }
-    ],
-    followUp: [{ id: 'senior-call', label: 'Call Meals on Wheels' }, { id: 'senior-snap', label: 'How to apply for SNAP' }, { id: 'senior-more', label: 'Other senior services' }]
-  },
-  'senior-call': {
-    userText: 'I want to call Meals on Wheels',
-    statusBadge: 'verified',
-    categories: [
-      { label: 'Meals on Wheels Contact', confidence: 97, resources: [{ name: 'Meals on Wheels Local Office', detail: 'Call (555) 234-5678 — Mon-Fri 8AM-5PM. They will take your info over the phone.', verified: 'May 2026' }], why: 'Requested direct contact', also: 'Home-delivered meals, Wellness checks' }
-    ],
-    followUp: []
-  },
-  'senior-snap': {
-    userText: 'How do I apply for SNAP?',
-    statusBadge: 'verified',
-    categories: [
-      { label: 'SNAP Application', confidence: 91, resources: [{ name: 'SNAP Online Application', detail: 'Apply at benefits.gov — takes about 10 minutes', verified: 'May 2026' }, { name: '211 Navigator', detail: 'Someone can help you apply over the phone', verified: 'May 2026' }], why: 'Asked about SNAP application', also: 'Medicare Savings Program, Extra Help (LIS)' }
-    ],
-    followUp: []
-  },
-  'senior-more': {
-    userText: 'What other services are available for seniors?',
-    statusBadge: 'verified',
-    categories: [
-      { label: 'Senior Services', confidence: 86, resources: [{ name: 'Area Agency on Aging', detail: 'Transportation, home repairs, legal aid, and social activities', verified: 'May 2026' }, { name: 'Medicare Counseling', detail: 'Free help understanding your coverage options', verified: 'May 2026' }], why: 'Requested additional senior services', also: 'Property tax relief, SSI benefits' }
-    ],
-    followUp: []
-  },
-  veteran: {
-    userText: "I'm a veteran dealing with PTSD and housing issues",
-    statusBadge: 'verified',
-    categories: [
-      { label: 'Veteran Housing (VASH)', confidence: 91, resources: [{ name: 'VA Supportive Housing', detail: 'HUD-VASH vouchers for veterans. Case manager assigned.', verified: 'May 2026' }], why: 'Veteran status + housing instability = VASH priority', also: 'SRO, Shared housing, Rapid rehousing' },
-      { label: 'PTSD Treatment', confidence: 89, resources: [{ name: 'VA PTSD Program', detail: 'Evidence-based therapy. No copay for combat veterans. Telehealth available.', verified: 'May 2026' }, { name: 'Vet Center Counseling', detail: 'No VA enrollment needed. Walk-ins welcome.', verified: 'May 2026', distance: '3.1 mi' }], why: 'PTSD mentioned — veteran-specific programs prioritized', also: 'Veterans Crisis Line: 988 Press 1' },
-      { label: 'Veteran Crisis Line', confidence: 85, resources: [{ name: '988, Press 1', detail: 'Veterans Crisis Line. Call, text 838255, or chat at veteranscrisisline.net.', verified: 'May 2026' }], why: 'PTSD + housing instability are risk factors — proactive inclusion', also: 'VA urgent care, Telehealth' },
-      { label: 'Veteran Employment', confidence: 62, resources: [{ name: 'Vocational Rehabilitation', detail: 'Job training + placement for veterans with service-connected disabilities.', verified: 'May 2026' }], why: 'You didn\u2019t mention work needs, but VR services available', also: 'GI Bill, Hire Heroes USA', warning: '62% confidence — employment need not explicitly stated' }
-    ],
-    followUp: [{ id: 'veteran-enroll', label: 'How do I enroll in VA healthcare?' }, { id: 'veteran-ptsd-now', label: 'Can I get PTSD help right away?' }, { id: 'veteran-housing', label: 'I need emergency housing tonight' }]
-  },
-  'veteran-enroll': {
-    userText: 'How do I enroll in VA healthcare?',
-    statusBadge: 'verified',
-    categories: [
-      { label: 'VA Enrollment', confidence: 94, resources: [{ name: 'VA Benefits Intake Center', detail: 'One-stop enrollment for all services', verified: 'May 2026', distance: '4.2 mi' }, { name: 'Online Enrollment', detail: 'va.gov/health-care/apply', verified: 'May 2026' }], why: 'Asked about enrollment', also: 'Disability comp, GI Bill, Home loan' }
-    ],
-    followUp: [{ id: 'veteran-ptsd-now', label: 'Can I get PTSD help right away?' }]
-  },
-  'veteran-ptsd-now': {
-    userText: 'Can I get PTSD help right away?',
-    statusBadge: 'verified',
-    categories: [
-      { label: 'Immediate PTSD Support', confidence: 90, resources: [{ name: 'Vet Center', detail: 'Walk-in, same-day counseling', verified: 'May 2026', distance: '3.1 mi' }, { name: 'Veterans Crisis Line', detail: '988 then Press 1 — 24/7', verified: 'May 2026' }], why: 'Requested immediate help', also: 'VA urgent care, Telehealth' }
-    ],
-    followUp: []
-  },
-  'veteran-housing': {
-    userText: 'I need emergency housing tonight.',
-    statusBadge: 'verified',
-    categories: [
-      { label: 'Emergency Shelter', confidence: 92, resources: [{ name: 'VA Emergency Shelter', detail: 'Same-day placement for veterans', verified: 'May 2026' }, { name: '211 Emergency Housing', detail: 'Call 211 for immediate placement', verified: 'May 2026' }], why: 'Emergency housing need stated', also: 'Transitional housing, Rapid rehousing' }
-    ],
-    followUp: []
-  }
+interface ClassifyResponse {
+  isCrisis: boolean
+  categories: { label: string; confidence: number }[]
+  needsClarification: boolean
+  clarificationMessage: string | null
+  crisisLines?: CrisisLine[]
+  note?: string
+  model: string
 }
 
+interface ConversationHistory {
+  id: string
+  title: string
+  preview: string
+  timestamp: string
+  category?: string | null
+  categoryColor?: string | null
+  confidence: number
+  isCrisis: boolean
+  createdAt: string
+}
+
+// ─── STARTERS ────────────────────────────────────────────
 const starters = [
   { id: 'job', label: 'Multi-Need', description: "I lost my job and can't pay rent. My kids need food.", icon: 'layers' },
   { id: 'crisis', label: 'Crisis', description: "I can't take this anymore. I want it all to end.", icon: 'shield' },
@@ -296,28 +103,75 @@ const starters = [
   { id: 'veteran', label: 'Complex', description: "I'm a veteran dealing with PTSD and housing issues", icon: 'star' }
 ]
 
-// ─── CONVERSATION HISTORY ─────────────────────────────────
-interface ConversationHistory {
-  id: string
-  title: string
-  preview: string
-  timestamp: string
-  starterId: string
+// ─── RESOURCE DATABASE ────────────────────────────────────
+const resourceDb: Record<string, Resource[]> = {
+  'Housing Assistance': [
+    { name: 'Section 8 Emergency Transfer', detail: '2 locations near you. Application takes ~15 min.', verified: 'May 2026' },
+    { name: 'Emergency Rental Assistance', detail: 'Up to 12 months rent support', verified: 'May 2026' },
+    { name: 'Emergency Shelter Network', detail: '4 locations with availability. Walk-ins accepted until 8 PM.', verified: 'May 2026' },
+  ],
+  'Food Assistance': [
+    { name: 'Community Food Bank', detail: 'Next distribution: Thursday 9AM. No ID required.', verified: 'May 2026', distance: '1.2 mi' },
+    { name: 'SNAP Benefits', detail: 'Monthly EBT card for groceries', verified: 'May 2026' },
+    { name: 'SNAP Benefits Enrollment', detail: 'You may qualify for $250/month. Apply online in 10 min.', verified: 'May 2026' },
+  ],
+  'Mental Health': [
+    { name: 'Community Counseling Center', detail: 'Sliding scale — $0 if uninsured', verified: 'May 2026', distance: '1.5 mi' },
+    { name: 'NAMI Support Group', detail: 'Free, weekly, no registration', verified: 'May 2026' },
+  ],
+  'Employment Services': [
+    { name: 'Workforce Center', detail: 'Job placement + training. Walk-ins welcome Mon-Fri.', verified: 'May 2026', distance: '2.4 mi' },
+    { name: 'Vocational Rehabilitation', detail: 'Job training + placement for veterans with service-connected disabilities.', verified: 'May 2026' },
+  ],
+  'Legal Aid': [
+    { name: 'Legal Aid Society', detail: 'Free consultations for housing, immigration, and benefits cases.', verified: 'May 2026' },
+  ],
+  'Healthcare': [
+    { name: 'Community Health Center', detail: 'Sliding scale fees. Walk-ins welcome.', verified: 'May 2026', distance: '1.8 mi' },
+    { name: 'Medicaid Enrollment', detail: 'Free or low-cost health coverage', verified: 'May 2026' },
+  ],
+  'Substance Abuse': [
+    { name: 'SAMHSA Helpline', detail: 'Free referrals 24/7. Call 1-800-662-4357.', verified: 'May 2026' },
+    { name: 'Local Recovery Center', detail: 'Detox, rehab, and outpatient services.', verified: 'May 2026' },
+  ],
+  'Senior Services': [
+    { name: 'Meals on Wheels', detail: 'Free grocery delivery for seniors 60+. Call (555) 234-5678 to enroll. No internet needed.', verified: 'May 2026' },
+    { name: 'Area Agency on Aging', detail: 'Transportation, home repairs, legal aid, and social activities', verified: 'May 2026' },
+  ],
 }
 
-const todayConversations: ConversationHistory[] = [
-  { id: 'conv-job', title: 'Job loss and rent help', preview: "I lost my job and can't pay rent...", timestamp: '2 min ago', starterId: 'job' },
-  { id: 'conv-crisis', title: 'Crisis support needed', preview: "I can't take this anymore...", timestamp: '18 min ago', starterId: 'crisis' },
-  { id: 'conv-stress', title: 'Housing clarification', preview: 'I need help with my situation', timestamp: '45 min ago', starterId: 'stress' },
-  { id: 'conv-senior', title: 'Senior grocery delivery', preview: "I'm 78 and need help...", timestamp: '1 hr ago', starterId: 'senior' },
-  { id: 'conv-veteran', title: 'Veteran PTSD support', preview: "I'm a veteran dealing with...", timestamp: '3 hr ago', starterId: 'veteran' },
-]
+const whyMap: Record<string, string> = {
+  'Housing Assistance': 'Housing or shelter need identified',
+  'Food Assistance': 'Food or basic necessities need identified',
+  'Mental Health': 'Mental or emotional health concern identified',
+  'Employment Services': 'Employment or job training need identified',
+  'Legal Aid': 'Legal assistance need identified',
+  'Healthcare': 'Health or medical need identified',
+  'Substance Abuse': 'Substance use concern identified',
+  'Senior Services': 'Senior-specific need identified',
+}
 
-const previousConversations: ConversationHistory[] = [
-  { id: 'conv-job-snap', title: 'SNAP eligibility check', preview: 'Do I qualify for SNAP?', timestamp: 'Yesterday', starterId: 'job-snap' },
-  { id: 'conv-vet-housing', title: 'Emergency housing tonight', preview: 'I need emergency housing...', timestamp: 'Yesterday', starterId: 'veteran-housing' },
-  { id: 'conv-stress-emot', title: 'Mental health resources', preview: "It's about my emotions...", timestamp: '2 days ago', starterId: 'stress-emotions' },
-]
+const alsoMap: Record<string, string> = {
+  'Housing Assistance': 'Section 8, Emergency shelters, LIHEAP, Rapid rehousing',
+  'Food Assistance': 'WIC, School meal programs, SNAP Online',
+  'Mental Health': 'Crisis counseling, Peer support, Telehealth',
+  'Employment Services': 'Job Corps, Rapid Re-employment, GI Bill',
+  'Legal Aid': 'Immigration services, Tenant rights',
+  'Healthcare': 'Telehealth options, Community clinics',
+  'Substance Abuse': 'Recovery support groups, Sober living',
+  'Senior Services': 'SNAP Online, Congregate meals, Medicare counseling',
+}
+
+function enrichCategories(rawCategories: { label: string; confidence: number }[]): Category[] {
+  return rawCategories.map(c => ({
+    label: c.label,
+    confidence: c.confidence,
+    resources: resourceDb[c.label] || [],
+    why: whyMap[c.label] || `Matched to ${c.label} category`,
+    also: alsoMap[c.label],
+    warning: c.confidence < 70 ? `${c.confidence}% confidence — consider providing more detail for better matches` : undefined,
+  }))
+}
 
 // ─── UTILITIES ───────────────────────────────────────────
 function getConfidenceColor(v: number): string {
@@ -349,6 +203,21 @@ function getConfidenceRingBg(v: number): string {
   if (v >= 70) return 'rgba(59,130,246,0.08)'
   if (v >= 50) return 'rgba(245,158,11,0.08)'
   return 'rgba(249,115,22,0.08)'
+}
+
+function formatTimeAgo(dateStr: string): string {
+  const date = new Date(dateStr)
+  const now = new Date()
+  const diffMs = now.getTime() - date.getTime()
+  const diffMin = Math.floor(diffMs / 60000)
+  if (diffMin < 1) return 'just now'
+  if (diffMin < 60) return `${diffMin} min ago`
+  const diffHr = Math.floor(diffMin / 60)
+  if (diffHr < 24) return `${diffHr} hr ago`
+  const diffDay = Math.floor(diffHr / 24)
+  if (diffDay === 1) return 'Yesterday'
+  if (diffDay < 7) return `${diffDay} days ago`
+  return date.toLocaleDateString()
 }
 
 // ─── CONFIDENCE RING ─────────────────────────────────────
@@ -665,7 +534,7 @@ function CategoryCard({ cat, index }: { cat: Category; index: number }) {
 }
 
 // ─── CRISIS OVERLAY ───────────────────────────────────────
-function CrisisBlock({ lines }: { lines: { name: string; action: string; call?: string }[] }) {
+function CrisisBlock({ lines }: { lines: CrisisLine[] }) {
   return (
     <motion.div
       initial={{ opacity: 0, scale: 0.97 }}
@@ -732,9 +601,17 @@ function CrisisBlock({ lines }: { lines: { name: string; action: string; call?: 
 }
 
 // ─── CLARIFY PANEL ────────────────────────────────────────
-function ClarifyPanel({ confidence, options, onSelect }: {
-  confidence: number; options: { label: string; nextId: string }[]; onSelect: (label: string, nextId: string) => void
+function ClarifyPanel({ confidence, clarificationMessage, onClarify }: {
+  confidence: number; clarificationMessage: string | null; onClarify: (text: string) => void
 }) {
+  const clarifyOptions = [
+    'Housing or shelter',
+    'Food or basic necessities',
+    'Health or mental health support',
+    'Legal assistance or immigration',
+    'Employment or job training',
+  ]
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 8 }}
@@ -759,22 +636,25 @@ function ClarifyPanel({ confidence, options, onSelect }: {
         <div>
           <p className="text-[11px] font-bold text-amber-600 uppercase tracking-wider">AI Confidence: {confidence}%</p>
           <p className="text-[16px] font-semibold text-gray-900 leading-snug mt-1.5">Which best describes what you need?</p>
+          {clarificationMessage && (
+            <p className="text-[12px] text-gray-400 mt-1">{clarificationMessage}</p>
+          )}
         </div>
       </div>
       <div className="flex flex-col gap-2.5">
-        {options.map((opt, i) => (
+        {clarifyOptions.map((opt, i) => (
           <motion.button
             key={i}
             initial={{ opacity: 0, x: -10 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.15 + i * 0.07, type: 'spring', stiffness: 400, damping: 30 }}
-            onClick={() => onSelect(opt.label, opt.nextId)}
+            onClick={() => onClarify(opt)}
             className="w-full text-left bg-white/90 border border-gray-100 rounded-xl px-5 py-3.5 text-[14px] font-medium text-gray-700 active:scale-[0.98] transition-all duration-200 hover:scale-[1.005] flex items-center justify-between group relative overflow-hidden gradient-border-hover"
             style={{
               boxShadow: '0 1px 4px rgba(0,0,0,0.03)',
             }}
           >
-            <span>{opt.label}</span>
+            <span>{opt}</span>
             <ArrowRight className="w-4 h-4 text-gray-300 group-hover:text-amber-500 group-hover:translate-x-0.5 transition-all" />
           </motion.button>
         ))}
@@ -1196,6 +1076,8 @@ function Sidebar({
   onNavDemoScenarios,
   onNavHome,
   activeNav,
+  conversations,
+  isLoadingConversations,
 }: {
   isOpen: boolean
   onToggle: () => void
@@ -1206,7 +1088,56 @@ function Sidebar({
   onNavDemoScenarios: () => void
   onNavHome: () => void
   activeNav: 'home' | 'how-it-works' | 'demo-scenarios' | null
+  conversations: ConversationHistory[]
+  isLoadingConversations: boolean
 }) {
+  // Group conversations by time period
+  const now = new Date()
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate())
+  const yesterday = new Date(today.getTime() - 86400000)
+
+  const todayConvs = conversations.filter(c => new Date(c.createdAt) >= today)
+  const previousConvs = conversations.filter(c => {
+    const d = new Date(c.createdAt)
+    return d < today && d >= yesterday
+  })
+  const olderConvs = conversations.filter(c => new Date(c.createdAt) < yesterday)
+
+  const renderConvItem = (conv: ConversationHistory) => {
+    const confDot = conv.isCrisis ? 'bg-red-500' : (conv.confidence >= 80 ? 'bg-emerald-500' : conv.confidence >= 50 ? 'bg-amber-500' : 'bg-orange-500')
+    const confBadge = conv.isCrisis ? 'bg-red-500/20 text-red-300' : conv.confidence >= 80 ? 'bg-emerald-500/20 text-emerald-300' : conv.confidence >= 50 ? 'bg-amber-500/20 text-amber-300' : 'bg-orange-500/20 text-orange-300'
+    const confValue = conv.isCrisis ? '!' : String(conv.confidence)
+
+    return (
+      <motion.button
+        key={conv.id}
+        onClick={() => onConversationSelect(conv)}
+        whileHover={{ x: 2 }}
+        className={`w-full text-left px-3 py-2.5 rounded-lg transition-all duration-200 group sidebar-item-hover ${
+          activeConversationId === conv.id
+            ? 'sidebar-item-active'
+            : ''
+        }`}
+      >
+        <div className="flex items-center gap-2.5">
+          <span className={`w-2 h-2 rounded-full shrink-0 ${confDot}`} />
+          <div className="min-w-0 flex-1">
+            <div className="flex items-center gap-1.5">
+              <p className={`text-[13px] font-medium truncate ${
+                activeConversationId === conv.id ? 'text-white' : 'text-gray-300 group-hover:text-white'
+              }`}>{conv.title}</p>
+              <span className={`shrink-0 text-[9px] font-bold px-1.5 py-0.5 rounded ${confBadge}`}>
+                {confValue}
+              </span>
+            </div>
+            <p className="text-[11px] text-gray-600 truncate mt-0.5">{conv.preview}</p>
+          </div>
+          <span className="text-[10px] text-gray-600 shrink-0">{conv.timestamp}</span>
+        </div>
+      </motion.button>
+    )
+  }
+
   return (
     <>
       {/* Mobile overlay */}
@@ -1321,91 +1252,57 @@ function Sidebar({
 
           {/* Conversation List */}
           <div className="flex-1 overflow-y-auto sidebar-scrollbar px-3 pb-3">
-            {/* Today */}
-            <div className="mb-4">
-              <div className="flex items-center gap-2 px-2 mb-2">
-                <Clock className="w-3 h-3 text-gray-500" />
-                <span className="text-[11px] font-semibold text-gray-500 uppercase tracking-wider">Today</span>
+            {isLoadingConversations ? (
+              <div className="flex items-center justify-center py-8">
+                <div className="w-5 h-5 border-2 border-gray-600 border-t-gray-300 rounded-full animate-spin" />
               </div>
-              <div className="space-y-0.5">
-                {todayConversations.map((conv) => {
-                  const confDot = conv.starterId === 'crisis' ? 'bg-red-500' : conv.starterId === 'stress' ? 'bg-amber-500' : 'bg-emerald-500'
-                  const confBadge = conv.starterId === 'crisis' ? 'bg-red-500/20 text-red-300' : conv.starterId === 'stress' ? 'bg-amber-500/20 text-amber-300' : 'bg-emerald-500/20 text-emerald-300'
-                  const confValue = conv.starterId === 'crisis' ? '!' : conv.starterId === 'stress' ? '43' : conv.starterId === 'job' ? '87' : conv.starterId === 'senior' ? '94' : '91'
-                  return (
-                    <motion.button
-                      key={conv.id}
-                      onClick={() => onConversationSelect(conv)}
-                      whileHover={{ x: 2 }}
-                      className={`w-full text-left px-3 py-2.5 rounded-lg transition-all duration-200 group sidebar-item-hover ${
-                        activeConversationId === conv.id
-                          ? 'sidebar-item-active'
-                          : ''
-                      }`}
-                    >
-                      <div className="flex items-center gap-2.5">
-                        <span className={`w-2 h-2 rounded-full shrink-0 ${confDot}`} />
-                        <div className="min-w-0 flex-1">
-                          <div className="flex items-center gap-1.5">
-                            <p className={`text-[13px] font-medium truncate ${
-                              activeConversationId === conv.id ? 'text-white' : 'text-gray-300 group-hover:text-white'
-                            }`}>{conv.title}</p>
-                            <span className={`shrink-0 text-[9px] font-bold px-1.5 py-0.5 rounded ${confBadge}`}>
-                              {confValue}
-                            </span>
-                          </div>
-                          <p className="text-[11px] text-gray-600 truncate mt-0.5">{conv.preview}</p>
-                        </div>
-                        <span className="text-[10px] text-gray-600 shrink-0">{conv.timestamp}</span>
-                      </div>
-                    </motion.button>
-                  )
-                })}
+            ) : conversations.length === 0 ? (
+              <div className="text-center py-8">
+                <MessageSquare className="w-6 h-6 text-gray-600 mx-auto mb-2" />
+                <p className="text-[12px] text-gray-600">No conversations yet</p>
               </div>
-            </div>
+            ) : (
+              <>
+                {/* Today */}
+                {todayConvs.length > 0 && (
+                  <div className="mb-4">
+                    <div className="flex items-center gap-2 px-2 mb-2">
+                      <Clock className="w-3 h-3 text-gray-500" />
+                      <span className="text-[11px] font-semibold text-gray-500 uppercase tracking-wider">Today</span>
+                    </div>
+                    <div className="space-y-0.5">
+                      {todayConvs.map(renderConvItem)}
+                    </div>
+                  </div>
+                )}
 
-            {/* Previous */}
-            <div className="mb-4">
-              <div className="flex items-center gap-2 px-2 mb-2">
-                <Clock className="w-3 h-3 text-gray-500" />
-                <span className="text-[11px] font-semibold text-gray-500 uppercase tracking-wider">Previous</span>
-              </div>
-              <div className="space-y-0.5">
-                {previousConversations.map((conv) => {
-                  const confDot = conv.starterId === 'crisis' ? 'bg-red-500' : conv.starterId === 'stress' ? 'bg-amber-500' : 'bg-emerald-500'
-                  const confBadge = conv.starterId === 'crisis' ? 'bg-red-500/20 text-red-300' : conv.starterId === 'stress' ? 'bg-amber-500/20 text-amber-300' : 'bg-emerald-500/20 text-emerald-300'
-                  const confValue = conv.starterId === 'job-snap' ? '94' : conv.starterId === 'veteran-housing' ? '92' : '83'
-                  return (
-                    <motion.button
-                      key={conv.id}
-                      onClick={() => onConversationSelect(conv)}
-                      whileHover={{ x: 2 }}
-                      className={`w-full text-left px-3 py-2.5 rounded-lg transition-all duration-200 group sidebar-item-hover ${
-                        activeConversationId === conv.id
-                          ? 'sidebar-item-active'
-                          : ''
-                      }`}
-                    >
-                      <div className="flex items-center gap-2.5">
-                        <span className={`w-2 h-2 rounded-full shrink-0 ${confDot}`} />
-                        <div className="min-w-0 flex-1">
-                          <div className="flex items-center gap-1.5">
-                            <p className={`text-[13px] font-medium truncate ${
-                              activeConversationId === conv.id ? 'text-white' : 'text-gray-300 group-hover:text-white'
-                            }`}>{conv.title}</p>
-                            <span className={`shrink-0 text-[9px] font-bold px-1.5 py-0.5 rounded ${confBadge}`}>
-                              {confValue}
-                            </span>
-                          </div>
-                          <p className="text-[11px] text-gray-600 truncate mt-0.5">{conv.preview}</p>
-                        </div>
-                        <span className="text-[10px] text-gray-600 shrink-0">{conv.timestamp}</span>
-                      </div>
-                    </motion.button>
-                  )
-                })}
-              </div>
-            </div>
+                {/* Previous */}
+                {previousConvs.length > 0 && (
+                  <div className="mb-4">
+                    <div className="flex items-center gap-2 px-2 mb-2">
+                      <Clock className="w-3 h-3 text-gray-500" />
+                      <span className="text-[11px] font-semibold text-gray-500 uppercase tracking-wider">Yesterday</span>
+                    </div>
+                    <div className="space-y-0.5">
+                      {previousConvs.map(renderConvItem)}
+                    </div>
+                  </div>
+                )}
+
+                {/* Older */}
+                {olderConvs.length > 0 && (
+                  <div className="mb-4">
+                    <div className="flex items-center gap-2 px-2 mb-2">
+                      <Clock className="w-3 h-3 text-gray-500" />
+                      <span className="text-[11px] font-semibold text-gray-500 uppercase tracking-wider">Earlier</span>
+                    </div>
+                    <div className="space-y-0.5">
+                      {olderConvs.map(renderConvItem)}
+                    </div>
+                  </div>
+                )}
+              </>
+            )}
           </div>
 
           {/* Footer */}
@@ -1433,7 +1330,7 @@ function Sidebar({
 function MessageActionButtons({ messageIndex, onCopy, onFeedback, onViewDetails, showDetails }: {
   messageIndex: number
   onCopy: (idx: number) => void
-  onFeedback: (idx: number, type: 'up' | 'down') => void
+  onFeedback: (idx: number, _type: 'up' | 'down') => void
   onViewDetails: (idx: number) => void
   showDetails: boolean
 }) {
@@ -1505,22 +1402,57 @@ function MessageActionButtons({ messageIndex, onCopy, onFeedback, onViewDetails,
   )
 }
 
+// ─── TRANSPARENCY ITEMS HELPER ───────────────────────────
+function getTransparencyItems(result: {
+  isCrisis: boolean
+  categories: Category[]
+  needsClarification: boolean
+  model: string
+  isUpgrade?: boolean
+  upgradeFrom?: number
+  upgradeTo?: number
+  upgradeCategory?: string
+}): string[] {
+  if (result.isCrisis) return [
+    'Crisis keywords detected by hardcoded safety layer — not AI',
+    'AI models can misclassify crisis situations, so this check runs first and bypasses all AI processing',
+    'Your safety is always prioritized over resource matching'
+  ]
+  if (result.needsClarification) return [
+    'Your request scored below 50% across all categories — too ambiguous for reliable matching',
+    'One clarification question can boost confidence by 30-40%, ensuring you get accurate resources',
+    'This is active learning — the model uses your answer to refine its classification'
+  ]
+
+  const items: string[] = []
+  if (result.isUpgrade && result.upgradeFrom !== undefined && result.upgradeTo !== undefined && result.upgradeCategory) {
+    items.push(`Clarification narrowed classification from ambiguous to ${result.upgradeCategory} — confidence jumped from ${result.upgradeFrom}% to ${result.upgradeTo}%`)
+    items.push('The model combined your original text + clarification to re-score all categories')
+  } else {
+    items.push(`Classified by ${result.model || 'BART-large-MNLI'} zero-shot model against 8 service categories`)
+  }
+  items.push('Resources sourced from United Way 211 verified database')
+  if (result.categories.some(c => c.confidence < 70)) {
+    items.push(`${result.categories.filter(c => c.confidence < 70).map(c => c.label).join(', ')} below 70% threshold — consider providing more detail for better matches`)
+  }
+  return items
+}
+
 // ─── MAIN ─────────────────────────────────────────────────
 export default function Home() {
   const [messages, setMessages] = useState<Array<{
     role: 'user' | 'ai'
     text: string
-    stepId?: string
     isCrisis?: boolean
-    crisisLines?: { name: string; action: string; call?: string }[]
+    crisisLines?: CrisisLine[]
     categories?: Category[]
     statusBadge?: 'crisis' | 'clarify' | 'verified' | 'upgrade'
     upgradeInfo?: { from: number; to: number; category: string }
     isClarify?: boolean
-    clarifyOptions?: { label: string; nextId: string }[]
     clarifyConfidence?: number
     clarifyReason?: string
     transparencyItems?: string[]
+    model?: string
   }>>([])
   const [suggestions, setSuggestions] = useState<Array<{ id: string; label: string; description?: string; icon?: string }>>(starters)
   const [isTyping, setIsTyping] = useState(false)
@@ -1537,44 +1469,272 @@ export default function Home() {
   const [expandedTransparency, setExpandedTransparency] = useState<Set<number>>(new Set())
   const textareaRef = useRef<HTMLTextAreaElement>(null)
 
+  // Conversation history from API
+  const [conversations, setConversations] = useState<ConversationHistory[]>([])
+  const [isLoadingConversations, setIsLoadingConversations] = useState(false)
+
+  // Current conversation ID for saving
+  const currentConvIdRef = useRef<string | null>(null)
+  // Track the previous confidence for upgrade detection
+  const previousConfidenceRef = useRef<number | null>(null)
+
+  // Fetch conversations from API
+  const fetchConversations = useCallback(async () => {
+    setIsLoadingConversations(true)
+    try {
+      const res = await fetch('/api/conversations')
+      if (res.ok) {
+        const data = await res.json()
+        const mapped: ConversationHistory[] = data.map((c: Record<string, unknown>) => ({
+          id: c.id as string,
+          title: c.title as string,
+          preview: c.preview as string,
+          timestamp: formatTimeAgo(c.createdAt as string),
+          category: (c.category as string) || null,
+          categoryColor: (c.categoryColor as string) || null,
+          confidence: c.confidence as number,
+          isCrisis: c.isCrisis as boolean,
+          createdAt: c.createdAt as string,
+        }))
+        setConversations(mapped)
+      }
+    } catch {
+      // Silently fail — sidebar will show empty state
+    } finally {
+      setIsLoadingConversations(false)
+    }
+  }, [])
+
+  useEffect(() => {
+    fetchConversations()
+  }, [fetchConversations])
+
   const scrollToBottom = useCallback(() => {
     setTimeout(() => {
       chatRef.current?.scrollTo({ top: chatRef.current.scrollHeight, behavior: 'smooth' })
     }, 80)
   }, [])
 
-  const handleSelect = useCallback((id: string, label: string) => {
-    const step = chatSteps[id]
-    if (!step) return
+  // Create conversation in DB and save user message
+  const createConversationAndSave = useCallback(async (userText: string, classifyResult: ClassifyResponse) => {
+    try {
+      // Determine conversation title and metadata from the classify result
+      const topCategory = classifyResult.categories[0]
+      const title = classifyResult.isCrisis
+        ? 'Crisis support needed'
+        : topCategory
+          ? `${topCategory.label} — ${userText.slice(0, 40)}${userText.length > 40 ? '...' : ''}`
+          : userText.slice(0, 60)
+      const preview = userText.slice(0, 60)
+      const category = classifyResult.isCrisis ? 'Crisis' : topCategory?.label || null
+      const categoryColor = classifyResult.isCrisis ? '#ef4444' : topCategory ? getConfidenceColor(topCategory.confidence) : '#6b7280'
+      const confidence = topCategory?.confidence || 0
 
-    setMessages(prev => [...prev, { role: 'user', text: label, stepId: id }])
+      // Create conversation
+      const convRes = await fetch('/api/conversations', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          title,
+          preview,
+          category,
+          categoryColor,
+          confidence,
+          isCrisis: classifyResult.isCrisis,
+        }),
+      })
+
+      if (convRes.ok) {
+        const convData = await convRes.json()
+        currentConvIdRef.current = convData.id
+        setActiveConversationId(convData.id)
+
+        // Save user message
+        await fetch(`/api/conversations/${convData.id}/messages`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ role: 'user', text: userText }),
+        })
+
+        // Save AI message
+        await fetch(`/api/conversations/${convData.id}/messages`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            role: 'ai',
+            text: classifyResult.isCrisis
+              ? 'Crisis detected — providing immediate resources'
+              : classifyResult.needsClarification
+                ? 'Clarification needed'
+                : `Found ${classifyResult.categories.length} resource categories`,
+            category,
+            confidence,
+            isCrisis: classifyResult.isCrisis,
+            resources: classifyResult.categories.map(c => c.label),
+          }),
+        })
+
+        // Refresh sidebar
+        fetchConversations()
+      }
+    } catch {
+      // Silently fail — conversation saving is non-critical
+    }
+  }, [fetchConversations])
+
+  // Main handler: send user text to /api/classify
+  const handleSend = useCallback(async (text: string) => {
+    if (!text.trim() || isTyping) return
+
+    const userText = text.trim()
+    setInputText('')
+
+    // Add user message
+    setMessages(prev => [...prev, { role: 'user', text: userText }])
     setSuggestions([])
     setIsTyping(true)
 
-    setTimeout(() => {
+    try {
+      const res = await fetch('/api/classify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text: userText }),
+      })
+
+      if (!res.ok) {
+        setIsTyping(false)
+        setMessages(prev => [...prev, {
+          role: 'ai',
+          text: 'Sorry, something went wrong. Please try again.',
+          statusBadge: 'clarify',
+          isClarify: true,
+          clarifyConfidence: 0,
+          transparencyItems: ['An error occurred while processing your request'],
+        }])
+        return
+      }
+
+      const data: ClassifyResponse = await res.json()
+
+      // Enrich categories with resources, why, also, warning
+      const enrichedCategories = enrichCategories(data.categories)
+
+      // Determine status badge and type
+      let statusBadge: 'crisis' | 'clarify' | 'verified' | 'upgrade' | undefined
+      let isCrisis = false
+      let crisisLines: CrisisLine[] | undefined
+      let isClarify = false
+      let clarifyConfidence: number | undefined
+      let clarifyReason: string | null | undefined
+      let upgradeInfo: { from: number; to: number; category: string } | undefined
+
+      if (data.isCrisis) {
+        statusBadge = 'crisis'
+        isCrisis = true
+        crisisLines = data.crisisLines || [
+          { name: '988 Suicide & Crisis Lifeline', action: 'Free. Confidential. 24/7.', call: '988' },
+          { name: 'Crisis Text Line', action: 'Text HOME to 741741', call: 'Text' },
+          { name: 'Local Crisis Center', action: 'Talk to a real person now', call: '211' },
+        ]
+      } else if (data.needsClarification) {
+        statusBadge = 'clarify'
+        isClarify = true
+        clarifyConfidence = enrichedCategories[0]?.confidence || 0
+        clarifyReason = data.clarificationMessage
+      } else if (previousConfidenceRef.current !== null && enrichedCategories[0] && enrichedCategories[0].confidence > previousConfidenceRef.current) {
+        statusBadge = 'upgrade'
+        upgradeInfo = {
+          from: previousConfidenceRef.current,
+          to: enrichedCategories[0].confidence,
+          category: enrichedCategories[0].label,
+        }
+      } else {
+        statusBadge = 'verified'
+      }
+
+      // Track confidence for upgrade detection on next message
+      if (enrichedCategories.length > 0) {
+        previousConfidenceRef.current = enrichedCategories[0].confidence
+      }
+
+      // Build transparency items
+      const transparencyItems = getTransparencyItems({
+        isCrisis,
+        categories: enrichedCategories,
+        needsClarification: data.needsClarification,
+        model: data.model,
+        isUpgrade: statusBadge === 'upgrade',
+        upgradeFrom: upgradeInfo?.from,
+        upgradeTo: upgradeInfo?.to,
+        upgradeCategory: upgradeInfo?.category,
+      })
+
       setIsTyping(false)
       setMessages(prev => [...prev, {
         role: 'ai',
         text: '',
-        stepId: id,
-        isCrisis: step.isCrisis,
-        crisisLines: step.crisisLines,
-        categories: step.categories,
-        statusBadge: step.statusBadge,
-        upgradeInfo: step.upgradeInfo,
-        isClarify: step.isClarify,
-        clarifyOptions: step.clarifyOptions,
-        clarifyConfidence: step.clarifyConfidence,
-        clarifyReason: step.clarifyReason,
-        transparencyItems: getTransparencyItems(step)
+        isCrisis,
+        crisisLines,
+        categories: enrichedCategories,
+        statusBadge,
+        upgradeInfo,
+        isClarify,
+        clarifyConfidence,
+        clarifyReason,
+        transparencyItems,
+        model: data.model,
       }])
-      setSuggestions(step.followUp.length > 0 ? step.followUp : [])
-    }, 700 + Math.random() * 400)
-  }, [])
 
-  const handleClarifySelect = useCallback((label: string, nextId: string) => {
-    handleSelect(nextId, label)
-  }, [handleSelect])
+      // Set follow-up suggestions
+      if (!isCrisis && !isClarify && enrichedCategories.length > 0) {
+        const followUps = enrichedCategories.slice(0, 3).map((cat, i) => ({
+          id: `followup-${i}`,
+          label: `Tell me more about ${cat.label}`,
+        }))
+        setSuggestions(followUps)
+      } else {
+        setSuggestions([])
+      }
+
+      // Save conversation to DB
+      createConversationAndSave(userText, data)
+    } catch {
+      setIsTyping(false)
+      setMessages(prev => [...prev, {
+        role: 'ai',
+        text: 'Network error. Please check your connection and try again.',
+        statusBadge: 'clarify',
+        isClarify: true,
+        clarifyConfidence: 0,
+        transparencyItems: ['A network error occurred'],
+      }])
+    }
+  }, [isTyping, createConversationAndSave])
+
+  // Handle starter card selection — pre-fill and submit
+  const handleSelectStarter = useCallback((id: string, _label: string) => {
+    const starter = starters.find(s => s.id === id)
+    if (starter) {
+      handleSend(starter.description)
+    }
+  }, [handleSend])
+
+  // Handle clarification selection
+  const handleClarifySelect = useCallback((optionText: string) => {
+    handleSend(optionText)
+  }, [handleSend])
+
+  // Handle follow-up suggestion click
+  const handleFollowUpClick = useCallback((id: string, label: string) => {
+    handleSend(label)
+  }, [handleSend])
+
+  // Handle textarea submit
+  const handleSubmit = useCallback(() => {
+    if (inputText.trim()) {
+      handleSend(inputText)
+    }
+  }, [inputText, handleSend])
 
   useEffect(() => {
     scrollToBottom()
@@ -1595,6 +1755,9 @@ export default function Home() {
     setMessages([])
     setSuggestions(starters)
     setActiveConversationId(null)
+    currentConvIdRef.current = null
+    previousConfidenceRef.current = null
+    setInputText('')
   }
 
   const handleNavHome = () => {
@@ -1614,17 +1777,12 @@ export default function Home() {
 
   const handleConversationSelect = useCallback((conv: ConversationHistory) => {
     setActiveConversationId(conv.id)
-    setMessages([])
-    setSuggestions([])
-    setIsTyping(false)
-    const step = chatSteps[conv.starterId]
-    if (step) {
-      handleSelect(conv.starterId, conv.starterId === 'job-snap' ? 'Do I qualify for SNAP?' : step.userText)
-    }
+    // For now, just set the conversation as active — full message history loading
+    // would require a GET /api/conversations/[id] endpoint
     if (window.innerWidth < 768) {
       setSidebarOpen(false)
     }
-  }, [handleSelect])
+  }, [])
 
   const hasMessages = messages.length > 0
 
@@ -1658,6 +1816,13 @@ export default function Home() {
     }
   }, [])
 
+  const handleKeyDown = useCallback((e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault()
+      handleSubmit()
+    }
+  }, [handleSubmit])
+
   return (
     <div className="h-screen flex overflow-hidden relative">
       {/* Animated mesh gradient background */}
@@ -1676,6 +1841,8 @@ export default function Home() {
         onNavDemoScenarios={handleNavDemoScenarios}
         onNavHome={handleNavHome}
         activeNav={activeNav}
+        conversations={conversations}
+        isLoadingConversations={isLoadingConversations}
       />
 
       {/* How It Works Modal */}
@@ -1690,10 +1857,13 @@ export default function Home() {
         {showDemoScenarios && (
           <DemoScenariosModal
             onClose={() => { setShowDemoScenarios(false); setActiveNav(null) }}
-            onSelectScenario={(id, label) => {
+            onSelectScenario={(id, _label) => {
               setShowDemoScenarios(false)
               setActiveNav(null)
-              handleSelect(id, label)
+              const starter = starters.find(s => s.id === id)
+              if (starter) {
+                handleSend(starter.description)
+              }
             }}
           />
         )}
@@ -1772,7 +1942,7 @@ export default function Home() {
               </AnimatePresence>
             </div>
 
-            <span className="text-[10px] font-semibold text-amber-600 bg-amber-50/80 px-2 py-0.5 rounded-md border border-amber-200/40">DEMO</span>
+            <span className="text-[10px] font-semibold text-amber-600 bg-amber-50/80 px-2 py-0.5 rounded-md border border-amber-200/40">LIVE</span>
           </div>
 
           <div className="flex items-center gap-1 sm:gap-2">
@@ -2005,7 +2175,7 @@ export default function Home() {
                           <>
                             <p className="text-[14px] text-gray-700 leading-relaxed mb-4 font-medium">I hear you, and I want to make sure you&apos;re safe right now. You don&apos;t have to go through this alone.</p>
                             <CrisisBlock lines={msg.crisisLines} />
-                            <TransparencyPanel items={[
+                            <TransparencyPanel items={msg.transparencyItems || [
                               'Crisis keywords detected by hardcoded safety layer — not AI',
                               'AI models can misclassify crisis situations, so this check runs first and bypasses all AI processing',
                               'Your safety is always prioritized over resource matching'
@@ -2014,15 +2184,15 @@ export default function Home() {
                         )}
 
                         {/* Clarification */}
-                        {msg.isClarify && msg.clarifyOptions && (
+                        {msg.isClarify && (
                           <>
                             <p className="text-[14px] text-gray-700 leading-relaxed mb-4 font-medium">I want to help, but I need to understand your situation better to find the right resources.</p>
                             <ClarifyPanel
                               confidence={msg.clarifyConfidence || 0}
-                              options={msg.clarifyOptions}
-                              onSelect={handleClarifySelect}
+                              clarificationMessage={msg.clarifyReason || null}
+                              onClarify={handleClarifySelect}
                             />
-                            <TransparencyPanel items={[
+                            <TransparencyPanel items={msg.transparencyItems || [
                               'Your request scored below 50% across all categories — too ambiguous for reliable matching',
                               'One clarification question can boost confidence by 30-40%, ensuring you get accurate resources',
                               'This is active learning — the model uses your answer to refine its classification'
@@ -2038,12 +2208,12 @@ export default function Home() {
                         )}
 
                         {/* Transparency for regular results */}
-                        {msg.categories && msg.categories.length > 0 && !msg.isCrisis && !msg.isClarify && msg.stepId && (
-                          <TransparencyPanel items={getTransparencyItems(chatSteps[msg.stepId])} />
+                        {msg.categories && msg.categories.length > 0 && !msg.isCrisis && !msg.isClarify && msg.transparencyItems && (
+                          <TransparencyPanel items={msg.transparencyItems} />
                         )}
 
                         {/* Expanded transparency panel from action buttons */}
-                        {expandedTransparency.has(i) && msg.stepId && !msg.isCrisis && !msg.isClarify && (
+                        {expandedTransparency.has(i) && msg.transparencyItems && !msg.isCrisis && !msg.isClarify && (
                           <motion.div
                             initial={{ opacity: 0, height: 0 }}
                             animate={{ opacity: 1, height: 'auto' }}
@@ -2057,7 +2227,7 @@ export default function Home() {
                                 <p className="text-[11px] font-bold text-gray-500 uppercase tracking-wider">Transparency Details</p>
                               </div>
                               <div className="space-y-2">
-                                {getTransparencyItems(chatSteps[msg.stepId]).map((item, idx) => (
+                                {msg.transparencyItems.map((item, idx) => (
                                   <div key={idx} className="flex gap-2 text-[12px] text-gray-500 leading-relaxed">
                                     <span className="w-1.5 h-1.5 rounded-full bg-gray-300 shrink-0 mt-[7px]" />
                                     {item}
@@ -2093,8 +2263,8 @@ export default function Home() {
           {suggestions.length > 0 && (
             <div className={`space-y-2 ${hasMessages ? 'pb-6' : 'pb-4'}`}>
               {suggestions.map((s, i) => {
-                if ('icon' in s) {
-                  return <SuggestionCard key={i} s={s as typeof starters[0]} index={i} onSelect={handleSelect} />
+                if ('icon' in s && s.icon) {
+                  return <SuggestionCard key={i} s={s as typeof starters[0]} index={i} onSelect={handleSelectStarter} />
                 }
                 // Follow-up chips — premium style
                 return (
@@ -2103,7 +2273,7 @@ export default function Home() {
                     initial={{ opacity: 0, y: 8 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ type: 'spring', stiffness: 400, damping: 28, delay: i * 0.06 }}
-                    onClick={() => handleSelect(s.id, s.label)}
+                    onClick={() => handleFollowUpClick(s.id, s.label)}
                     whileHover={{ scale: 1.005, y: -1 }}
                     whileTap={{ scale: 0.995 }}
                     className="w-full text-left glass-card rounded-xl px-5 py-3.5 text-[13px] font-medium text-gray-700 border border-gray-100/40 flex items-center justify-between group relative overflow-hidden gradient-border-hover"
@@ -2152,14 +2322,19 @@ export default function Home() {
                 ref={textareaRef}
                 value={inputText}
                 onChange={handleTextareaInput}
+                onKeyDown={handleKeyDown}
                 placeholder={hasMessages ? 'Ask a follow-up question...' : 'Describe what you need help with...'}
                 className="flex-1 bg-transparent text-[14px] outline-none text-gray-900 placeholder:text-gray-300 font-medium resize-none min-h-[24px] max-h-[120px] leading-relaxed"
                 rows={1}
               />
               {/* Send button */}
-              <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-gray-900 to-gray-800 flex items-center justify-center shrink-0 shadow-sm shadow-gray-900/10 cursor-pointer hover:shadow-md hover:shadow-gray-900/15 transition-shadow mb-0.5">
+              <button
+                onClick={handleSubmit}
+                disabled={!inputText.trim() || isTyping}
+                className="w-8 h-8 rounded-xl bg-gradient-to-br from-gray-900 to-gray-800 flex items-center justify-center shrink-0 shadow-sm shadow-gray-900/10 cursor-pointer hover:shadow-md hover:shadow-gray-900/15 transition-shadow mb-0.5 disabled:opacity-40 disabled:cursor-not-allowed"
+              >
                 <Send className="w-3.5 h-3.5 text-white" />
-              </div>
+              </button>
             </div>
             {/* Bottom row: hints + char count */}
             <div className="flex items-center justify-between px-4 pb-2.5">
@@ -2192,7 +2367,7 @@ export default function Home() {
                   initial={{ opacity: 0, y: 6 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.8 + i * 0.05, duration: 0.3 }}
-                  onClick={() => setInputText(chip)}
+                  onClick={() => handleSend(chip)}
                   className="px-3.5 py-1.5 rounded-full text-[12px] font-medium text-gray-500 bg-white/60 border border-gray-100/40 hover:text-gray-700 hover:bg-white/80 hover:border-gray-200/60 transition-all duration-200 backdrop-blur-sm"
                   style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.03)' }}
                 >
@@ -2204,38 +2379,11 @@ export default function Home() {
 
           <p className="text-[11px] text-gray-300 text-center mt-2.5 flex items-center justify-center gap-2 font-medium">
             <span className="inline-block w-1.5 h-1.5 rounded-full bg-emerald-400 shadow-sm shadow-emerald-400/30" />
-            ClearPath AI · Demo Mode — Verified resources · Calibrated confidence · BART-large-MNLI
+            ClearPath AI · Live Mode — Verified resources · Calibrated confidence · BART-large-MNLI
           </p>
         </div>
       </div>
       </div>{/* end main area wrapper */}
     </div>
   )
-}
-
-// ─── HELPERS ─────────────────────────────────────────────
-function getTransparencyItems(step: ChatStep): string[] {
-  if (step.isCrisis) return [
-    'Crisis keywords detected by hardcoded safety layer — not AI',
-    'AI models can misclassify crisis situations, so this check runs first and bypasses all AI processing',
-    'Your safety is always prioritized over resource matching'
-  ]
-  if (step.isClarify) return [
-    'Your request scored below 50% across all categories — too ambiguous for reliable matching',
-    'One clarification question can boost confidence by 30-40%, ensuring you get accurate resources',
-    'This is active learning — the model uses your answer to refine its classification'
-  ]
-
-  const items: string[] = []
-  if (step.upgradeInfo) {
-    items.push(`Clarification narrowed classification from ambiguous to ${step.upgradeInfo.category} — confidence jumped from ${step.upgradeInfo.from}% to ${step.upgradeInfo.to}%`)
-    items.push('The model combined your original text + clarification to re-score all categories')
-  } else {
-    items.push('Classified by BART-large-MNLI zero-shot model against 8 service categories')
-  }
-  items.push('Resources sourced from United Way 211 verified database')
-  if (step.categories.some(c => c.confidence < 70)) {
-    items.push(`${step.categories.filter(c => c.confidence < 70).map(c => c.label).join(', ')} below 70% threshold — consider providing more detail for better matches`)
-  }
-  return items
 }

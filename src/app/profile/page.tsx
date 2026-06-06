@@ -1,8 +1,10 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
+import { signOut } from 'next-auth/react'
 import {
   User,
   Mail,
@@ -50,8 +52,10 @@ import {
   ChevronDown,
   FileText,
   Globe2,
+  Loader2,
 } from 'lucide-react'
 import Navbar from '@/components/Navbar'
+import { useAuth } from '@/hooks/use-auth'
 
 // ─── MOCK DATA ──────────────────────────────────────────
 const activityTimeline = [
@@ -325,22 +329,78 @@ function ToggleSwitch({
   )
 }
 
+// ─── SKELETON COMPONENT ──────────────────────────────────
+function ProfileSkeleton() {
+  return (
+    <div className="min-h-screen flex flex-col mesh-gradient-bg">
+      <Navbar />
+      <main className="flex-1 pt-24 pb-16">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="glass-card rounded-3xl shadow-premium-lg relative overflow-hidden mb-8">
+            <div className="h-28 sm:h-36 bg-gray-200 animate-pulse" />
+            <div className="px-6 sm:px-8 pb-6 sm:pb-8 relative">
+              <div className="flex flex-col sm:flex-row items-center sm:items-end gap-6 -mt-10 sm:-mt-12">
+                <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-gray-300 animate-pulse" />
+                <div className="flex-1 text-center sm:text-left space-y-3">
+                  <div className="h-7 w-40 bg-gray-200 rounded-lg animate-pulse mx-auto sm:mx-0" />
+                  <div className="h-4 w-56 bg-gray-100 rounded-lg animate-pulse mx-auto sm:mx-0" />
+                </div>
+              </div>
+            </div>
+          </div>
+          <div className="grid grid-cols-3 gap-3 sm:gap-4 mb-8">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="glass-card rounded-2xl p-4 sm:p-5 shadow-premium text-center">
+                <div className="w-10 h-10 rounded-xl bg-gray-200 animate-pulse mx-auto mb-3" />
+                <div className="h-6 w-16 bg-gray-200 rounded-lg animate-pulse mx-auto mb-2" />
+                <div className="h-3 w-20 bg-gray-100 rounded-lg animate-pulse mx-auto" />
+              </div>
+            ))}
+          </div>
+          <div className="glass-card rounded-2xl p-6 sm:p-8 shadow-premium mb-8 space-y-5">
+            <div className="h-5 w-32 bg-gray-200 rounded-lg animate-pulse" />
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="h-12 bg-gray-100 rounded-xl animate-pulse" />
+            ))}
+          </div>
+        </div>
+      </main>
+    </div>
+  )
+}
+
 // ─── MAIN PROFILE PAGE ─────────────────────────────────
 export default function ProfilePage() {
+  const router = useRouter()
+  const { user: authUser, isLoading: authLoading, isAuthenticated, signOut: authSignOut } = useAuth()
+  const [profileLoading, setProfileLoading] = useState(true)
+  const [saving, setSaving] = useState(false)
+
+  // Profile state from API
+  const [profileData, setProfileData] = useState<{
+    id: string; name: string; email: string; image: string | null; username: string | null;
+    location: string | null; language: string | null; plan: string; createdAt: string;
+    stats: { totalConversations: number; totalResources: number; avgConfidence: number };
+  } | null>(null)
+  const [apiSavedResources, setApiSavedResources] = useState<Array<{
+    id: string; title: string; category: string; confidence: number; verifiedDate: string | null;
+    action: string | null; categoryColor: string;
+  }>>([])
+
   const [isEditing, setIsEditing] = useState(false)
   const [saved, setSaved] = useState(false)
-  const [fullName, setFullName] = useState('Alex Korane')
-  const [email, setEmail] = useState('alex@example.com')
+  const [fullName, setFullName] = useState('')
+  const [email, setEmail] = useState('')
   const [phone, setPhone] = useState('')
   const [location, setLocation] = useState('')
-  const [language, setLanguage] = useState('English')
+  const [language, setLanguage] = useState('')
 
   // Original values for cancel
-  const [origName, setOrigName] = useState(fullName)
-  const [origEmail, setOrigEmail] = useState(email)
-  const [origPhone, setOrigPhone] = useState(phone)
-  const [origLocation, setOrigLocation] = useState(location)
-  const [origLanguage, setOrigLanguage] = useState(language)
+  const [origName, setOrigName] = useState('')
+  const [origEmail, setOrigEmail] = useState('')
+  const [origPhone, setOrigPhone] = useState('')
+  const [origLocation, setOrigLocation] = useState('')
+  const [origLanguage, setOrigLanguage] = useState('')
 
   // Notification preferences state
   const [emailNotifs, setEmailNotifs] = useState(true)
@@ -363,6 +423,45 @@ export default function ProfilePage() {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
   const [deleteConfirmText, setDeleteConfirmText] = useState('')
 
+  // ─── Fetch profile on mount ──────────────────────────
+  useEffect(() => {
+    if (authLoading) return
+    if (!isAuthenticated || !authUser?.id) {
+      router.push('/login')
+      return
+    }
+    const fetchProfile = async () => {
+      try {
+        const [profileRes, resourcesRes] = await Promise.all([
+          fetch(`/api/user/profile?userId=${authUser.id}`),
+          fetch(`/api/saved-resources?userId=${authUser.id}`),
+        ])
+        if (profileRes.ok) {
+          const data = await profileRes.json()
+          setProfileData(data)
+          setFullName(data.name ?? '')
+          setEmail(data.email ?? '')
+          setPhone('')
+          setLocation(data.location ?? '')
+          setLanguage(data.language ?? 'English')
+        }
+        if (resourcesRes.ok) {
+          const resData = await resourcesRes.json()
+          setApiSavedResources(Array.isArray(resData) ? resData : [])
+        }
+      } catch (err) {
+        console.error('Failed to fetch profile:', err)
+      } finally {
+        setProfileLoading(false)
+      }
+    }
+    fetchProfile()
+  }, [authLoading, isAuthenticated, authUser?.id, router])
+
+  // Show skeleton while loading
+  if (authLoading || profileLoading) return <ProfileSkeleton />
+  if (!isAuthenticated) return null
+
   const handleEdit = () => {
     setOrigName(fullName)
     setOrigEmail(email)
@@ -382,10 +481,38 @@ export default function ProfilePage() {
     setIsEditing(false)
   }
 
-  const handleSave = () => {
-    setIsEditing(false)
-    setSaved(true)
-    setTimeout(() => setSaved(false), 3000)
+  const handleSave = async () => {
+    if (!authUser?.id) return
+    setSaving(true)
+    try {
+      const res = await fetch('/api/user/profile', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userId: authUser.id,
+          name: fullName,
+          email,
+          location,
+          language,
+        }),
+      })
+      if (res.ok) {
+        const updated = await res.json()
+        setProfileData((prev) => prev ? { ...prev, ...updated } : prev)
+        setIsEditing(false)
+        setSaved(true)
+        setTimeout(() => setSaved(false), 3000)
+      }
+    } catch (err) {
+      console.error('Failed to save profile:', err)
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  const handleSignOut = async () => {
+    await authSignOut()
+    router.push('/login')
   }
 
   const handleCopyReferral = () => {
@@ -401,8 +528,30 @@ export default function ProfilePage() {
     .toUpperCase()
     .slice(0, 2)
 
+  // Category icon/color mapping
+  const categoryMeta: Record<string, { icon: React.ComponentType<{ className?: string }>; color: string; bg: string }> = {
+    Housing: { icon: Home, color: '#3b82f6', bg: 'rgba(59,130,246,0.06)' },
+    Food: { icon: Utensils, color: '#10b981', bg: 'rgba(16,185,129,0.06)' },
+    'Mental Health': { icon: Heart, color: '#8b5cf6', bg: 'rgba(139,92,246,0.06)' },
+    Crisis: { icon: AlertTriangle, color: '#ef4444', bg: 'rgba(239,68,68,0.06)' },
+    Employment: { icon: Briefcase, color: '#f59e0b', bg: 'rgba(245,158,11,0.06)' },
+    Legal: { icon: Shield, color: '#06b6d4', bg: 'rgba(6,182,212,0.06)' },
+  }
+
+  // Map API resources to display format
+  const displayResources = apiSavedResources.map((r) => {
+    const meta = categoryMeta[r.category] ?? { icon: Bookmark, color: '#6b7280', bg: 'rgba(107,114,128,0.06)' }
+    return {
+      ...r,
+      categoryIcon: meta.icon,
+      categoryColor: r.categoryColor || meta.color,
+      categoryBg: meta.bg,
+      actionIcon: r.action?.includes('location') ? MapPin : r.action?.includes('Apply') ? Zap : r.action?.includes('Phone') ? Phone : Star,
+    }
+  })
+
   // Filter saved resources
-  const filteredResources = savedResources.filter((r) => {
+  const filteredResources = displayResources.filter((r) => {
     const matchesFilter = resourceFilter === 'all' || r.category === resourceFilter
     const matchesSearch = resourceSearch === '' || r.title.toLowerCase().includes(resourceSearch.toLowerCase()) || r.category.toLowerCase().includes(resourceSearch.toLowerCase())
     return matchesFilter && matchesSearch
@@ -416,6 +565,40 @@ export default function ProfilePage() {
 
   // Privacy score calculation
   const privacyScore = 85
+
+  // Computed values from profile data
+  const memberSince = profileData?.createdAt
+    ? new Date(profileData.createdAt).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })
+    : 'Recently'
+  const memberDays = profileData?.createdAt
+    ? Math.max(1, Math.floor((Date.now() - new Date(profileData.createdAt).getTime()) / (1000 * 60 * 60 * 24)))
+    : 1
+  const userPlan = profileData?.plan ?? 'free'
+  const stats = profileData?.stats ?? { totalConversations: 0, totalResources: 0, avgConfidence: 0 }
+
+  const accountStats = [
+    {
+      label: 'Conversations',
+      value: String(stats.totalConversations),
+      icon: Layers,
+      colorHex: '#3b82f6',
+      bgColor: 'rgba(59,130,246,0.06)',
+    },
+    {
+      label: 'Resources found',
+      value: String(stats.totalResources),
+      icon: Shield,
+      colorHex: '#10b981',
+      bgColor: 'rgba(16,185,129,0.06)',
+    },
+    {
+      label: 'Member for',
+      value: `${memberDays} day${memberDays !== 1 ? 's' : ''}`,
+      icon: Calendar,
+      colorHex: '#8b5cf6',
+      bgColor: 'rgba(139,92,246,0.06)',
+    },
+  ]
 
   return (
     <div className="min-h-screen flex flex-col mesh-gradient-bg">
@@ -480,7 +663,7 @@ export default function ProfilePage() {
                       {/* Member tier badge */}
                       <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider bg-emerald-50/80 text-emerald-600 border border-emerald-100/60">
                         <Crown className="w-3 h-3" />
-                        Free
+                        {userPlan === 'pro' ? 'Pro' : 'Free'}
                       </span>
                     </div>
                     <div className="flex flex-col sm:flex-row items-center sm:items-start gap-2 sm:gap-4 mt-2">
@@ -491,7 +674,7 @@ export default function ProfilePage() {
                       <div className="hidden sm:block w-1 h-1 rounded-full bg-gray-300" />
                       <div className="flex items-center gap-1.5 text-[14px] text-gray-500">
                         <Calendar className="w-3.5 h-3.5 text-gray-400" />
-                        Member since June 2026
+                        Member since {memberSince}
                       </div>
                     </div>
 
@@ -499,19 +682,19 @@ export default function ProfilePage() {
                     <div className="flex items-center justify-center sm:justify-start gap-3 mt-5">
                       <button
                         onClick={handleEdit}
-                        disabled={isEditing}
+                        disabled={isEditing || saving}
                         className="inline-flex items-center gap-2 px-5 py-2.5 text-[13px] font-semibold text-white rounded-xl bg-gradient-to-b from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 shadow-md shadow-blue-500/20 hover:shadow-lg hover:shadow-blue-500/30 transition-all active:scale-[0.97] disabled:opacity-50 disabled:cursor-not-allowed"
                       >
-                        <Edit3 className="w-3.5 h-3.5" />
-                        Edit profile
+                        {saving ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Edit3 className="w-3.5 h-3.5" />}
+                        {saving ? 'Saving...' : 'Edit profile'}
                       </button>
-                      <Link
-                        href="/login"
+                      <button
+                        onClick={handleSignOut}
                         className="inline-flex items-center gap-2 px-5 py-2.5 text-[13px] font-medium text-gray-500 hover:text-gray-700 rounded-xl hover:bg-gray-100/60 transition-all"
                       >
                         <LogOut className="w-3.5 h-3.5" />
                         Sign out
-                      </Link>
+                      </button>
                     </div>
                   </div>
                 </div>
@@ -550,7 +733,7 @@ export default function ProfilePage() {
                   <div className="flex items-center gap-3">
                     <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[12px] font-bold bg-emerald-100/80 text-emerald-700">
                       <Sparkles className="w-3.5 h-3.5" />
-                      Free Plan
+                      {userPlan === 'pro' ? 'Pro Plan' : 'Free Plan'}
                     </span>
                   </div>
                   <Link
@@ -562,7 +745,7 @@ export default function ProfilePage() {
                   </Link>
                 </div>
                 <p className="text-[12px] text-emerald-600/70">
-                  You are on the Free plan. Upgrade to Pro for unlimited conversations, full database access, and priority support.
+                  You are on the {userPlan === 'pro' ? 'Pro' : 'Free'} plan. {userPlan !== 'pro' ? 'Upgrade to Pro for unlimited conversations, full database access, and priority support.' : 'You have access to all premium features.'}
                 </p>
               </div>
 
@@ -652,7 +835,7 @@ export default function ProfilePage() {
                         Saved Resources
                       </h2>
                       <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-emerald-100/80 text-[10px] font-bold text-emerald-700">
-                        {savedResources.length}
+                        {displayResources.length}
                       </span>
                     </div>
                     <p className="text-[12px] text-gray-400 mt-0.5">
@@ -857,10 +1040,11 @@ export default function ProfilePage() {
                       <div className="flex items-center gap-3 pt-3">
                         <button
                           onClick={handleSave}
-                          className="inline-flex items-center gap-2 px-6 py-2.5 text-[13px] font-semibold text-white rounded-xl bg-gradient-to-b from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 shadow-md shadow-blue-500/20 hover:shadow-lg hover:shadow-blue-500/30 transition-all active:scale-[0.97]"
+                          disabled={saving}
+                          className="inline-flex items-center gap-2 px-6 py-2.5 text-[13px] font-semibold text-white rounded-xl bg-gradient-to-b from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 shadow-md shadow-blue-500/20 hover:shadow-lg hover:shadow-blue-500/30 transition-all active:scale-[0.97] disabled:opacity-50"
                         >
-                          <Check className="w-3.5 h-3.5" />
-                          Save changes
+                          {saving ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Check className="w-3.5 h-3.5" />}
+                          {saving ? 'Saving...' : 'Save changes'}
                         </button>
                         <button
                           onClick={handleCancel}
@@ -898,15 +1082,15 @@ export default function ProfilePage() {
                 </div>
                 <div className="grid grid-cols-3 gap-3 sm:gap-4 mb-6">
                   <div className="rounded-xl bg-blue-50/40 border border-blue-100/40 p-3 sm:p-4 text-center">
-                    <p className="text-xl sm:text-2xl font-extrabold tracking-tight text-blue-600">24</p>
+                    <p className="text-xl sm:text-2xl font-extrabold tracking-tight text-blue-600">{stats.totalConversations}</p>
                     <p className="text-[10px] sm:text-[11px] font-medium text-blue-500/70 mt-0.5">Conversations</p>
                   </div>
                   <div className="rounded-xl bg-emerald-50/40 border border-emerald-100/40 p-3 sm:p-4 text-center">
-                    <p className="text-xl sm:text-2xl font-extrabold tracking-tight text-emerald-600">47</p>
+                    <p className="text-xl sm:text-2xl font-extrabold tracking-tight text-emerald-600">{stats.totalResources}</p>
                     <p className="text-[10px] sm:text-[11px] font-medium text-emerald-500/70 mt-0.5">Resources found</p>
                   </div>
                   <div className="rounded-xl bg-violet-50/40 border border-violet-100/40 p-3 sm:p-4 text-center">
-                    <p className="text-xl sm:text-2xl font-extrabold tracking-tight text-violet-600">84%</p>
+                    <p className="text-xl sm:text-2xl font-extrabold tracking-tight text-violet-600">{stats.avgConfidence}%</p>
                     <p className="text-[10px] sm:text-[11px] font-medium text-violet-500/70 mt-0.5">Avg confidence</p>
                   </div>
                 </div>

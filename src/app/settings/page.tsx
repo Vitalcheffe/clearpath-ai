@@ -1,7 +1,8 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   Settings,
@@ -47,8 +48,10 @@ import {
   Mail,
   BadgeCheck,
   HelpCircle,
+  Loader2,
 } from 'lucide-react'
 import Navbar from '@/components/Navbar'
+import { useAuth } from '@/hooks/use-auth'
 
 // ─── TYPES ──────────────────────────────────────────────
 type SectionKey = 'general' | 'privacy' | 'notifications' | 'accessibility' | 'appearance' | 'account' | 'data' | 'advanced'
@@ -188,9 +191,67 @@ function SettingRow({
   )
 }
 
+// ─── SKELETON COMPONENT ──────────────────────────────────
+function SettingsSkeleton() {
+  return (
+    <div className="min-h-screen flex flex-col mesh-gradient-bg">
+      <Navbar />
+      <main className="flex-1 pt-20 pb-12">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-8">
+          <div className="flex items-center gap-4 mb-8">
+            <div className="w-12 h-12 rounded-2xl bg-gray-200 animate-pulse" />
+            <div className="space-y-2">
+              <div className="h-7 w-36 bg-gray-200 rounded-lg animate-pulse" />
+              <div className="h-4 w-64 bg-gray-100 rounded-lg animate-pulse" />
+            </div>
+          </div>
+          <div className="flex flex-col md:flex-row gap-6">
+            <div className="md:w-[220px] shrink-0">
+              <div className="glass-card rounded-2xl p-3 shadow-premium space-y-2">
+                {[...Array(8)].map((_, i) => (
+                  <div key={i} className="flex items-center gap-3 px-3 py-2.5">
+                    <div className="w-8 h-8 rounded-lg bg-gray-200 animate-pulse" />
+                    <div className="h-4 w-20 bg-gray-100 rounded animate-pulse" />
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div className="flex-1 glass-card rounded-2xl shadow-premium p-6 space-y-4">
+              <div className="flex items-center gap-3 pb-5 border-b border-gray-100/60">
+                <div className="w-10 h-10 rounded-xl bg-gray-200 animate-pulse" />
+                <div className="space-y-2">
+                  <div className="h-5 w-32 bg-gray-200 rounded animate-pulse" />
+                  <div className="h-3 w-56 bg-gray-100 rounded animate-pulse" />
+                </div>
+              </div>
+              {[...Array(6)].map((_, i) => (
+                <div key={i} className="flex items-center justify-between py-4 px-5">
+                  <div className="flex items-center gap-4">
+                    <div className="w-10 h-10 rounded-xl bg-gray-100 animate-pulse" />
+                    <div className="space-y-2">
+                      <div className="h-4 w-32 bg-gray-200 rounded animate-pulse" />
+                      <div className="h-3 w-48 bg-gray-100 rounded animate-pulse" />
+                    </div>
+                  </div>
+                  <div className="w-12 h-7 bg-gray-200 rounded-full animate-pulse" />
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  )
+}
+
 // ─── MAIN SETTINGS PAGE ────────────────────────────────
 export default function SettingsPage() {
+  const router = useRouter()
+  const { user, isLoading: authLoading, isAuthenticated } = useAuth()
   const [activeSection, setActiveSection] = useState<SectionKey>('general')
+  const [settingsLoading, setSettingsLoading] = useState(true)
+  const [saving, setSaving] = useState(false)
+  const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 
   // General state
   const [language, setLanguage] = useState('English')
@@ -241,6 +302,120 @@ export default function SettingsPage() {
   const [developerMode, setDeveloperMode] = useState(false)
   const [debugLogging, setDebugLogging] = useState(false)
 
+  // ─── Fetch settings on mount ──────────────────────────
+  useEffect(() => {
+    if (authLoading) return
+    if (!isAuthenticated || !user?.id) {
+      router.push('/login')
+      return
+    }
+    const fetchSettings = async () => {
+      try {
+        const res = await fetch(`/api/user/settings?userId=${user.id}`)
+        if (res.ok) {
+          const data = await res.json()
+          if (data) {
+            setLanguage(data.language ?? 'English')
+            setTheme((data.theme as 'light' | 'dark') ?? 'light')
+            setZipCode(data.zipCode ?? '')
+            setConfidenceThreshold(data.confidenceThreshold ?? 70)
+            setDefaultCategory(data.defaultCategory ?? 'All')
+            setAutoClarification(data.autoClarification ?? true)
+            setDistanceUnit((data.distanceUnit as 'miles' | 'km') ?? 'miles')
+            setNotificationSound(data.notificationSound ?? true)
+            setDataRetention(data.dataRetention ?? true)
+            setShareUsage(data.shareUsage ?? false)
+            setSessionTimeout(data.sessionTimeout ?? '30')
+            setIpMasking(data.ipMasking ?? false)
+            setDoNotTrack(data.doNotTrack ?? false)
+            setBlockThirdPartyCookies(data.blockThirdPartyCookies ?? true)
+            setTwoFactor(data.twoFactor ?? false)
+            setEmailNotifs(data.emailNotifs ?? true)
+            setResourceUpdates(data.resourceUpdates ?? true)
+            setNewFeatures(data.newFeatures ?? false)
+            setWeeklySummary(data.weeklySummary ?? false)
+            setLargeText(data.largeText ?? false)
+            setHighContrast(data.highContrast ?? false)
+            setScreenReader(data.screenReader ?? false)
+            setReducedMotion(data.reducedMotion ?? false)
+            setFontSize((data.fontSize as 'normal' | 'large' | 'xl') ?? 'normal')
+            setDensity((data.density as 'compact' | 'comfortable' | 'spacious') ?? 'comfortable')
+            setSidebarPosition((data.sidebarPosition as 'left' | 'right') ?? 'left')
+            setAnimationSpeed((data.animationSpeed as 'slow' | 'normal' | 'fast') ?? 'normal')
+            setAutoDelete((data.autoDelete as 'never' | '30' | '90') ?? 'never')
+            setDownloadFormat((data.downloadFormat as 'json' | 'csv' | 'pdf') ?? 'json')
+            setDeveloperMode(data.developerMode ?? false)
+            setDebugLogging(data.debugLogging ?? false)
+          }
+        }
+      } catch (err) {
+        console.error('Failed to fetch settings:', err)
+      } finally {
+        setSettingsLoading(false)
+      }
+    }
+    fetchSettings()
+  }, [authLoading, isAuthenticated, user?.id, router])
+
+  // ─── Persist settings changes ─────────────────────────
+  const persistSetting = useCallback(async (updates: Record<string, unknown>) => {
+    if (!user?.id) return
+    setSaving(true)
+    try {
+      await fetch('/api/user/settings', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId: user.id, ...updates }),
+      })
+    } catch (err) {
+      console.error('Failed to save settings:', err)
+    } finally {
+      setSaving(false)
+    }
+  }, [user?.id])
+
+  const debouncedPersist = useCallback((updates: Record<string, unknown>) => {
+    if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current)
+    saveTimeoutRef.current = setTimeout(() => persistSetting(updates), 500)
+  }, [persistSetting])
+
+  // Wrapped setters that also persist
+  const updateLanguage = useCallback((v: string) => { setLanguage(v); debouncedPersist({ language: v }) }, [debouncedPersist])
+  const updateTheme = useCallback((v: 'light' | 'dark') => { setTheme(v); debouncedPersist({ theme: v }) }, [debouncedPersist])
+  const updateZipCode = useCallback((v: string) => { setZipCode(v); debouncedPersist({ zipCode: v }) }, [debouncedPersist])
+  const updateConfidenceThreshold = useCallback((v: number) => { setConfidenceThreshold(v); debouncedPersist({ confidenceThreshold: v }) }, [debouncedPersist])
+  const updateDefaultCategory = useCallback((v: string) => { setDefaultCategory(v); debouncedPersist({ defaultCategory: v }) }, [debouncedPersist])
+  const updateAutoClarification = useCallback((v: boolean) => { setAutoClarification(v); persistSetting({ autoClarification: v }) }, [persistSetting])
+  const updateDistanceUnit = useCallback((v: 'miles' | 'km') => { setDistanceUnit(v); debouncedPersist({ distanceUnit: v }) }, [debouncedPersist])
+  const updateNotificationSound = useCallback((v: boolean) => { setNotificationSound(v); persistSetting({ notificationSound: v }) }, [persistSetting])
+  const updateDataRetention = useCallback((v: boolean) => { setDataRetention(v); persistSetting({ dataRetention: v }) }, [persistSetting])
+  const updateShareUsage = useCallback((v: boolean) => { setShareUsage(v); persistSetting({ shareUsage: v }) }, [persistSetting])
+  const updateSessionTimeout = useCallback((v: string) => { setSessionTimeout(v); debouncedPersist({ sessionTimeout: v }) }, [debouncedPersist])
+  const updateIpMasking = useCallback((v: boolean) => { setIpMasking(v); persistSetting({ ipMasking: v }) }, [persistSetting])
+  const updateDoNotTrack = useCallback((v: boolean) => { setDoNotTrack(v); persistSetting({ doNotTrack: v }) }, [persistSetting])
+  const updateBlockThirdPartyCookies = useCallback((v: boolean) => { setBlockThirdPartyCookies(v); persistSetting({ blockThirdPartyCookies: v }) }, [persistSetting])
+  const updateTwoFactor = useCallback((v: boolean) => { setTwoFactor(v); persistSetting({ twoFactor: v }) }, [persistSetting])
+  const updateEmailNotifs = useCallback((v: boolean) => { setEmailNotifs(v); persistSetting({ emailNotifs: v }) }, [persistSetting])
+  const updateResourceUpdates = useCallback((v: boolean) => { setResourceUpdates(v); persistSetting({ resourceUpdates: v }) }, [persistSetting])
+  const updateNewFeatures = useCallback((v: boolean) => { setNewFeatures(v); persistSetting({ newFeatures: v }) }, [persistSetting])
+  const updateWeeklySummary = useCallback((v: boolean) => { setWeeklySummary(v); persistSetting({ weeklySummary: v }) }, [persistSetting])
+  const updateLargeText = useCallback((v: boolean) => { setLargeText(v); persistSetting({ largeText: v }) }, [persistSetting])
+  const updateHighContrast = useCallback((v: boolean) => { setHighContrast(v); persistSetting({ highContrast: v }) }, [persistSetting])
+  const updateScreenReader = useCallback((v: boolean) => { setScreenReader(v); persistSetting({ screenReader: v }) }, [persistSetting])
+  const updateReducedMotion = useCallback((v: boolean) => { setReducedMotion(v); persistSetting({ reducedMotion: v }) }, [persistSetting])
+  const updateFontSize = useCallback((v: 'normal' | 'large' | 'xl') => { setFontSize(v); debouncedPersist({ fontSize: v }) }, [debouncedPersist])
+  const updateDensity = useCallback((v: 'compact' | 'comfortable' | 'spacious') => { setDensity(v); debouncedPersist({ density: v }) }, [debouncedPersist])
+  const updateSidebarPosition = useCallback((v: 'left' | 'right') => { setSidebarPosition(v); debouncedPersist({ sidebarPosition: v }) }, [debouncedPersist])
+  const updateAnimationSpeed = useCallback((v: 'slow' | 'normal' | 'fast') => { setAnimationSpeed(v); debouncedPersist({ animationSpeed: v }) }, [debouncedPersist])
+  const updateAutoDelete = useCallback((v: 'never' | '30' | '90') => { setAutoDelete(v); debouncedPersist({ autoDelete: v }) }, [debouncedPersist])
+  const updateDownloadFormat = useCallback((v: 'json' | 'csv' | 'pdf') => { setDownloadFormat(v); debouncedPersist({ downloadFormat: v }) }, [debouncedPersist])
+  const updateDeveloperMode = useCallback((v: boolean) => { setDeveloperMode(v); persistSetting({ developerMode: v }) }, [persistSetting])
+  const updateDebugLogging = useCallback((v: boolean) => { setDebugLogging(v); persistSetting({ debugLogging: v }) }, [persistSetting])
+
+  // Show skeleton while loading
+  if (authLoading || settingsLoading) return <SettingsSkeleton />
+  if (!isAuthenticated) return null
+
   const getConfidenceLabel = (val: number): string => {
     if (val <= 50) return 'Low'
     if (val <= 70) return 'Medium'
@@ -283,6 +458,12 @@ export default function SettingsPage() {
                 </h1>
                 <p className="text-[14px] text-gray-500 mt-0.5">
                   Manage your preferences and privacy controls
+                  {saving && (
+                    <span className="inline-flex items-center gap-1.5 ml-3 text-[12px] text-blue-500">
+                      <Loader2 className="w-3 h-3 animate-spin" />
+                      Saving...
+                    </span>
+                  )}
                 </p>
               </div>
             </div>
@@ -415,7 +596,7 @@ export default function SettingsPage() {
                           >
                             <select
                               value={language}
-                              onChange={(e) => setLanguage(e.target.value)}
+                              onChange={(e) => updateLanguage(e.target.value)}
                               className="appearance-none bg-white border border-gray-200 rounded-xl px-4 py-2 text-[13px] font-medium text-gray-900 pr-9 shadow-sm hover:border-gray-300 focus:border-blue-400 focus:ring-2 focus:ring-blue-500/10 focus:outline-none transition-all cursor-pointer"
                               style={{
                                 backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%239ca3af' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E")`,
@@ -440,7 +621,7 @@ export default function SettingsPage() {
                           >
                             <div className="flex items-center gap-1 p-1 bg-gray-100 rounded-xl">
                               <button
-                                onClick={() => setTheme('light')}
+                                onClick={() => updateTheme('light')}
                                 className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[12px] font-semibold transition-all ${
                                   theme === 'light'
                                     ? 'bg-white text-gray-900 shadow-sm'
@@ -451,7 +632,7 @@ export default function SettingsPage() {
                                 Light
                               </button>
                               <button
-                                onClick={() => setTheme('dark')}
+                                onClick={() => updateTheme('dark')}
                                 className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[12px] font-semibold transition-all relative ${
                                   theme === 'dark'
                                     ? 'bg-white text-gray-900 shadow-sm'
@@ -479,7 +660,7 @@ export default function SettingsPage() {
                           >
                             <select
                               value={defaultCategory}
-                              onChange={(e) => setDefaultCategory(e.target.value)}
+                              onChange={(e) => updateDefaultCategory(e.target.value)}
                               className="appearance-none bg-white border border-gray-200 rounded-xl px-4 py-2 text-[13px] font-medium text-gray-900 pr-9 shadow-sm hover:border-gray-300 focus:border-blue-400 focus:ring-2 focus:ring-blue-500/10 focus:outline-none transition-all cursor-pointer"
                               style={{
                                 backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%239ca3af' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E")`,
@@ -504,7 +685,7 @@ export default function SettingsPage() {
                             title="Auto-clarification"
                             description="Automatically ask follow-up questions when confidence is below threshold"
                           >
-                            <ToggleSwitch checked={autoClarification} onChange={setAutoClarification} />
+                            <ToggleSwitch checked={autoClarification} onChange={updateAutoClarification} />
                           </SettingRow>
 
                           {/* Default Location */}
@@ -518,7 +699,7 @@ export default function SettingsPage() {
                             <input
                               type="text"
                               value={zipCode}
-                              onChange={(e) => setZipCode(e.target.value.replace(/\D/g, '').slice(0, 5))}
+                              onChange={(e) => updateZipCode(e.target.value.replace(/\D/g, '').slice(0, 5))}
                               placeholder="e.g. 10001"
                               maxLength={5}
                               className="w-28 bg-white border border-gray-200 rounded-xl px-4 py-2 text-[13px] font-medium text-gray-900 placeholder:text-gray-400 shadow-sm hover:border-gray-300 focus:border-blue-400 focus:ring-2 focus:ring-blue-500/10 focus:outline-none transition-all"
@@ -535,7 +716,7 @@ export default function SettingsPage() {
                           >
                             <div className="flex items-center gap-1 p-1 bg-gray-100 rounded-xl">
                               <button
-                                onClick={() => setDistanceUnit('miles')}
+                                onClick={() => updateDistanceUnit('miles')}
                                 className={`px-3 py-1.5 rounded-lg text-[12px] font-semibold transition-all ${
                                   distanceUnit === 'miles' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700'
                                 }`}
@@ -543,7 +724,7 @@ export default function SettingsPage() {
                                 Miles
                               </button>
                               <button
-                                onClick={() => setDistanceUnit('km')}
+                                onClick={() => updateDistanceUnit('km')}
                                 className={`px-3 py-1.5 rounded-lg text-[12px] font-semibold transition-all ${
                                   distanceUnit === 'km' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700'
                                 }`}
@@ -561,7 +742,7 @@ export default function SettingsPage() {
                             title="Notification sound"
                             description="Play a sound when new notifications arrive"
                           >
-                            <ToggleSwitch checked={notificationSound} onChange={setNotificationSound} />
+                            <ToggleSwitch checked={notificationSound} onChange={updateNotificationSound} />
                           </SettingRow>
 
                           {/* Confidence Threshold */}
@@ -575,7 +756,7 @@ export default function SettingsPage() {
                             <div className="flex flex-col items-end gap-2">
                               <div className="flex items-center gap-3">
                                 <button
-                                  onClick={() => setConfidenceThreshold(50)}
+                                  onClick={() => updateConfidenceThreshold(50)}
                                   className={`px-2.5 py-1 rounded-lg text-[11px] font-bold transition-all ${
                                     confidenceThreshold <= 50
                                       ? 'bg-amber-50 text-amber-600 border border-amber-200/60'
@@ -585,7 +766,7 @@ export default function SettingsPage() {
                                   Low
                                 </button>
                                 <button
-                                  onClick={() => setConfidenceThreshold(70)}
+                                  onClick={() => updateConfidenceThreshold(70)}
                                   className={`px-2.5 py-1 rounded-lg text-[11px] font-bold transition-all ${
                                     confidenceThreshold > 50 && confidenceThreshold <= 70
                                       ? 'bg-blue-50 text-blue-600 border border-blue-200/60'
@@ -595,7 +776,7 @@ export default function SettingsPage() {
                                   Medium
                                 </button>
                                 <button
-                                  onClick={() => setConfidenceThreshold(90)}
+                                  onClick={() => updateConfidenceThreshold(90)}
                                   className={`px-2.5 py-1 rounded-lg text-[11px] font-bold transition-all ${
                                     confidenceThreshold > 70
                                       ? 'bg-emerald-50 text-emerald-600 border border-emerald-200/60'
@@ -644,7 +825,7 @@ export default function SettingsPage() {
                             title="Don't store any conversation data"
                             description="When enabled, your conversations are never stored on our servers. This is on by default to protect your privacy."
                           >
-                            <ToggleSwitch checked={dataRetention} onChange={setDataRetention} />
+                            <ToggleSwitch checked={dataRetention} onChange={updateDataRetention} />
                           </SettingRow>
 
                           <SettingRow
@@ -666,7 +847,7 @@ export default function SettingsPage() {
                             title="Share usage data for improvement"
                             description="Help us improve ClearPath AI by sharing anonymized usage patterns. No personal data is ever shared."
                           >
-                            <ToggleSwitch checked={shareUsage} onChange={setShareUsage} />
+                            <ToggleSwitch checked={shareUsage} onChange={updateShareUsage} />
                           </SettingRow>
 
                           {/* Session Timeout */}
@@ -679,7 +860,7 @@ export default function SettingsPage() {
                           >
                             <select
                               value={sessionTimeout}
-                              onChange={(e) => setSessionTimeout(e.target.value)}
+                              onChange={(e) => updateSessionTimeout(e.target.value)}
                               className="appearance-none bg-white border border-gray-200 rounded-xl px-4 py-2 text-[13px] font-medium text-gray-900 pr-9 shadow-sm hover:border-gray-300 focus:outline-none transition-all cursor-pointer"
                               style={{
                                 backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%239ca3af' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E")`,
@@ -702,7 +883,7 @@ export default function SettingsPage() {
                             title="IP masking"
                             description="Mask your IP address from analytics and logging systems"
                           >
-                            <ToggleSwitch checked={ipMasking} onChange={setIpMasking} />
+                            <ToggleSwitch checked={ipMasking} onChange={updateIpMasking} />
                           </SettingRow>
 
                           {/* Do Not Track */}
@@ -713,7 +894,7 @@ export default function SettingsPage() {
                             title="Do-not-track header"
                             description="Send DNT headers to all third-party services and analytics"
                           >
-                            <ToggleSwitch checked={doNotTrack} onChange={setDoNotTrack} />
+                            <ToggleSwitch checked={doNotTrack} onChange={updateDoNotTrack} />
                           </SettingRow>
 
                           {/* Block Third-Party Cookies */}
@@ -724,7 +905,7 @@ export default function SettingsPage() {
                             title="Block third-party cookies"
                             description="Prevent third-party services from setting tracking cookies in your browser"
                           >
-                            <ToggleSwitch checked={blockThirdPartyCookies} onChange={setBlockThirdPartyCookies} />
+                            <ToggleSwitch checked={blockThirdPartyCookies} onChange={updateBlockThirdPartyCookies} />
                           </SettingRow>
 
                           {/* Delete All Data */}
@@ -857,7 +1038,7 @@ export default function SettingsPage() {
                             title="Two-factor authentication"
                             description="Add an extra layer of security by requiring a code from your authenticator app"
                           >
-                            <ToggleSwitch checked={twoFactor} onChange={setTwoFactor} />
+                            <ToggleSwitch checked={twoFactor} onChange={updateTwoFactor} />
                           </SettingRow>
 
                           <SettingRow
@@ -896,7 +1077,7 @@ export default function SettingsPage() {
                             title="Email notifications"
                             description="Receive important updates and alerts via email"
                           >
-                            <ToggleSwitch checked={emailNotifs} onChange={setEmailNotifs} />
+                            <ToggleSwitch checked={emailNotifs} onChange={updateEmailNotifs} />
                           </SettingRow>
 
                           <SettingRow
@@ -906,7 +1087,7 @@ export default function SettingsPage() {
                             title="Resource updates"
                             description="Get notified when saved resources have changes or new information"
                           >
-                            <ToggleSwitch checked={resourceUpdates} onChange={setResourceUpdates} />
+                            <ToggleSwitch checked={resourceUpdates} onChange={updateResourceUpdates} />
                           </SettingRow>
 
                           <SettingRow
@@ -916,7 +1097,7 @@ export default function SettingsPage() {
                             title="New features"
                             description="Be the first to know about new features and improvements to ClearPath AI"
                           >
-                            <ToggleSwitch checked={newFeatures} onChange={setNewFeatures} />
+                            <ToggleSwitch checked={newFeatures} onChange={updateNewFeatures} />
                           </SettingRow>
 
                           <SettingRow
@@ -926,7 +1107,7 @@ export default function SettingsPage() {
                             title="Weekly summary"
                             description="Receive a weekly digest of your activity and helpful resources"
                           >
-                            <ToggleSwitch checked={weeklySummary} onChange={setWeeklySummary} />
+                            <ToggleSwitch checked={weeklySummary} onChange={updateWeeklySummary} />
                           </SettingRow>
                         </>
                       )}
@@ -941,7 +1122,7 @@ export default function SettingsPage() {
                             title="Large text"
                             description="Increase text size throughout the interface for better readability"
                           >
-                            <ToggleSwitch checked={largeText} onChange={setLargeText} />
+                            <ToggleSwitch checked={largeText} onChange={updateLargeText} />
                           </SettingRow>
 
                           <SettingRow
@@ -951,7 +1132,7 @@ export default function SettingsPage() {
                             title="High contrast mode"
                             description="Increase color contrast for better visual distinction between elements"
                           >
-                            <ToggleSwitch checked={highContrast} onChange={setHighContrast} />
+                            <ToggleSwitch checked={highContrast} onChange={updateHighContrast} />
                           </SettingRow>
 
                           <SettingRow
@@ -961,7 +1142,7 @@ export default function SettingsPage() {
                             title="Screen reader optimization"
                             description="Enhance the interface for screen readers with additional ARIA labels and descriptions"
                           >
-                            <ToggleSwitch checked={screenReader} onChange={setScreenReader} />
+                            <ToggleSwitch checked={screenReader} onChange={updateScreenReader} />
                           </SettingRow>
 
                           <SettingRow
@@ -971,7 +1152,7 @@ export default function SettingsPage() {
                             title="Reduced motion"
                             description="Minimize animations and transitions throughout the interface"
                           >
-                            <ToggleSwitch checked={reducedMotion} onChange={setReducedMotion} />
+                            <ToggleSwitch checked={reducedMotion} onChange={updateReducedMotion} />
                           </SettingRow>
                         </>
                       )}
@@ -991,7 +1172,7 @@ export default function SettingsPage() {
                               {(['normal', 'large', 'xl'] as const).map((size) => (
                                 <button
                                   key={size}
-                                  onClick={() => setFontSize(size)}
+                                  onClick={() => updateFontSize(size)}
                                   className={`px-3 py-1.5 rounded-lg text-[12px] font-semibold transition-all ${
                                     fontSize === size ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700'
                                   }`}
@@ -1014,7 +1195,7 @@ export default function SettingsPage() {
                               {(['compact', 'comfortable', 'spacious'] as const).map((d) => (
                                 <button
                                   key={d}
-                                  onClick={() => setDensity(d)}
+                                  onClick={() => updateDensity(d)}
                                   className={`px-2.5 py-1.5 rounded-lg text-[11px] font-semibold capitalize transition-all ${
                                     density === d ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700'
                                   }`}
@@ -1035,7 +1216,7 @@ export default function SettingsPage() {
                           >
                             <div className="flex items-center gap-1 p-1 bg-gray-100 rounded-xl">
                               <button
-                                onClick={() => setSidebarPosition('left')}
+                                onClick={() => updateSidebarPosition('left')}
                                 className={`px-3 py-1.5 rounded-lg text-[12px] font-semibold transition-all ${
                                   sidebarPosition === 'left' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700'
                                 }`}
@@ -1043,7 +1224,7 @@ export default function SettingsPage() {
                                 Left
                               </button>
                               <button
-                                onClick={() => setSidebarPosition('right')}
+                                onClick={() => updateSidebarPosition('right')}
                                 className={`px-3 py-1.5 rounded-lg text-[12px] font-semibold transition-all ${
                                   sidebarPosition === 'right' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700'
                                 }`}
@@ -1065,7 +1246,7 @@ export default function SettingsPage() {
                               {(['slow', 'normal', 'fast'] as const).map((speed) => (
                                 <button
                                   key={speed}
-                                  onClick={() => setAnimationSpeed(speed)}
+                                  onClick={() => updateAnimationSpeed(speed)}
                                   className={`px-2.5 py-1.5 rounded-lg text-[11px] font-semibold capitalize transition-all ${
                                     animationSpeed === speed ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700'
                                   }`}
@@ -1141,7 +1322,7 @@ export default function SettingsPage() {
                           >
                             <select
                               value={autoDelete}
-                              onChange={(e) => setAutoDelete(e.target.value as 'never' | '30' | '90')}
+                              onChange={(e) => updateAutoDelete(e.target.value as 'never' | '30' | '90')}
                               className="appearance-none bg-white border border-gray-200 rounded-xl px-4 py-2 text-[13px] font-medium text-gray-900 pr-9 shadow-sm hover:border-gray-300 focus:outline-none transition-all cursor-pointer"
                               style={{
                                 backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%239ca3af' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E")`,
@@ -1167,7 +1348,7 @@ export default function SettingsPage() {
                               {(['json', 'csv', 'pdf'] as const).map((fmt) => (
                                 <button
                                   key={fmt}
-                                  onClick={() => setDownloadFormat(fmt)}
+                                  onClick={() => updateDownloadFormat(fmt)}
                                   className={`px-3 py-1.5 rounded-lg text-[11px] font-semibold uppercase transition-all ${
                                     downloadFormat === fmt ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700'
                                   }`}
@@ -1237,7 +1418,7 @@ export default function SettingsPage() {
                             title="Developer mode"
                             description="Enable developer tools, API access, and debug information in the interface"
                           >
-                            <ToggleSwitch checked={developerMode} onChange={setDeveloperMode} />
+                            <ToggleSwitch checked={developerMode} onChange={updateDeveloperMode} />
                           </SettingRow>
 
                           {/* API Key Management */}
@@ -1314,7 +1495,7 @@ export default function SettingsPage() {
                             title="Debug logging"
                             description="Enable verbose logging to console for troubleshooting. This may impact performance."
                           >
-                            <ToggleSwitch checked={debugLogging} onChange={setDebugLogging} />
+                            <ToggleSwitch checked={debugLogging} onChange={updateDebugLogging} />
                           </SettingRow>
 
                           {/* Debug info card */}

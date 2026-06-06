@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
@@ -29,10 +29,26 @@ import {
   TrendingUp,
   Bookmark,
   Sliders,
+  Loader2,
+  LogIn,
 } from 'lucide-react'
 import Navbar from '@/components/Navbar'
+import { useAuth } from '@/hooks/use-auth'
 
 // ─── TYPES ───────────────────────────────────────────────
+interface ApiConversation {
+  id: string
+  title: string
+  preview: string
+  category: string | null
+  categoryColor: string | null
+  confidence: number
+  isCrisis: boolean
+  topResource?: string | null
+  createdAt: string
+  updatedAt: string
+}
+
 interface Conversation {
   id: string
   title: string
@@ -44,177 +60,8 @@ interface Conversation {
   timestamp: string
   group: string
   topResource?: string
+  createdAt: string
 }
-
-// ─── MOCK DATA ───────────────────────────────────────────
-const conversations: Conversation[] = [
-  {
-    id: 'conv-1',
-    title: 'Job loss and rent help',
-    category: 'Housing',
-    categoryColor: '#3b82f6',
-    confidence: 87,
-    preview: "I lost my job and can't pay rent. My kids need food.",
-    timestamp: '2 hours ago',
-    group: 'Today',
-    topResource: 'Section 8 Emergency Transfer',
-  },
-  {
-    id: 'conv-2',
-    title: 'Crisis support needed',
-    category: 'Crisis',
-    categoryColor: '#ef4444',
-    confidence: 100,
-    isCrisis: true,
-    preview: "I can't take this anymore. I want it all to end.",
-    timestamp: '18 min ago',
-    group: 'Today',
-    topResource: '988 Crisis Lifeline',
-  },
-  {
-    id: 'conv-3',
-    title: 'Housing clarification',
-    category: 'Housing',
-    categoryColor: '#3b82f6',
-    confidence: 43,
-    preview: 'I need help with my situation',
-    timestamp: 'Yesterday',
-    group: 'Yesterday',
-    topResource: 'Emergency Housing Hotline',
-  },
-  {
-    id: 'conv-4',
-    title: 'Senior grocery delivery',
-    category: 'Food',
-    categoryColor: '#f59e0b',
-    confidence: 94,
-    preview: "I'm 78 and need help getting groceries delivered",
-    timestamp: 'Yesterday',
-    group: 'Yesterday',
-    topResource: 'Meals on Wheels Program',
-  },
-  {
-    id: 'conv-5',
-    title: 'Veteran PTSD support',
-    category: 'Mental Health',
-    categoryColor: '#8b5cf6',
-    confidence: 91,
-    preview: "I'm a veteran dealing with PTSD and housing issues",
-    timestamp: '3 days ago',
-    group: 'This Week',
-    topResource: 'VA PTSD Counseling',
-  },
-  {
-    id: 'conv-6',
-    title: 'SNAP eligibility check',
-    category: 'Food',
-    categoryColor: '#f59e0b',
-    confidence: 94,
-    preview: 'Do I qualify for SNAP benefits?',
-    timestamp: '4 days ago',
-    group: 'This Week',
-    topResource: 'SNAP Benefits Application',
-  },
-  {
-    id: 'conv-7',
-    title: 'Emergency housing tonight',
-    category: 'Housing',
-    categoryColor: '#3b82f6',
-    confidence: 92,
-    preview: 'I need emergency housing tonight.',
-    timestamp: '5 days ago',
-    group: 'This Week',
-    topResource: 'Salvation Army Shelter',
-  },
-  {
-    id: 'conv-8',
-    title: 'Mental health resources',
-    category: 'Mental Health',
-    categoryColor: '#8b5cf6',
-    confidence: 83,
-    preview: "It's about my emotions. I've been like this for months.",
-    timestamp: '1 week ago',
-    group: 'Earlier',
-    topResource: 'Community Mental Health Center',
-  },
-  {
-    id: 'conv-9',
-    title: 'Utility assistance',
-    category: 'Housing',
-    categoryColor: '#3b82f6',
-    confidence: 89,
-    preview: 'I also need help with utilities.',
-    timestamp: '2 weeks ago',
-    group: 'Earlier',
-    topResource: 'LIHEAP Energy Assistance',
-  },
-  {
-    id: 'conv-10',
-    title: 'Legal aid consultation',
-    category: 'Legal',
-    categoryColor: '#06b6d4',
-    confidence: 81,
-    preview: 'I need legal help with my eviction notice',
-    timestamp: '2 weeks ago',
-    group: 'Earlier',
-    topResource: 'Legal Aid Society',
-  },
-  {
-    id: 'conv-11',
-    title: 'Employment services inquiry',
-    category: 'Employment',
-    categoryColor: '#10b981',
-    confidence: 68,
-    preview: 'Are there job training programs near me?',
-    timestamp: '3 weeks ago',
-    group: 'Earlier',
-    topResource: 'Workforce Development Center',
-  },
-  {
-    id: 'conv-12',
-    title: 'Childcare support options',
-    category: 'Housing',
-    categoryColor: '#3b82f6',
-    confidence: 72,
-    preview: 'I need affordable childcare while I work',
-    timestamp: '3 weeks ago',
-    group: 'Earlier',
-    topResource: 'Head Start Program',
-  },
-  {
-    id: 'conv-13',
-    title: 'Disability benefits application',
-    category: 'Legal',
-    categoryColor: '#06b6d4',
-    confidence: 78,
-    preview: 'How do I apply for disability benefits?',
-    timestamp: '1 month ago',
-    group: 'Earlier',
-    topResource: 'SSA Disability Office',
-  },
-  {
-    id: 'conv-14',
-    title: 'Medicaid enrollment help',
-    category: 'Food',
-    categoryColor: '#f59e0b',
-    confidence: 86,
-    preview: 'I need help signing up for Medicaid for my family',
-    timestamp: '1 month ago',
-    group: 'Earlier',
-    topResource: 'Medicaid Application Center',
-  },
-  {
-    id: 'conv-15',
-    title: 'Domestic violence shelter',
-    category: 'Crisis',
-    categoryColor: '#ef4444',
-    confidence: 96,
-    preview: 'I need to find a safe place to stay tonight',
-    timestamp: '1 month ago',
-    group: 'Earlier',
-    topResource: 'National DV Hotline',
-  },
-]
 
 // ─── FILTER CATEGORIES ───────────────────────────────────
 const filterCategories = [
@@ -235,6 +82,61 @@ const confidenceFilters = [
 ]
 
 const recentSearches = ['housing assistance', 'food stamps', 'crisis support', 'legal aid']
+
+// ─── DATE GROUPING HELPERS ───────────────────────────────
+function getDateGroup(dateStr: string): string {
+  const date = new Date(dateStr)
+  const now = new Date()
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate())
+  const yesterday = new Date(today.getTime() - 86400000)
+  const weekAgo = new Date(today.getTime() - 7 * 86400000)
+
+  if (date >= today) return 'Today'
+  if (date >= yesterday) return 'Yesterday'
+  if (date >= weekAgo) return 'This Week'
+  return 'Earlier'
+}
+
+function formatTimestamp(dateStr: string): string {
+  const date = new Date(dateStr)
+  const now = new Date()
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate())
+  const yesterday = new Date(today.getTime() - 86400000)
+
+  if (date >= today) {
+    const diffMs = now.getTime() - date.getTime()
+    const diffMins = Math.floor(diffMs / 60000)
+    if (diffMins < 1) return 'Just now'
+    if (diffMins < 60) return `${diffMins} min ago`
+    const diffHours = Math.floor(diffMins / 60)
+    return `${diffHours} hour${diffHours > 1 ? 's' : ''} ago`
+  }
+
+  if (date >= yesterday) return 'Yesterday'
+
+  const diffMs = now.getTime() - date.getTime()
+  const diffDays = Math.floor(diffMs / 86400000)
+  if (diffDays < 7) return `${diffDays} day${diffDays > 1 ? 's' : ''} ago`
+  if (diffDays < 30) return `${Math.floor(diffDays / 7)} week${Math.floor(diffDays / 7) > 1 ? 's' : ''} ago`
+  if (diffDays < 365) return `${Math.floor(diffDays / 30)} month${Math.floor(diffDays / 30) > 1 ? 's' : ''} ago`
+  return `${Math.floor(diffDays / 365)} year${Math.floor(diffDays / 365) > 1 ? 's' : ''} ago`
+}
+
+function mapApiConversation(api: ApiConversation): Conversation {
+  return {
+    id: api.id,
+    title: api.title,
+    category: api.category || 'General',
+    categoryColor: api.categoryColor || '#6b7280',
+    confidence: api.confidence,
+    isCrisis: api.isCrisis,
+    preview: api.preview,
+    timestamp: formatTimestamp(api.createdAt),
+    group: getDateGroup(api.createdAt),
+    topResource: api.topResource || undefined,
+    createdAt: api.createdAt,
+  }
+}
 
 // ─── CONFIDENCE HELPERS ──────────────────────────────────
 function getConfidenceColor(v: number, isCrisis?: boolean): string {
@@ -322,8 +224,70 @@ function CategoryBadge({ label, color }: { label: string; color: string }) {
   )
 }
 
+// ─── LOADING SKELETON ────────────────────────────────────
+function LoadingSkeleton() {
+  return (
+    <div className="min-h-screen flex flex-col mesh-gradient-bg">
+      <Navbar />
+      <main className="flex-1 pt-24 pb-16">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          {/* Header skeleton */}
+          <div className="mb-10">
+            <div className="flex items-center justify-between gap-4 mb-8">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-gray-200/60 animate-pulse" />
+                <div>
+                  <div className="h-7 w-56 bg-gray-200/60 rounded-lg animate-pulse mb-1" />
+                  <div className="h-4 w-40 bg-gray-100/60 rounded-lg animate-pulse" />
+                </div>
+              </div>
+            </div>
+            {/* Search bar skeleton */}
+            <div className="h-13 bg-gray-100/40 rounded-2xl animate-pulse mb-5" />
+            {/* Filter skeleton */}
+            <div className="flex gap-2">
+              {[1, 2, 3, 4, 5].map((i) => (
+                <div key={i} className="h-9 w-20 bg-gray-100/40 rounded-xl animate-pulse" />
+              ))}
+            </div>
+          </div>
+          {/* Stats skeleton */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-8">
+            {[1, 2, 3, 4].map((i) => (
+              <div key={i} className="glass-card rounded-xl p-4 text-center">
+                <div className="w-8 h-8 rounded-lg bg-gray-100/60 mx-auto mb-2 animate-pulse" />
+                <div className="h-6 w-12 bg-gray-100/60 mx-auto rounded animate-pulse mb-1" />
+                <div className="h-3 w-16 bg-gray-50/60 mx-auto rounded animate-pulse" />
+              </div>
+            ))}
+          </div>
+          {/* Conversation skeleton */}
+          <div className="space-y-3">
+            {[1, 2, 3, 4, 5].map((i) => (
+              <div key={i} className="glass-card rounded-2xl p-5 animate-pulse">
+                <div className="flex items-center gap-4">
+                  <div className="w-3 h-3 rounded-full bg-gray-200/60" />
+                  <div className="flex-1 space-y-2">
+                    <div className="h-4 w-48 bg-gray-100/60 rounded" />
+                    <div className="h-3 w-72 bg-gray-50/60 rounded" />
+                  </div>
+                  <div className="h-6 w-14 bg-gray-100/60 rounded-lg" />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </main>
+    </div>
+  )
+}
+
 // ─── MAIN PAGE ───────────────────────────────────────────
 export default function HistoryPage() {
+  const { isAuthenticated, isLoading: authLoading, user } = useAuth()
+  const [conversations, setConversations] = useState<Conversation[]>([])
+  const [dataLoading, setDataLoading] = useState(true)
+  const [deletingIds, setDeletingIds] = useState<string[]>([])
   const [searchQuery, setSearchQuery] = useState('')
   const [activeFilter, setActiveFilter] = useState('all')
   const [filterOpen, setFilterOpen] = useState(false)
@@ -333,6 +297,136 @@ export default function HistoryPage() {
   const [showRecentSearches, setShowRecentSearches] = useState(false)
   const [currentPage, setCurrentPage] = useState(1)
   const itemsPerPage = 8
+
+  // Fetch conversations from API
+  const fetchConversations = useCallback(async () => {
+    try {
+      setDataLoading(true)
+      const params = new URLSearchParams()
+      if (user?.id) params.set('userId', user.id)
+      const res = await fetch(`/api/conversations?${params.toString()}`)
+      if (res.ok) {
+        const data: ApiConversation[] = await res.json()
+        setConversations(data.map(mapApiConversation))
+      }
+    } catch (err) {
+      console.error('Failed to fetch conversations:', err)
+    } finally {
+      setDataLoading(false)
+    }
+  }, [user?.id])
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      fetchConversations()
+    } else if (!authLoading) {
+      setDataLoading(false)
+    }
+  }, [isAuthenticated, authLoading, fetchConversations])
+
+  // Delete a single conversation
+  const handleDelete = async (id: string) => {
+    try {
+      setDeletingIds((prev) => [...prev, id])
+      const res = await fetch(`/api/conversations/${id}`, { method: 'DELETE' })
+      if (res.ok) {
+        setConversations((prev) => prev.filter((c) => c.id !== id))
+        setSelectedConversations((prev) => prev.filter((sid) => sid !== id))
+      }
+    } catch (err) {
+      console.error('Failed to delete conversation:', err)
+    } finally {
+      setDeletingIds((prev) => prev.filter((d) => d !== id))
+    }
+  }
+
+  // Delete selected conversations
+  const handleDeleteSelected = async () => {
+    const idsToDelete = [...selectedConversations]
+    try {
+      setDeletingIds((prev) => [...prev, ...idsToDelete])
+      await Promise.all(
+        idsToDelete.map((id) =>
+          fetch(`/api/conversations/${id}`, { method: 'DELETE' })
+        )
+      )
+      setConversations((prev) => prev.filter((c) => !idsToDelete.includes(c.id)))
+      setSelectedConversations([])
+    } catch (err) {
+      console.error('Failed to delete selected conversations:', err)
+    } finally {
+      setDeletingIds((prev) => prev.filter((d) => !idsToDelete.includes(d)))
+    }
+  }
+
+  // ─── Auth gate ───
+  if (authLoading || dataLoading) {
+    return <LoadingSkeleton />
+  }
+
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-screen flex flex-col mesh-gradient-bg">
+        <Navbar />
+        <main className="flex-1 pt-24 pb-16">
+          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] }}
+              className="flex flex-col items-center justify-center py-24 px-6"
+            >
+              <div className="relative mb-8">
+                <div
+                  className="w-28 h-28 rounded-3xl flex items-center justify-center"
+                  style={{
+                    background: 'linear-gradient(135deg, rgba(59,130,246,0.08), rgba(16,185,129,0.06))',
+                    border: '1px solid rgba(59,130,246,0.1)',
+                  }}
+                >
+                  <LogIn className="w-12 h-12 text-gray-300" />
+                </div>
+                <div className="absolute inset-[-12px] rounded-3xl border border-gray-100/60" style={{ animation: 'subtle-float 4s ease-in-out infinite' }} />
+              </div>
+              <h3 className="text-[20px] font-bold text-gray-900 tracking-tight mb-2">
+                Sign in to view your history
+              </h3>
+              <p className="text-[14px] text-gray-400 text-center max-w-sm leading-relaxed mb-8">
+                Your conversation history is tied to your account. Sign in to see past conversations, resources, and confidence scores.
+              </p>
+              <Link
+                href="/login"
+                className="inline-flex items-center gap-2.5 px-7 py-3.5 text-[14px] font-semibold text-white rounded-2xl bg-gradient-to-b from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 shadow-lg shadow-blue-500/20 hover:shadow-xl hover:shadow-blue-500/30 transition-all active:scale-[0.97]"
+              >
+                <LogIn className="w-4 h-4" />
+                Sign in
+                <ArrowRight className="w-4 h-4" />
+              </Link>
+            </motion.div>
+          </div>
+        </main>
+        {/* Footer */}
+        <footer className="mt-auto border-t border-gray-100/60 bg-white/40 backdrop-blur-sm">
+          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+              <div className="flex items-center gap-2.5">
+                <div className="w-6 h-6 rounded-lg bg-gradient-to-br from-gray-900 to-gray-700 flex items-center justify-center">
+                  <Layers className="w-3 h-3 text-white" />
+                </div>
+                <span className="text-[13px] font-bold text-gray-700">ClearPath AI</span>
+                <span className="inline-flex items-center px-2 py-0.5 rounded-md text-[9px] font-bold tracking-wider uppercase bg-emerald-50/80 text-emerald-600 border border-emerald-100/60">
+                  Demo
+                </span>
+              </div>
+              <p className="text-[12px] text-gray-400 font-medium">
+                Built for USAII Global AI Hackathon 2026 &middot; No data stored, ever
+              </p>
+            </div>
+          </div>
+        </footer>
+      </div>
+    )
+  }
 
   // Filter conversations
   const filteredConversations = conversations.filter((conv) => {
@@ -374,13 +468,19 @@ export default function HistoryPage() {
 
   // Stats
   const totalConversations = conversations.length
-  const totalResources = 47
-  const avgConfidence = Math.round(conversations.reduce((sum, c) => sum + c.confidence, 0) / conversations.length)
+  const avgConfidence = conversations.length > 0
+    ? Math.round(conversations.reduce((sum, c) => sum + c.confidence, 0) / conversations.length)
+    : 0
   const crisisCount = conversations.filter((c) => c.isCrisis).length
   const thisWeekCount = conversations.filter(
     (c) => c.group === 'Today' || c.group === 'Yesterday' || c.group === 'This Week'
   ).length
-  const mostSearchedCategory = 'Housing'
+  // Compute most searched category
+  const categoryCounts: Record<string, number> = {}
+  conversations.forEach((c) => {
+    categoryCounts[c.category] = (categoryCounts[c.category] || 0) + 1
+  })
+  const mostSearchedCategory = Object.entries(categoryCounts).sort((a, b) => b[1] - a[1])[0]?.[0] || '—'
 
   // Bulk actions
   const toggleSelect = (id: string) => {
@@ -396,6 +496,9 @@ export default function HistoryPage() {
       setSelectedConversations(filteredConversations.map((c) => c.id))
     }
   }
+
+  // Is empty (no conversations at all)
+  const isEmpty = conversations.length === 0
 
   return (
     <div className="min-h-screen flex flex-col mesh-gradient-bg">
@@ -433,7 +536,12 @@ export default function HistoryPage() {
                     <Download className="w-3.5 h-3.5" />
                     Export
                   </button>
-                  <button className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-[12px] font-semibold bg-white/60 border border-red-100/60 text-red-500 hover:bg-red-50/40 transition-all">
+                  <button
+                    onClick={() => {
+                      if (conversations.length > 0) handleDeleteSelected()
+                    }}
+                    className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-[12px] font-semibold bg-white/60 border border-red-100/60 text-red-500 hover:bg-red-50/40 transition-all"
+                  >
                     <Trash2 className="w-3.5 h-3.5" />
                     Clear
                   </button>
@@ -630,43 +738,79 @@ export default function HistoryPage() {
           </motion.div>
 
           {/* ═══════════ STATS SUMMARY CARDS ═══════════ */}
-          <motion.div
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.3 }}
-            className="mb-8"
-          >
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-              <div className="glass-card rounded-xl p-4 text-center">
-                <div className="w-8 h-8 rounded-lg bg-blue-50/80 flex items-center justify-center mx-auto mb-2">
-                  <Layers className="w-4 h-4 text-blue-600" />
+          {!isEmpty && (
+            <motion.div
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.3 }}
+              className="mb-8"
+            >
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                <div className="glass-card rounded-xl p-4 text-center">
+                  <div className="w-8 h-8 rounded-lg bg-blue-50/80 flex items-center justify-center mx-auto mb-2">
+                    <Layers className="w-4 h-4 text-blue-600" />
+                  </div>
+                  <p className="text-xl font-extrabold tracking-tight text-gray-900">{totalConversations}</p>
+                  <p className="text-[10px] font-medium text-gray-400 mt-0.5">Conversations</p>
                 </div>
-                <p className="text-xl font-extrabold tracking-tight text-gray-900">{totalConversations}</p>
-                <p className="text-[10px] font-medium text-gray-400 mt-0.5">Conversations</p>
-              </div>
-              <div className="glass-card rounded-xl p-4 text-center">
-                <div className="w-8 h-8 rounded-lg bg-emerald-50/80 flex items-center justify-center mx-auto mb-2">
-                  <TrendingUp className="w-4 h-4 text-emerald-600" />
+                <div className="glass-card rounded-xl p-4 text-center">
+                  <div className="w-8 h-8 rounded-lg bg-emerald-50/80 flex items-center justify-center mx-auto mb-2">
+                    <TrendingUp className="w-4 h-4 text-emerald-600" />
+                  </div>
+                  <p className="text-xl font-extrabold tracking-tight text-gray-900">{avgConfidence}%</p>
+                  <p className="text-[10px] font-medium text-gray-400 mt-0.5">Avg confidence</p>
                 </div>
-                <p className="text-xl font-extrabold tracking-tight text-gray-900">{avgConfidence}%</p>
-                <p className="text-[10px] font-medium text-gray-400 mt-0.5">Avg confidence</p>
-              </div>
-              <div className="glass-card rounded-xl p-4 text-center">
-                <div className="w-8 h-8 rounded-lg bg-violet-50/80 flex items-center justify-center mx-auto mb-2">
-                  <BarChart3 className="w-4 h-4 text-violet-600" />
+                <div className="glass-card rounded-xl p-4 text-center">
+                  <div className="w-8 h-8 rounded-lg bg-violet-50/80 flex items-center justify-center mx-auto mb-2">
+                    <BarChart3 className="w-4 h-4 text-violet-600" />
+                  </div>
+                  <p className="text-xl font-extrabold tracking-tight text-gray-900">{mostSearchedCategory}</p>
+                  <p className="text-[10px] font-medium text-gray-400 mt-0.5">Top category</p>
                 </div>
-                <p className="text-xl font-extrabold tracking-tight text-gray-900">{mostSearchedCategory}</p>
-                <p className="text-[10px] font-medium text-gray-400 mt-0.5">Top category</p>
-              </div>
-              <div className="glass-card rounded-xl p-4 text-center">
-                <div className="w-8 h-8 rounded-lg bg-red-50/80 flex items-center justify-center mx-auto mb-2">
-                  <Shield className="w-4 h-4 text-red-500" />
+                <div className="glass-card rounded-xl p-4 text-center">
+                  <div className="w-8 h-8 rounded-lg bg-red-50/80 flex items-center justify-center mx-auto mb-2">
+                    <Shield className="w-4 h-4 text-red-500" />
+                  </div>
+                  <p className="text-xl font-extrabold tracking-tight text-gray-900">{crisisCount}</p>
+                  <p className="text-[10px] font-medium text-gray-400 mt-0.5">Crisis interventions</p>
                 </div>
-                <p className="text-xl font-extrabold tracking-tight text-gray-900">{crisisCount}</p>
-                <p className="text-[10px] font-medium text-gray-400 mt-0.5">Crisis interventions</p>
               </div>
-            </div>
-          </motion.div>
+            </motion.div>
+          )}
+
+          {/* ═══════════ EMPTY STATE (no conversations at all) ═══════════ */}
+          {isEmpty && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] }}
+              className="flex flex-col items-center justify-center py-20 px-6"
+            >
+              <div className="relative mb-8">
+                <div
+                  className="w-24 h-24 rounded-3xl flex items-center justify-center"
+                  style={{
+                    background: 'linear-gradient(135deg, rgba(59,130,246,0.08), rgba(16,185,129,0.06))',
+                    border: '1px solid rgba(59,130,246,0.1)',
+                  }}
+                >
+                  <MessageSquare className="w-10 h-10 text-gray-300" />
+                </div>
+                <div className="absolute inset-[-12px] rounded-3xl border border-gray-100/60" style={{ animation: 'subtle-float 4s ease-in-out infinite' }} />
+              </div>
+              <h3 className="text-[18px] font-bold text-gray-900 tracking-tight mb-2">No conversations yet</h3>
+              <p className="text-[14px] text-gray-400 text-center max-w-sm leading-relaxed">
+                Start your first conversation with ClearPath AI to get personalized resource recommendations.
+              </p>
+              <Link
+                href="/app"
+                className="mt-8 inline-flex items-center gap-2 px-6 py-3 text-[13px] font-semibold text-white rounded-xl bg-gradient-to-b from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 shadow-md shadow-blue-500/20 hover:shadow-lg hover:shadow-blue-500/30 transition-all active:scale-[0.97]"
+              >
+                <MessageSquare className="w-4 h-4" />
+                Start your first conversation
+              </Link>
+            </motion.div>
+          )}
 
           {/* ═══════════ BULK ACTIONS BAR ═══════════ */}
           <AnimatePresence>
@@ -688,7 +832,10 @@ export default function HistoryPage() {
                       <Download className="w-3 h-3" />
                       Export selected
                     </button>
-                    <button className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-semibold bg-red-50/80 text-red-500 border border-red-100/60 hover:bg-red-50 transition-all">
+                    <button
+                      onClick={handleDeleteSelected}
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-semibold bg-red-50/80 text-red-500 border border-red-100/60 hover:bg-red-50 transition-all"
+                    >
                       <Trash2 className="w-3 h-3" />
                       Delete selected
                     </button>
@@ -706,7 +853,7 @@ export default function HistoryPage() {
           </AnimatePresence>
 
           {/* ═══════════ SELECT ALL BAR ═══════════ */}
-          {filteredConversations.length > 0 && (
+          {!isEmpty && filteredConversations.length > 0 && (
             <div className="flex items-center gap-3 mb-4">
               <button
                 onClick={toggleSelectAll}
@@ -728,7 +875,7 @@ export default function HistoryPage() {
           )}
 
           {/* ═══════════ CONVERSATION LIST ═══════════ */}
-          {filteredConversations.length === 0 ? (
+          {!isEmpty && filteredConversations.length === 0 ? (
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -759,7 +906,7 @@ export default function HistoryPage() {
                 Start a new conversation
               </Link>
             </motion.div>
-          ) : (
+          ) : !isEmpty && (
             <div className="space-y-8">
               {groupOrder.map((group) => {
                 const items = groupedConversations[group]
@@ -793,9 +940,10 @@ export default function HistoryPage() {
                       variants={staggerContainer}
                       className="space-y-2"
                     >
-                      {items.map((conv, i) => {
+                      {items.map((conv) => {
                         const color = getConfidenceColor(conv.confidence, conv.isCrisis)
                         const isSelected = selectedConversations.includes(conv.id)
+                        const isDeleting = deletingIds.includes(conv.id)
                         return (
                           <motion.div
                             key={conv.id}
@@ -805,21 +953,26 @@ export default function HistoryPage() {
                             <div
                               className="block relative overflow-hidden rounded-2xl transition-all duration-300 group"
                               style={{
-                                background: isSelected
+                                background: isDeleting
+                                  ? 'rgba(239,68,68,0.06)'
+                                  : isSelected
                                   ? 'rgba(59,130,246,0.06)'
                                   : 'rgba(255, 255, 255, 0.65)',
                                 backdropFilter: 'blur(20px) saturate(1.2)',
                                 WebkitBackdropFilter: 'blur(20px) saturate(1.2)',
-                                border: `1px solid ${isSelected ? 'rgba(59,130,246,0.2)' : 'rgba(255,255,255,0.5)'}`,
-                                boxShadow: isSelected
+                                border: `1px solid ${isDeleting ? 'rgba(239,68,68,0.2)' : isSelected ? 'rgba(59,130,246,0.2)' : 'rgba(255,255,255,0.5)'}`,
+                                boxShadow: isDeleting
+                                  ? '0 4px 16px -4px rgba(239,68,68,0.1)'
+                                  : isSelected
                                   ? '0 4px 16px -4px rgba(59,130,246,0.1)'
                                   : '0 1px 3px rgba(0,0,0,0.03), 0 8px 24px rgba(0,0,0,0.04)',
+                                opacity: isDeleting ? 0.6 : 1,
                               }}
                             >
                               {/* Left accent bar */}
                               <div
                                 className="absolute top-0 left-0 w-1 h-full rounded-l-2xl"
-                                style={{ backgroundColor: color, opacity: isSelected ? 1 : 0.5 }}
+                                style={{ backgroundColor: isDeleting ? '#ef4444' : color, opacity: isSelected || isDeleting ? 1 : 0.5 }}
                               />
 
                               <div className="flex items-center gap-4 p-4 sm:p-5 pl-5 sm:pl-6">
@@ -903,10 +1056,16 @@ export default function HistoryPage() {
                                       <Share2 className="w-3.5 h-3.5" />
                                     </button>
                                     <button
-                                      className="p-1.5 rounded-lg text-gray-300 hover:text-red-500 hover:bg-red-50/60 transition-all"
+                                      onClick={() => handleDelete(conv.id)}
+                                      disabled={isDeleting}
+                                      className="p-1.5 rounded-lg text-gray-300 hover:text-red-500 hover:bg-red-50/60 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
                                       title="Delete"
                                     >
-                                      <Trash2 className="w-3.5 h-3.5" />
+                                      {isDeleting ? (
+                                        <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                                      ) : (
+                                        <Trash2 className="w-3.5 h-3.5" />
+                                      )}
                                     </button>
                                   </div>
 
@@ -933,7 +1092,7 @@ export default function HistoryPage() {
           )}
 
           {/* ═══════════ PAGINATION ═══════════ */}
-          {totalPages > 1 && (
+          {!isEmpty && totalPages > 1 && (
             <motion.div
               initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
@@ -973,7 +1132,7 @@ export default function HistoryPage() {
           )}
 
           {/* ═══════════ CONFIDENCE BREAKDOWN ═══════════ */}
-          {filteredConversations.length > 0 && (
+          {!isEmpty && filteredConversations.length > 0 && (
             <motion.div
               initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
@@ -1008,7 +1167,7 @@ export default function HistoryPage() {
           )}
 
           {/* ═══════════ QUICK TIPS ═══════════ */}
-          {filteredConversations.length > 0 && (
+          {!isEmpty && filteredConversations.length > 0 && (
             <motion.div
               initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
@@ -1041,7 +1200,7 @@ export default function HistoryPage() {
           )}
 
           {/* ═══════════ BOTTOM CTA ═══════════ */}
-          {filteredConversations.length > 0 && (
+          {!isEmpty && filteredConversations.length > 0 && (
             <motion.div
               initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
