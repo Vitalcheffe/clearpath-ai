@@ -4,4 +4,8 @@
 - Environments: .env
 
 ✓ Starting...
-✓ Ready in 604ms
+✓ Ready in 554ms
+prisma:query SELECT `main`.`Resource`.`id`, `main`.`Resource`.`name`, `main`.`Resource`.`category`, `main`.`Resource`.`description`, `main`.`Resource`.`phone`, `main`.`Resource`.`address`, `main`.`Resource`.`hours`, `main`.`Resource`.`eligibility`, `main`.`Resource`.`services`, `main`.`Resource`.`languages`, `main`.`Resource`.`lastVerified`, `main`.`Resource`.`url`, `main`.`Resource`.`createdAt` FROM `main`.`Resource` WHERE (`main`.`Resource`.`name` LIKE ? OR `main`.`Resource`.`description` LIKE ? OR `main`.`Resource`.`services` LIKE ?) ORDER BY `main`.`Resource`.`name` ASC LIMIT ? OFFSET ?
+prisma:query SELECT `main`.`Resource`.`id`, `main`.`Resource`.`category` FROM `main`.`Resource` WHERE 1=1 ORDER BY `main`.`Resource`.`category` ASC LIMIT ? OFFSET ?
+ GET /api/community-resources?search=food 200 in 334ms (compile: 300ms, render: 34ms)
+ 334ms (compile: 300ms, render: 34ms)

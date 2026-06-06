@@ -136,37 +136,37 @@ const leadership = [
     funFact: 'Once debugged a production API during a 14-hour layover in Casablanca airport — using only a phone and terminal emulator.',
   },
   {
-    name: 'Elena Vasquez',
-    role: 'Lead ML Engineer',
-    bio: 'Elena brings 8 years of experience in natural language processing and zero-shot classification to ClearPath AI. She architected the BART-large-MNLI integration that powers our classification engine, and previously worked at Hugging Face and Stanford NLP. She specializes in building models that are both accurate and honest about their uncertainty, a philosophy that aligns perfectly with our commitment to calibrated transparency. Her confidence calibration system is the backbone of every classification result you see.',
+    name: 'Elena Vasquez (Illustrative)',
+    role: 'Lead ML Engineer (Example Position)',
+    bio: 'This is an illustrative placeholder for the Lead ML Engineer role. After the hackathon, ClearPath AI plans to recruit an experienced NLP specialist to own the classification pipeline, model calibration, and inference optimization. The ideal candidate would bring expertise in zero-shot classification and a commitment to honest AI.',
     expertise: ['BART-large-MNLI', 'Zero-Shot Classification', 'Model Calibration', 'Hugging Face Transformers', 'NLP Pipeline Design'],
     initials: 'EV',
     colorHex: '#10b981',
     bgColor: 'rgba(16,185,129,0.06)',
     socialLinks: { github: '#', twitter: '#', linkedin: '#' },
-    funFact: 'Published her first NLP paper at 22 — on why language models should admit when they are wrong.',
+    funFact: 'This is a placeholder position — not an actual team member.',
   },
   {
-    name: 'Sofia Kim',
-    role: 'AI Safety & Ethics Lead',
-    bio: 'Sofia ensures that ClearPath AI is not just functional but fair. With a PhD in AI Ethics from MIT and extensive experience auditing ML systems for bias, she designed the 6-layer transparency architecture from the ground up. Her work ensures that the system never hides uncertainty, never ignores crisis signals, and never discriminates. She authored our Responsible AI charter and leads our NIST AI Risk Framework compliance efforts, making safety architectural rather than optional.',
+    name: 'Sofia Kim (Illustrative)',
+    role: 'AI Safety & Ethics Lead (Example Position)',
+    bio: 'This is an illustrative placeholder for the AI Safety & Ethics Lead role. After the hackathon, ClearPath AI plans to recruit an AI safety specialist to oversee bias auditing, fairness metrics, and NIST AI Risk Framework compliance. The ideal candidate would ensure that transparency is architectural, not optional.',
     expertise: ['AI Safety Engineering', 'Bias Auditing', 'NIST AI RMF', 'Explainable AI', 'Fairness Metrics'],
     initials: 'SK',
     colorHex: '#8b5cf6',
     bgColor: 'rgba(139,92,246,0.06)',
     socialLinks: { github: '#', twitter: '#', linkedin: '#' },
-    funFact: 'Her dissertation on "Honest Machines" has been cited over 400 times and directly inspired the confidence score display in ClearPath AI.',
+    funFact: 'This is a placeholder position — not an actual team member.',
   },
   {
-    name: 'Michael Torres',
-    role: 'Data & Partnerships Director',
-    bio: 'Michael bridges the gap between technology and community services. With 10 years at United Way and deep connections to 211 organizations nationwide, he built and maintains the verified resource database that makes ClearPath AI trustworthy. Every resource card you see exists because Michael or his team verified it. He brokered the landmark data-sharing agreement with United Way 211 that gave us access to 50,000+ verified resources across all 50 states, with source attribution and last-verified dates.',
+    name: 'Michael Torres (Illustrative)',
+    role: 'Data & Partnerships Director (Example Position)',
+    bio: 'This is an illustrative placeholder for the Data & Partnerships Director role. After the hackathon, ClearPath AI plans to recruit a partnerships lead to build and maintain relationships with 211 organizations and verify the resource database. The ideal candidate would bridge the gap between technology and community services.',
     expertise: ['211 Database Integration', 'Data Verification', 'Community Partnerships', 'Social Services Navigation', 'Nonprofit Data Systems'],
     initials: 'MT',
     colorHex: '#f59e0b',
     bgColor: 'rgba(245,158,11,0.06)',
     socialLinks: { github: '#', twitter: '#', linkedin: '#' },
-    funFact: 'Has personally helped over 3,000 families find housing resources through 211 — and remembers most of their stories by name.',
+    funFact: 'This is a placeholder position — not an actual team member.',
   },
 ]
 
@@ -305,9 +305,9 @@ const coreTeam = [
 /* ═══ Advisory Board Data ═══ */
 const advisoryBoard = [
   {
-    name: 'Dr. Sarah Chen',
+    name: 'AI Ethics Researcher (Planned)',
     role: 'AI Ethics Researcher',
-    org: 'Stanford Institute for Human-Centered AI',
+    org: 'Placeholder — Advisor to be recruited',
     bio: 'Dr. Chen is a leading researcher in AI ethics and transparency, with over 50 published papers on responsible AI deployment. Her work on calibrated uncertainty in classification systems directly informed ClearPath AI\'s confidence scoring methodology. She serves as our primary advisor on AI safety architecture and NIST compliance.',
     expertise: ['AI Ethics & Governance', 'Calibrated Uncertainty', 'NIST AI Risk Framework', 'Transparent AI Systems'],
     color: '#3b82f6',
@@ -317,9 +317,9 @@ const advisoryBoard = [
     icon: Brain,
   },
   {
-    name: 'Marcus Johnson',
+    name: 'Community Navigator (Planned)',
     role: 'Community Navigator',
-    org: 'Former Director, United Way 211 Southeast Region',
+    org: 'Placeholder — Advisor to be recruited',
     bio: 'Marcus spent 22 years as a community navigator, personally helping over 15,000 families find housing, food, and healthcare resources. His insider knowledge of the 211 system — its strengths, its gaps, and its bureaucratic pain points — shaped every aspect of how ClearPath AI connects people to real help.',
     expertise: ['Community Resource Navigation', '211 System Operations', 'Crisis Intervention', 'Social Services Policy'],
     color: '#10b981',
@@ -329,9 +329,9 @@ const advisoryBoard = [
     icon: Compass,
   },
   {
-    name: 'Dr. Priya Patel',
+    name: 'NLP Research Scientist (Planned)',
     role: 'NLP Research Scientist',
-    org: 'Google DeepMind (formerly Hugging Face)',
+    org: 'Placeholder — Advisor to be recruited',
     bio: 'Dr. Patel is a research scientist specializing in zero-shot and few-shot NLP classification. Her pioneering work on BART-large-MNLI optimization made real-time zero-shot classification practical for production systems. She advises ClearPath AI on model selection, fine-tuning strategies, and inference optimization.',
     expertise: ['Zero-Shot NLI', 'BART Architecture', 'Model Compression', 'Multilingual NLP'],
     color: '#8b5cf6',
@@ -341,9 +341,9 @@ const advisoryBoard = [
     icon: Cpu,
   },
   {
-    name: 'James Rodriguez',
+    name: 'Partnership Director (Planned)',
     role: 'United Way Partnership Director',
-    org: 'United Way Worldwide',
+    org: 'Placeholder — Advisor to be recruited',
     bio: 'James oversees technology partnerships for United Way Worldwide, managing relationships with over 1,200 local United Way chapters. He brokered the data-sharing agreement that gives ClearPath AI access to verified 211 resources nationwide. His advocacy for tech-enabled social services drives our shared mission.',
     expertise: ['Nonprofit Technology', 'Data Partnerships', 'Social Impact Strategy', 'Community Health Systems'],
     color: '#f59e0b',
@@ -762,13 +762,13 @@ export default function TeamPage() {
                         )}
                         {/* Social links */}
                         <div className="flex items-center gap-2">
-                          <a href={leader.socialLinks.github} className="w-8 h-8 rounded-lg flex items-center justify-center text-gray-400 hover:text-gray-700 hover:bg-gray-50 transition-all">
+                          <a href={leader.socialLinks.github} className="w-8 h-8 rounded-lg flex items-center justify-center text-gray-400 transition-all pointer-events-none opacity-50">
                             <Github className="w-3.5 h-3.5" />
                           </a>
-                          <a href={leader.socialLinks.twitter} className="w-8 h-8 rounded-lg flex items-center justify-center text-gray-400 hover:text-gray-700 hover:bg-gray-50 transition-all">
+                          <a href={leader.socialLinks.twitter} className="w-8 h-8 rounded-lg flex items-center justify-center text-gray-400 transition-all pointer-events-none opacity-50">
                             <Globe className="w-3.5 h-3.5" />
                           </a>
-                          <a href={leader.socialLinks.linkedin} className="w-8 h-8 rounded-lg flex items-center justify-center text-gray-400 hover:text-gray-700 hover:bg-gray-50 transition-all">
+                          <a href={leader.socialLinks.linkedin} className="w-8 h-8 rounded-lg flex items-center justify-center text-gray-400 transition-all pointer-events-none opacity-50">
                             <Linkedin className="w-3.5 h-3.5" />
                           </a>
                         </div>
@@ -837,7 +837,7 @@ export default function TeamPage() {
                 <Users className="w-3.5 h-3.5" />
                 The Builders
               </div>
-              <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-gray-900">Core Team</h2>
+              <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-gray-900">Core Team <span className="text-base font-medium text-gray-400">(Illustrative — positions to be filled)</span></h2>
               <p className="text-[15px] text-gray-500 mt-4 max-w-2xl mx-auto leading-relaxed">
                 The engineers, researchers, designers, and advocates who turned a vision of honest AI into a working, testable system.
               </p>
@@ -955,7 +955,7 @@ export default function TeamPage() {
                 <Compass className="w-3.5 h-3.5" />
                 Expert Guidance
               </div>
-              <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-gray-900">Advisors & Partners</h2>
+              <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-gray-900">Advisory Board <span className="text-base font-medium text-gray-400">(Planned)</span></h2>
               <p className="text-[15px] text-gray-500 mt-4 max-w-2xl mx-auto leading-relaxed">
                 World-class experts in AI ethics, NLP research, community navigation, and nonprofit partnerships who guide our mission and ensure we build responsibly.
               </p>
@@ -1234,11 +1234,11 @@ export default function TeamPage() {
             >
               <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-[11px] font-semibold bg-rose-50/80 text-rose-600 border border-rose-100/60 mb-4">
                 <Briefcase className="w-3.5 h-3.5" />
-                We&apos;re Hiring
+                Future Openings
               </div>
-              <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-gray-900">Open Positions</h2>
+              <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-gray-900">Future Openings <span className="text-base font-medium text-gray-400">(Not Currently Hiring)</span></h2>
               <p className="text-[15px] text-gray-500 mt-4 max-w-2xl mx-auto leading-relaxed">
-                Join us in building AI that serves the most vulnerable people in our communities. Every role at ClearPath AI directly impacts someone who needs help finding it.
+                These positions will open after the hackathon as ClearPath AI grows. We are not currently hiring, but we are planning for the roles below. Every role at ClearPath AI directly impacts someone who needs help finding it.
               </p>
             </motion.div>
 

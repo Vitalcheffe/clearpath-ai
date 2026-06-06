@@ -608,8 +608,8 @@ export default function AboutPage() {
               transition={{ duration: 0.5 }}
               className="text-center mb-14"
             >
-              <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-gray-900">Our Story</h2>
-              <p className="text-[15px] text-gray-500 mt-3">From a problem we couldn&apos;t ignore to a solution we had to build</p>
+              <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-gray-900">Our Story <span className="text-base font-normal text-gray-400">(Illustrative timeline)</span></h2>
+              <p className="text-[15px] text-gray-500 mt-3">From a problem we couldn&apos;t ignore to a solution we had to build — project development narrative</p>
             </motion.div>
 
             <div className="relative">
@@ -775,7 +775,7 @@ export default function AboutPage() {
                       { dimension: 'Human Escalation', clearpath: ['yes', 'Architectural, automatic'], chatgpt: ['no', 'Not available'], google: ['no', 'Not available'], hotline: ['yes', 'Already human'] },
                       { dimension: 'Response Time', clearpath: ['yes', '< 2 seconds'], chatgpt: ['yes', '< 5 seconds'], google: ['yes', 'Instant'], hotline: ['no', '72hr callback wait'] },
                       { dimension: 'Resource Verification', clearpath: ['yes', 'Verified 211.org data'], chatgpt: ['no', 'Unverified training data'], google: ['partial', 'Mixed quality'], hotline: ['yes', 'Human-verified'] },
-                      { dimension: 'Privacy / Data Storage', clearpath: ['yes', 'Zero storage, in-memory'], chatgpt: ['no', 'Conversations stored'], google: ['no', 'Search history tracked'], hotline: ['partial', 'Call records exist'] },
+                      { dimension: 'Privacy / Data Storage', clearpath: ['partial', 'Guest: session-only / Account: encrypted storage'], chatgpt: ['no', 'Conversations stored'], google: ['no', 'Search history tracked'], hotline: ['partial', 'Call records exist'] },
                       { dimension: 'Known Limitations Visible', clearpath: ['yes', 'Documented and displayed'], chatgpt: ['no', 'Hidden disclaimers'], google: ['no', 'None'], hotline: ['partial', 'Varies by operator'] },
                       { dimension: 'Multi-Need Classification', clearpath: ['yes', 'Housing + Food + Legal'], chatgpt: ['partial', 'Single responses only'], google: ['no', 'Keyword-based'], hotline: ['yes', 'Human assessment'] },
                       { dimension: 'Open Source', clearpath: ['yes', 'Fully open source'], chatgpt: ['no', 'Proprietary'], google: ['no', 'Proprietary'], hotline: ['partial', 'Data sometimes open'] },

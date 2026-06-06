@@ -351,7 +351,7 @@ const articles: BlogArticle[] = [
     categoryBg: 'bg-amber-50 text-amber-700 border-amber-100/60',
     title: 'Privacy by Design: How We Protect Vulnerable Users',
     excerpt: 'Our approach to data minimization, PII stripping, and privacy-first architecture — because people seeking help with housing, health, and safety deserve the strongest protections.',
-    fullPreview: 'When someone searches for "domestic violence shelter near me," the privacy implications of that query are profound. Our Privacy by Design approach ensures that user queries are processed with the minimum data retention necessary. Every query passes through our PII stripping layer before classification, which removes names, addresses, phone numbers, and other identifying information using a combination of regex patterns and a fine-tuned NER model. Queries are never stored in their original form — only anonymized, aggregated patterns are retained for model improvement. We do not use cookies for tracking, we do not build user profiles, and our session data is automatically purged after 30 minutes of inactivity. These are not afterthoughts or compliance checkboxes; they are foundational architectural decisions that were made before a single line of code was written.',
+    fullPreview: 'When someone searches for "domestic violence shelter near me," the privacy implications of that query are profound. Our Privacy by Design approach ensures that user queries are processed with the minimum data retention necessary. Every query passes through our PII stripping layer before classification, which removes names, addresses, phone numbers, and other identifying information using a combination of regex patterns and a fine-tuned NER model. We do not use cookies for tracking and we do not build user profiles. These are not afterthoughts or compliance checkboxes; they are foundational architectural decisions that were made before a single line of code was written.',
     author: 'Amine Boudjar',
     authorRole: 'Founder & Architect',
     authorInitials: 'AB',
@@ -424,48 +424,48 @@ const articles: BlogArticle[] = [
 
 const researchPapers = [
   {
-    title: 'Calibrated Transparency: A Novel Architecture for Honest AI in Social Services',
-    authors: 'S. Chen, A. Boudjar, H. Patel',
-    venue: 'USAII Hackathon 2026 — Technical Paper',
-    date: 'June 2026',
-    abstract: 'We present a 6-layer transparency architecture that enforces calibrated confidence display, automatic human escalation, and crisis-locked safety protocols. Our approach achieves 94.2% classification accuracy on community resource queries while maintaining zero hallucinated resources — a property impossible with generative approaches. The architecture processes queries through input normalization, crisis detection, zero-shot classification, confidence calibration, explanation generation, and human escalation layers, each independently monitored and logged for full auditability.',
+    title: 'ClearPath AI: System Architecture & Design Decisions',
+    authors: 'ClearPath AI Team',
+    venue: 'USAII Global AI Hackathon 2026 — Project Documentation',
+    date: '2026',
+    abstract: 'Technical documentation for the ClearPath AI project, developed for the USAII Global AI Hackathon 2026. We present a 6-layer transparency architecture that enforces calibrated confidence display, automatic human escalation, and crisis-locked safety protocols. The architecture processes queries through input normalization, crisis detection, zero-shot classification, confidence calibration, explanation generation, and human escalation layers, each independently monitored and logged for full auditability.',
     citations: 0,
-    doi: '10.48550/arXiv.2026.clearpath',
+    doi: '',
     gradient: 'from-violet-600 to-indigo-600',
-    keyFindings: ['94.2% classification accuracy', 'Zero hallucinated resources', '6-layer transparent architecture', 'Real-time crisis detection'],
+    keyFindings: ['6-layer transparent architecture', 'Zero-shot classification approach', 'Hardcoded crisis detection', 'Calibrated confidence display'],
   },
   {
-    title: 'Zero-Shot Classification vs. Generative Retrieval for Community Resource Navigation',
-    authors: 'S. Chen, M. Rivera',
-    venue: 'NeurIPS 2026 Workshop on Responsible AI',
-    date: 'May 2026',
-    abstract: 'A systematic comparison of zero-shot classification (BART-large-MNLI) and generative retrieval (GPT-4) for matching community resource queries. Results show classification eliminates hallucination entirely while achieving competitive relevance scores, with 3.2x fewer critical failures on crisis-adjacent queries. Our evaluation on ClearBench-5K demonstrates that classification-based approaches provide superior safety guarantees in domains where factual accuracy is non-negotiable.',
-    citations: 3,
-    doi: '10.48550/arXiv.2026.zeroshot',
+    title: 'Classification vs. Generation for Community Resource Navigation',
+    authors: 'ClearPath AI Team',
+    venue: 'USAII Global AI Hackathon 2026 — Technical Analysis',
+    date: '2026',
+    abstract: 'A comparison of zero-shot classification (BART-large-MNLI) and generative retrieval approaches for matching community resource queries. Our analysis explores why classification eliminates hallucination risk entirely by constraining outputs to a verified database, while generative approaches can produce plausible-sounding but non-existent resources — a critical safety concern in social service domains where factual accuracy is non-negotiable.',
+    citations: 0,
+    doi: '',
     gradient: 'from-blue-600 to-cyan-600',
-    keyFindings: ['3.2x fewer critical failures', 'Classification eliminates hallucination', 'Competitive relevance at 91.8%', 'Crisis query safety advantage'],
+    keyFindings: ['Classification prevents hallucinated resources', 'Constrained output space', 'Verified database matching', 'Safety-first design philosophy'],
   },
   {
-    title: 'Crisis Detection in Low-Resource Settings: Hardcoded Guardrails vs. Learned Classifiers',
-    authors: 'M. Rivera, A. Boudjar, L. Park',
-    venue: 'AAAI 2026 Spring Symposium',
-    date: 'April 2026',
-    abstract: 'We propose a dual-layer crisis detection system combining hardcoded keyword matching with a lightweight BERT classifier. The hardcoded layer ensures 100% recall on a curated crisis lexicon, while the learned layer catches oblique or misspelled crisis signals. Combined system achieves 99.7% recall at 0.3% false positive rate, significantly outperforming either approach alone and providing robust safety guarantees for deployment in sensitive social service contexts.',
-    citations: 7,
-    doi: '10.48550/arXiv.2026.crisis',
+    title: 'Hardcoded Crisis Detection: Deterministic Safety Guardrails in AI Systems',
+    authors: 'ClearPath AI Team',
+    venue: 'USAII Global AI Hackathon 2026 — Safety Documentation',
+    date: '2026',
+    abstract: 'Documentation of our dual-layer crisis detection system combining hardcoded keyword matching with the classification pipeline. The hardcoded layer ensures deterministic detection of crisis expressions, always bypassing AI classification to provide immediate crisis resources. This design ensures safety never depends on probabilistic AI judgment when users express crisis signals.',
+    citations: 0,
+    doi: '',
     gradient: 'from-emerald-600 to-teal-600',
-    keyFindings: ['99.7% crisis recall', '0.3% false positive rate', 'Dual-layer architecture', '2,800+ crisis lexicon terms'],
+    keyFindings: ['Deterministic crisis detection', 'AI bypass on crisis signals', 'Hardcoded keyword scanner', 'Safety-first architecture'],
   },
   {
-    title: 'Privacy-Preserving Resource Navigation: Data Minimization in AI-Assisted Social Services',
-    authors: 'A. Boudjar, S. Chen',
-    venue: 'FAccT 2026 — Fairness, Accountability, and Transparency',
-    date: 'March 2026',
-    abstract: 'We present a privacy-first architecture for AI-assisted social service navigation that minimizes data collection while maintaining classification effectiveness. Our approach combines PII stripping, session-based processing without persistent identifiers, and federated model updates that never expose individual query patterns. Evaluation shows that the privacy-preserving pipeline reduces PII exposure by 97.4% while maintaining classification accuracy within 1.2 percentage points of the non-anonymized baseline.',
-    citations: 4,
-    doi: '10.48550/arXiv.2026.privacy',
+    title: 'Privacy-by-Design in AI-Assisted Social Services',
+    authors: 'ClearPath AI Team',
+    venue: 'USAII Global AI Hackathon 2026 — Privacy Documentation',
+    date: '2026',
+    abstract: 'Documentation of ClearPath AI\'s privacy-first architecture for AI-assisted social service navigation. Our approach minimizes data collection, processes queries through PII stripping, and avoids persistent storage of user queries. Users seeking help for domestic violence, substance abuse, or mental health crises often do so from shared devices — our architecture is designed with these vulnerable populations in mind.',
+    citations: 0,
+    doi: '',
     gradient: 'from-amber-600 to-orange-600',
-    keyFindings: ['97.4% PII reduction', '1.2% accuracy trade-off', 'Federated model updates', '30-minute data retention'],
+    keyFindings: ['Minimal data collection', 'No persistent query storage', 'Privacy-first architecture', 'Designed for vulnerable populations'],
   },
 ]
 
@@ -497,7 +497,7 @@ const communityStories = [
   {
     name: 'Aisha Williams',
     role: 'Domestic Violence Survivor, Atlanta GA',
-    story: 'Aisha needed to find a shelter but was afraid of leaving digital traces. ClearPath AI processed her query without storing any personal information and connected her with a confidential crisis counselor within seconds. The 30-minute session data auto-purge gave her the confidence to reach out.',
+    story: 'Aisha needed to find a shelter but was afraid of leaving digital traces. ClearPath AI processed her query without storing any personal information and connected her with a confidential crisis counselor within seconds, giving her the confidence to reach out.',
     avatar: 'from-purple-400 to-indigo-500',
     initials: 'AW',
     tag: 'Crisis Support',
@@ -875,7 +875,7 @@ function ResearchPaperCard({ paper }: { paper: typeof researchPapers[0]; index: 
       {/* Key Findings */}
       {paper.keyFindings && (
         <div className="mb-4">
-          <p className="text-[11px] font-bold text-gray-700 uppercase tracking-wider mb-2">Key Findings</p>
+          <p className="text-[11px] font-bold text-gray-700 uppercase tracking-wider mb-2">Key Points</p>
           <div className="flex flex-wrap gap-2">
             {paper.keyFindings.map((finding) => (
               <span
@@ -893,19 +893,19 @@ function ResearchPaperCard({ paper }: { paper: typeof researchPapers[0]; index: 
       {/* Footer */}
       <div className="flex items-center justify-between pt-4 border-t border-gray-100/60">
         <div className="flex items-center gap-4">
-          <span className="text-[11px] text-gray-400 flex items-center gap-1">
-            <Quote className="w-3 h-3" />
-            {paper.citations} citations
-          </span>
-          <span className="text-[11px] text-gray-400 flex items-center gap-1">
-            <ExternalLink className="w-3 h-3" />
-            {paper.doi}
-          </span>
+          {paper.citations > 0 && (
+            <span className="text-[11px] text-gray-400 flex items-center gap-1">
+              <Quote className="w-3 h-3" />
+              {paper.citations} citations
+            </span>
+          )}
+          {paper.doi && (
+            <span className="text-[11px] text-gray-400 flex items-center gap-1">
+              <ExternalLink className="w-3 h-3" />
+              {paper.doi}
+            </span>
+          )}
         </div>
-        <button className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-semibold text-gray-500 hover:text-gray-700 bg-gray-50 hover:bg-gray-100 border border-gray-100/60 transition-all">
-          <Download className="w-3 h-3" />
-          PDF
-        </button>
       </div>
     </motion.div>
   )
@@ -943,14 +943,10 @@ function CommunityStoryCard({ story }: { story: typeof communityStories[0] }) {
         &ldquo;{story.story}&rdquo;
       </p>
 
-      {/* Impact indicator */}
+      {/* Disclaimer */}
       <div className="mt-5 flex items-center gap-2">
-        <div className="flex items-center gap-1">
-          {[...Array(5)].map((_, i) => (
-            <Star key={i} className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />
-          ))}
-        </div>
-        <span className="text-[11px] text-gray-400 font-medium">Life-changing impact</span>
+        <AlertTriangle className="w-3.5 h-3.5 text-amber-500 shrink-0" />
+        <span className="text-[11px] text-gray-400 font-medium">Illustrative example based on common community resource scenarios</span>
       </div>
     </motion.div>
   )
@@ -1062,6 +1058,12 @@ export default function BlogPage() {
                 ClearPath AI Blog
               </motion.div>
 
+              {/* Disclaimer */}
+              <motion.div variants={fadeInUp} className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-[11px] font-medium bg-amber-50/80 text-amber-700 border border-amber-100/60 mb-6 max-w-xl mx-auto">
+                <AlertTriangle className="w-3.5 h-3.5 shrink-0" />
+                Project documentation and development insights — these are not live blog posts from external contributors.
+              </motion.div>
+
               {/* Title */}
               <motion.h1
                 variants={fadeInUp}
@@ -1075,7 +1077,7 @@ export default function BlogPage() {
 
               {/* Subtitle */}
               <motion.p variants={fadeInUp} className="text-lg sm:text-xl text-gray-500 mt-6 max-w-3xl mx-auto leading-relaxed">
-                Research breakthroughs, engineering deep-dives, and community stories from the team building
+                Research insights, engineering deep-dives, and project documentation from the team building
                 the world&apos;s most transparent AI resource navigator.
               </motion.p>
 
@@ -1111,8 +1113,8 @@ export default function BlogPage() {
               >
                 {[
                   { icon: BookOpen, value: '14', label: 'Articles', color: '#8b5cf6' },
-                  { icon: FileText, value: '4', label: 'Papers', color: '#3b82f6' },
-                  { icon: Users, value: '4', label: 'Stories', color: '#10b981' },
+                  { icon: FileText, value: '4', label: 'Documents', color: '#3b82f6' },
+                  { icon: Users, value: '4', label: 'Scenarios', color: '#10b981' },
                   { icon: Tag, value: '24+', label: 'Topics', color: '#f59e0b' },
                 ].map((stat) => {
                   const Icon = stat.icon
@@ -1631,12 +1633,12 @@ export default function BlogPage() {
             >
               <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-[11px] font-semibold bg-violet-50/80 text-violet-600 border border-violet-100/60 mb-4">
                 <GraduationCap className="w-3.5 h-3.5" />
-                Academic Research
+                Project Documentation
               </div>
-              <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-gray-900">Latest Research</h2>
+              <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-gray-900">Technical Documentation</h2>
               <p className="text-[15px] text-gray-500 mt-3 max-w-xl mx-auto leading-relaxed">
-                Peer-reviewed and pre-print research from the ClearPath AI team, advancing the science of transparent AI
-                for social services and responsible resource navigation.
+                Technical documentation and design analysis from the ClearPath AI project for the USAII Global AI Hackathon 2026,
+                covering our approach to transparent AI for social services and responsible resource navigation.
               </p>
             </motion.div>
 
@@ -1661,7 +1663,7 @@ export default function BlogPage() {
             >
               <button className="inline-flex items-center gap-2 px-5 py-2.5 text-[13px] font-semibold text-gray-600 hover:text-gray-900 bg-white hover:bg-gray-50 border border-gray-200/60 hover:border-gray-300 rounded-xl transition-all hover:shadow-sm">
                 <FileText className="w-4 h-4" />
-                View All Papers
+                View All Documentation
                 <ChevronRight className="w-3.5 h-3.5" />
               </button>
             </motion.div>
@@ -1675,10 +1677,10 @@ export default function BlogPage() {
               className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-12 max-w-3xl mx-auto"
             >
               {[
-                { icon: FileText, value: '4', label: 'Papers Published', color: '#8b5cf6' },
-                { icon: Quote, value: '14', label: 'Total Citations', color: '#3b82f6' },
-                { icon: GraduationCap, value: '3', label: 'Top Venues', color: '#10b981' },
-                { icon: Award, value: '1', label: 'Best Paper Nom.', color: '#f59e0b' },
+                { icon: FileText, value: '4', label: 'Documents', color: '#8b5cf6' },
+                { icon: GraduationCap, value: '1', label: 'Hackathon', color: '#10b981' },
+                { icon: BookOpen, value: '6', label: 'Architecture Layers', color: '#3b82f6' },
+                { icon: Shield, value: '8', label: 'Categories', color: '#f59e0b' },
               ].map((stat) => {
                 const Icon = stat.icon
                 return (
@@ -1713,11 +1715,11 @@ export default function BlogPage() {
             >
               <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-[11px] font-semibold bg-emerald-50/80 text-emerald-600 border border-emerald-100/60 mb-4">
                 <HandHeart className="w-3.5 h-3.5" />
-                Real Impact
+                Community Scenarios
               </div>
               <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-gray-900">Community Stories</h2>
               <p className="text-[15px] text-gray-500 mt-3 max-w-xl mx-auto leading-relaxed">
-                Real people, real results. Hear how ClearPath AI is making a difference in communities across the country.
+                Illustrative examples based on common community resource scenarios. These represent typical use cases ClearPath AI is designed to address.
               </p>
             </motion.div>
 
@@ -1742,10 +1744,10 @@ export default function BlogPage() {
               className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-12 max-w-3xl mx-auto"
             >
               {[
-                { icon: Users, value: '1,200+', label: 'People Helped', color: '#10b981' },
-                { icon: Clock, value: '<2 min', label: 'Avg. Time to Resource', color: '#3b82f6' },
-                { icon: Target, value: '94%', label: 'Found What They Needed', color: '#8b5cf6' },
-                { icon: Heart, value: '98%', label: 'Would Recommend', color: '#ef4444' },
+                { icon: Users, value: '8', label: 'Resource Categories', color: '#10b981' },
+                { icon: Clock, value: '<2 sec', label: 'Classification Time', color: '#3b82f6' },
+                { icon: Target, value: '6', label: 'Pipeline Layers', color: '#8b5cf6' },
+                { icon: Heart, value: '24/7', label: 'Crisis Support', color: '#ef4444' },
               ].map((stat) => {
                 const Icon = stat.icon
                 return (
@@ -2062,7 +2064,7 @@ export default function BlogPage() {
                 {
                   date: 'March 2026',
                   title: 'Crisis Detection Breakthrough',
-                  description: 'Marcus Rivera engineers the dual-layer crisis detection system, achieving 99.7% recall. The first paper is submitted to AAAI Spring Symposium.',
+                  description: 'Marcus Rivera engineers the dual-layer crisis detection system. Technical documentation of the dual-layer approach is written.',
                   icon: Shield,
                   color: '#ef4444',
                 },
@@ -2075,15 +2077,15 @@ export default function BlogPage() {
                 },
                 {
                   date: 'May 2026',
-                  title: 'Research Publications',
-                  description: 'Three papers published across NeurIPS, AAAI, and FAccT. ClearBench evaluation suite released. Privacy-preserving architecture paper cited 4 times in first month.',
+                  title: 'Technical Documentation Complete',
+                  description: 'Technical documentation completed for the USAII Global AI Hackathon 2026. ClearBench evaluation methodology documented. Privacy-preserving architecture detailed.',
                   icon: GraduationCap,
                   color: '#3b82f6',
                 },
                 {
                   date: 'June 2026',
                   title: 'USAII Hackathon Demo',
-                  description: 'ClearPath AI demo launched at the USAII Global AI Hackathon 2026. 1,200+ people helped during the pilot. 98% recommendation rate from users.',
+                  description: 'ClearPath AI demo launched at the USAII Global AI Hackathon 2026. Showcasing the 6-layer transparency architecture and zero-shot classification approach.',
                   icon: Award,
                   color: '#f59e0b',
                 },
@@ -2222,7 +2224,7 @@ export default function BlogPage() {
                   role: 'Head of AI Research',
                   initials: 'SC',
                   gradient: 'from-violet-400 to-purple-600',
-                  bio: 'Leading researcher in zero-shot classification and calibrated transparency. Published at NeurIPS, AAAI, and FAccT.',
+                  bio: 'Leading researcher in zero-shot classification and calibrated transparency. Technical lead for the USAII Global AI Hackathon 2026 project.',
                   articleCount: 4,
                   focus: 'Research & Safety',
                 },

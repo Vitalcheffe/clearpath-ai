@@ -97,7 +97,7 @@ const principles = [
     icon: Lock,
     title: 'We NEVER store PII without consent',
     description:
-      'No account creation required. No email, no password, no personal information stored. Session data is purged when the browser closes. No Google Analytics, no Facebook Pixel, no third-party tracking. The only data that leaves our system is the classification API call to HuggingFace, which processes text without storing it. Users seeking help for domestic violence or substance abuse often do so from shared devices — they deserve absolute privacy by default.',
+      'Account creation is optional — no email or password required for guest use. For guests, session data is purged when the browser closes. Authenticated users can access their history across sessions. No Google Analytics, no Facebook Pixel, no third-party tracking. The only data that leaves our system is the classification API call to HuggingFace, which processes text without storing it. Users seeking help for domestic violence or substance abuse often do so from shared devices — they deserve absolute privacy by default.',
     color: '#8b5cf6',
     bg: 'rgba(139,92,246,0.06)',
   },
@@ -298,7 +298,7 @@ const comparisonRows = [
   {
     dimension: 'Data storage',
     genericAI: 'Conversations stored for model training, subject to data retention policies',
-    clearPath: 'Session-only — all data purged on session end, no accounts, no PII, no third-party analytics',
+    clearPath: 'Session-only for guests — data purged on session end. Optional accounts for cross-session history with encrypted storage. No third-party analytics',
     genericIcon: X,
     clearPathIcon: Check,
   },
@@ -326,7 +326,7 @@ const comparisonRows = [
   {
     dimension: 'Bias accountability',
     genericAI: 'Internal review — bias audits rarely published, no external oversight of training data',
-    clearPath: 'Transparent audits — bias test results published publicly, zero-shot model eliminates fine-tuning bias',
+    clearPath: 'Audits planned — bias test results to be published publicly, zero-shot model eliminates fine-tuning bias',
     genericIcon: X,
     clearPathIcon: Check,
   },
@@ -352,7 +352,7 @@ const commitments = [
   { text: 'Confidence scores are displayed', status: 'Implemented', evidence: '"How Confident" percentage on every result' },
   { text: 'Crisis detection is deterministic', status: 'Implemented', evidence: 'Hardcoded keyword scanner, no AI dependency' },
   { text: 'Human escalation is available', status: 'Implemented', evidence: '211.org integration + confidence threshold trigger' },
-  { text: 'No PII is collected or stored', status: 'Implemented', evidence: 'Session-based only, no accounts, no persistent storage' },
+  { text: 'Minimal PII collected; guests share none', status: 'Implemented', evidence: 'Guest sessions are anonymous; accounts collect minimal info with encrypted storage' },
   { text: 'Known failure modes are documented', status: 'Implemented', evidence: 'Full failure mode table in documentation' },
   { text: 'Bias risks are identified and mitigated', status: 'Implemented', evidence: '5 identified bias types with specific mitigations' },
   { text: 'Code is open-source and auditable', status: 'Planned', evidence: 'GitHub repository with full documentation' },
@@ -363,37 +363,37 @@ const commitments = [
 // ─── ETHICS COMMITTEE DATA ───────────────────────────────
 const committeeMembers = [
   {
-    name: 'Dr. Sarah Chen',
+    name: 'Dr. Sarah Chen (Illustrative)',
     role: 'Chair, AI Ethics Committee',
     initials: 'SC',
     gradient: 'from-blue-500 to-violet-500',
     shadowColor: 'shadow-blue-500/20',
-    bio: 'Dr. Chen is a Professor of Computer Science at Georgia Tech specializing in fairness in machine learning. She has published over 40 papers on algorithmic bias and served on the ACM Conference on Fairness, Accountability, and Transparency (FAccT) program committee for three consecutive years. She brings rigorous academic standards to our ethical review process.',
+    bio: 'This is an illustrative example of the type of expert we would seek for our Ethics Committee. An ideal chair would be a Professor of Computer Science specializing in fairness in machine learning, with publications on algorithmic bias and experience on program committees for conferences like FAccT. We are actively recruiting for this role.',
   },
   {
-    name: 'Marcus Williams',
+    name: 'Marcus Williams (Illustrative)',
     role: 'Community Advocate',
     initials: 'MW',
     gradient: 'from-emerald-500 to-teal-500',
     shadowColor: 'shadow-emerald-500/20',
-    bio: 'Marcus is a former 211 navigator with 8 years of experience connecting vulnerable populations to community resources. He currently serves as Director of Community Outreach at the United Way of Greater Atlanta. His frontline experience ensures our ethics framework addresses the real-world needs of the people we serve, not just theoretical concerns.',
+    bio: 'This is an illustrative example of the type of community advocate we would seek. An ideal candidate would be a former 211 navigator with experience connecting vulnerable populations to community resources, with frontline experience ensuring our ethics framework addresses the real-world needs of the people we serve. We are actively recruiting for this role.',
   },
   {
-    name: 'Dr. Priya Patel',
+    name: 'Dr. Priya Patel (Illustrative)',
     role: 'Data Privacy & Compliance Lead',
     initials: 'PP',
     gradient: 'from-amber-500 to-orange-500',
     shadowColor: 'shadow-amber-500/20',
-    bio: 'Dr. Patel is a healthcare data privacy attorney and former HIPAA compliance officer at the CDC. She holds a J.D. from Yale Law School and a Ph.D. in Information Science from the University of Michigan. She ensures our data practices meet or exceed regulatory requirements across all jurisdictions where ClearPath AI operates.',
+    bio: 'This is an illustrative example of the type of privacy expert we would seek. An ideal candidate would be a data privacy attorney with compliance experience in healthcare or technology, ensuring our data practices meet or exceed regulatory requirements. We are actively recruiting for this role.',
   },
 ]
 
 // ─── BIAS AUDIT DATA ─────────────────────────────────────
 const biasCategories = [
-  { category: 'Gender', testCount: 2400, passRate: '94.2%', finding: 'Slight over-classification of domestic violence resources for female-coded queries (3.1% vs. 1.8% for male-coded)', status: 'Mitigated' },
-  { category: 'Race / Ethnicity', testCount: 3200, passRate: '91.7%', finding: 'Queries mentioning specific cultural terms occasionally misclassified; e.g., "powwow" not recognized as community event', status: 'Monitoring' },
-  { category: 'Age', testCount: 1800, passRate: '96.8%', finding: 'No significant age-based bias detected. Senior-specific queries correctly routed to appropriate categories', status: 'Passed' },
-  { category: 'Language', testCount: 1200, passRate: '78.3%', finding: 'Non-English queries and AAE (African American English) expressions have higher misclassification rates — a known, documented limitation', status: 'Documented' },
+  { category: 'Gender', testCount: 0, passRate: 'Pending', finding: 'Bias testing is conducted using representative sample queries. Formal audit results pending publication. Known concern: potential over-classification of domestic violence resources for female-coded queries.', status: 'Pending' },
+  { category: 'Race / Ethnicity', testCount: 0, passRate: 'Pending', finding: 'Bias testing is conducted using representative sample queries. Formal audit results pending publication. Known concern: queries mentioning specific cultural terms may be misclassified.', status: 'Pending' },
+  { category: 'Age', testCount: 0, passRate: 'Pending', finding: 'Bias testing is conducted using representative sample queries. Formal audit results pending publication.', status: 'Pending' },
+  { category: 'Language', testCount: 0, passRate: 'Pending', finding: 'Non-English queries and AAE (African American English) expressions have higher misclassification rates — a known, documented limitation. Formal audit results pending publication.', status: 'Documented' },
 ]
 
 // ─── INCIDENT RESPONSE DATA ──────────────────────────────
@@ -414,39 +414,18 @@ const incidentSteps = [
 // ─── RESEARCH PARTNERSHIPS DATA ──────────────────────────
 const partnerships = [
   {
-    university: 'Georgia Institute of Technology',
-    department: 'School of Interactive Computing',
-    description: 'Joint research on fairness-aware classification for social service navigation. Our collaboration focuses on developing novel evaluation metrics for zero-shot classifiers in high-stakes community resource contexts, where misclassification can directly impact vulnerable populations.',
+    university: 'Academic Partnership (Planned)',
+    department: 'Fairness & Classification Research',
+    description: 'We plan to partner with academic institutions for research on fairness-aware classification for social service navigation. Our goal is to develop novel evaluation metrics for zero-shot classifiers in high-stakes community resource contexts, where misclassification can directly impact vulnerable populations. Partnership details pending.',
     projects: ['Fairness-aware confidence calibration for zero-shot models', 'Cross-lingual crisis keyword detection using multilingual embeddings', 'User study on transparency features in AI-assisted social services'],
-    papers: [
-      { title: 'Calibrated Transparency: Confidence Scores as Trust Signals in Community Resource AI', abstract: 'We investigate whether displaying calibrated confidence scores alongside AI-generated resource recommendations improves user decision-making accuracy compared to traditional opaque AI outputs. Our user study (n=240) found that calibrated transparency reduced inappropriate reliance on low-confidence results by 37% without decreasing overall user satisfaction.' },
-      { title: 'Beyond English: Detecting Crisis Signals in Multilingual and Code-Switched Text', abstract: 'This paper presents a framework for extending deterministic crisis keyword detection beyond English, incorporating multilingual embeddings and community-sourced crisis expression lexicons for Spanish, Mandarin, and Hindi. We demonstrate a 42% improvement in crisis recall for non-English queries while maintaining a false positive rate below 2%.' },
-    ],
-  },
-  {
-    university: 'University of Michigan',
-    department: 'School of Information',
-    description: 'Research partnership focused on data governance and privacy-preserving architectures for community resource platforms. The collaboration leverages UMich\'s expertise in human-computer interaction and social computing to design systems that protect vulnerable users by default.',
-    projects: ['Privacy-preserving session architecture for sensitive services', 'Design patterns for human-AI handoff in crisis contexts', 'Longitudinal study on user trust in AI resource recommendations'],
-    papers: [
-      { title: 'Zero-Knowledge Navigation: Privacy Architecture for AI Social Service Platforms', abstract: 'We propose a session-based architecture that provides personalized AI recommendations without persistent user data storage. Our design eliminates entire categories of data breach risk while maintaining recommendation quality through in-memory processing and ephemeral session contexts. The architecture is validated against GDPR, CCPA, and HIPAA requirements.' },
-    ],
-  },
-  {
-    university: 'Stanford University',
-    department: 'Stanford Institute for Human-Centered AI (HAI)',
-    description: 'Collaborative research on responsible AI deployment frameworks, with a focus on the unique challenges of deploying AI systems in social services where the cost of errors is measured in human welfare rather than revenue. Our work together contributes to the broader field of public-interest AI.',
-    projects: ['NIST AI RMF implementation for community resource navigation', 'Measuring the societal impact of AI-assisted social service delivery', 'Ethical guidelines for AI in government social programs'],
-    papers: [
-      { title: 'When Errors Cost Lives: Responsible AI for Community Resource Navigation', abstract: 'We present a comprehensive responsible AI framework specifically designed for community resource navigation systems. The framework introduces the concept of "calibrated humility" — the practice of designing AI systems that prioritize honest uncertainty over confident approximation. We demonstrate through case studies that this approach reduces harmful outcomes by 52% compared to standard AI deployment practices.' },
-    ],
+    papers: [],
   },
 ]
 
 // ─── COMMUNITY FEEDBACK DATA ─────────────────────────────
 const feedbackExamples = [
   {
-    id: 'FB-2026-001',
+    id: 'EXAMPLE-001',
     category: 'Crisis Detection',
     feedback: 'I typed "I want to hurt myself" and the system showed me the 988 number immediately. But when my friend typed "I don\'t want to be here anymore," it didn\'t trigger the crisis response.',
     response: 'Thank you for this critical feedback. We have added "don\'t want to be here" and 14 similar expressions to our crisis keyword list. We also added a "Report missed crisis" button so users can flag these cases in real-time. This feedback directly saved us from a dangerous blind spot.',
@@ -454,7 +433,7 @@ const feedbackExamples = [
     timeline: 'Fixed within 24 hours of report',
   },
   {
-    id: 'FB-2026-002',
+    id: 'EXAMPLE-002',
     category: 'Classification Accuracy',
     feedback: 'When I searched for "help with my electricity bill," the system classified it under "Employment" instead of "Financial Assistance." The confidence score was only 52%, which was honest, but the top result was still wrong.',
     response: 'We identified that our label set lacked a "Utility Assistance" subcategory under Financial Assistance. We expanded the classification labels to include utility-specific programs and added "electricity," "water bill," and "heating" as explicit association terms. Confidence for these queries now averages 78%.',
@@ -462,7 +441,7 @@ const feedbackExamples = [
     timeline: 'Label expansion deployed within 1 week',
   },
   {
-    id: 'FB-2026-003',
+    id: 'EXAMPLE-003',
     category: 'Accessibility',
     feedback: 'The confidence scores are great, but as someone with low vision, I have trouble distinguishing between the green (high) and yellow (medium) colors on the confidence badges.',
     response: 'This is an important accessibility gap. We have added text labels ("High," "Medium," "Low") alongside the color-coded badges and implemented ARIA labels for screen readers. We also added a high-contrast mode in Settings that uses distinct patterns (solid, striped, outlined) in addition to colors.',
@@ -476,30 +455,30 @@ const regulations = [
   {
     name: 'GDPR',
     fullName: 'General Data Protection Regulation',
-    status: 'Compliant',
+    status: 'Aligned',
     color: '#3b82f6',
-    description: 'No personal data stored, no cookies for tracking, data processed in-memory only, right to deletion is automatic (session ends = data gone), no cross-border data transfers of personal information, Data Protection Officer appointed.',
+    description: 'We design our systems with privacy-first principles aligned with GDPR requirements. Guest sessions process no personal data; authenticated users can access, export, and delete their data. We use the Hugging Face Inference API as a data processor. Formal compliance certification is pending.',
   },
   {
     name: 'CCPA',
     fullName: 'California Consumer Privacy Act',
-    status: 'Compliant',
+    status: 'Aligned',
     color: '#10b981',
-    description: 'No personal information sold or shared. No user profiles created. Right to know: we process only query text in real-time. Right to delete: nothing stored to delete. Right to opt-out: close the tab. No "Do Not Sell" signal needed because we never sell data.',
+    description: 'We design our systems aligned with CCPA best practices. No personal information sold or shared. No user profiles created for advertising. Right to know and right to delete available for account holders. Guest sessions retain no data. No "Do Not Sell" signal needed because we never sell data. Formal compliance certification is pending.',
   },
   {
     name: 'HIPAA',
     fullName: 'Health Insurance Portability and Accountability Act',
-    status: 'Compliant',
+    status: 'Aligned',
     color: '#8b5cf6',
-    description: 'No protected health information (PHI) is collected, stored, or transmitted. Crisis detection operates on keyword matching without recording health conditions. No medical advice is provided. System does not qualify as a covered entity or business associate under HIPAA.',
+    description: 'No protected health information (PHI) is collected, stored, or transmitted. Crisis detection operates on keyword matching without recording health conditions. No medical advice is provided. System does not qualify as a covered entity or business associate under HIPAA. Formal compliance certification is pending.',
   },
   {
     name: 'COPPA',
     fullName: "Children's Online Privacy Protection Act",
-    status: 'Compliant',
+    status: 'Aligned',
     color: '#f59e0b',
-    description: 'No personal information collected from children under 13. No accounts, no email, no age gates. In-memory processing means no children\'s data is ever persisted. Crisis detection works identically for all users, including minors seeking help.',
+    description: 'We design our systems aligned with COPPA best practices. No personal information collected from children under 13 in guest mode. Account creation is optional. Guest sessions are in-memory only. Crisis detection works identically for all users, including minors seeking help. Formal compliance certification is pending.',
   },
 ]
 
@@ -902,7 +881,7 @@ export default function ResponsibleAIPage() {
             <div className="grid sm:grid-cols-3 gap-4 pl-0 md:pl-14">
               <div className="p-4 rounded-xl bg-gray-50/60 border border-gray-100">
                 <p className="font-semibold text-gray-800 text-[13px] mb-1">Dataset</p>
-                <p className="text-[12px] text-gray-400 leading-relaxed">8,600 synthetic queries across 7 categories, designed to test for demographic bias in classification outcomes. Each query was crafted with controlled variations for gender, race, age, and language patterns.</p>
+                <p className="text-[12px] text-gray-400 leading-relaxed">Representative sample queries across 7 categories, designed to test for demographic bias in classification outcomes. Queries include controlled variations for gender, race, age, and language patterns. Formal audit dataset pending.</p>
               </div>
               <div className="p-4 rounded-xl bg-gray-50/60 border border-gray-100">
                 <p className="font-semibold text-gray-800 text-[13px] mb-1">Evaluation Criteria</p>
@@ -910,7 +889,7 @@ export default function ResponsibleAIPage() {
               </div>
               <div className="p-4 rounded-xl bg-gray-50/60 border border-gray-100">
                 <p className="font-semibold text-gray-800 text-[13px] mb-1">Test Cadence</p>
-                <p className="text-[12px] text-gray-400 leading-relaxed">Full audit quarterly, automated parity tests run on every model update, ad hoc testing triggered by community feedback reports. Last full audit: June 2026.</p>
+                <p className="text-[12px] text-gray-400 leading-relaxed">Full audit quarterly (pending first formal audit), automated parity tests run on every model update, ad hoc testing triggered by community feedback reports.</p>
               </div>
             </div>
           </motion.div>
@@ -925,7 +904,7 @@ export default function ResponsibleAIPage() {
           >
             <div className="p-6 md:p-8 border-b border-gray-100/60">
               <h3 className="text-lg font-bold text-gray-900 tracking-tight">Results by Demographic Category</h3>
-              <p className="text-[13px] text-gray-500 mt-1">8,600 test queries evaluated across 4 demographic dimensions</p>
+              <p className="text-[13px] text-gray-500 mt-1">Representative sample queries evaluated across 4 demographic dimensions — formal audit pending</p>
             </div>
             <div className="overflow-x-auto">
               <table className="w-full">
@@ -940,12 +919,12 @@ export default function ResponsibleAIPage() {
                 </thead>
                 <tbody>
                   {biasCategories.map((cat, i) => {
-                    const statusColor = cat.status === 'Passed' ? '#10b981' : cat.status === 'Mitigated' ? '#3b82f6' : cat.status === 'Monitoring' ? '#f59e0b' : '#8b5cf6'
+                    const statusColor = cat.status === 'Passed' ? '#10b981' : cat.status === 'Mitigated' ? '#3b82f6' : cat.status === 'Monitoring' ? '#f59e0b' : cat.status === 'Pending' ? '#6b7280' : '#8b5cf6'
                     return (
                       <tr key={cat.category} className="border-b border-gray-50/60 last:border-b-0 hover:bg-white/40 transition-colors">
                         <td className="p-4"><span className="text-[13px] font-semibold text-gray-900">{cat.category}</span></td>
                         <td className="p-4"><span className="text-[13px] text-gray-500">{cat.testCount.toLocaleString()}</span></td>
-                        <td className="p-4"><span className="text-[13px] font-semibold" style={{ color: parseFloat(cat.passRate) >= 90 ? '#10b981' : parseFloat(cat.passRate) >= 80 ? '#f59e0b' : '#ef4444' }}>{cat.passRate}</span></td>
+                        <td className="p-4"><span className="text-[13px] font-semibold" style={{ color: cat.passRate === 'Pending' ? '#6b7280' : parseFloat(cat.passRate) >= 90 ? '#10b981' : parseFloat(cat.passRate) >= 80 ? '#f59e0b' : '#ef4444' }}>{cat.passRate}</span></td>
                         <td className="p-4"><span className="text-[12px] text-gray-500 leading-relaxed">{cat.finding}</span></td>
                         <td className="p-4">
                           <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-semibold" style={{ backgroundColor: `${statusColor}10`, color: statusColor, border: `1px solid ${statusColor}20` }}>
@@ -1010,7 +989,7 @@ export default function ResponsibleAIPage() {
                   'Automated parity tests run on every model or label set update',
                   'Community feedback monitoring with dedicated bias-reporting channel',
                   'Quarterly full audit with published results (next: September 2026)',
-                  'External review by Georgia Tech fairness research group',
+                  'External academic review (partnership pending)',
                   'Real-time classification distribution monitoring for drift detection',
                 ].map((item, i) => (
                   <li key={i} className="flex items-start gap-2.5">
@@ -1252,9 +1231,9 @@ export default function ResponsibleAIPage() {
             </p>
             <div className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-emerald-50/60 border border-emerald-100 mt-4">
               <Send className="w-4 h-4 text-emerald-500" />
-              <a href="mailto:ethics@clearpath-ai.org" className="text-[14px] font-semibold text-emerald-600 hover:text-emerald-500 transition-colors">
-                ethics@clearpath-ai.org
-              </a>
+              <Link href="/contact" className="text-[14px] font-semibold text-emerald-600 hover:text-emerald-500 transition-colors">
+                Contact the Committee
+              </Link>
             </div>
           </motion.div>
         </div>
@@ -1793,13 +1772,13 @@ export default function ResponsibleAIPage() {
             transition={{ duration: 0.5 }}
             className="glass-card rounded-2xl p-6 md:p-8 shadow-premium mb-10"
           >
-            <h3 className="text-[16px] font-bold text-gray-900 tracking-tight mb-4">Impact Metrics (Q2 2026)</h3>
+            <h3 className="text-[16px] font-bold text-gray-900 tracking-tight mb-4">Impact Metrics (Illustrative)</h3>
             <div className="grid sm:grid-cols-4 gap-4">
               {[
-                { label: 'Feedback Received', value: '847', change: '+23%', icon: MessageSquare, color: '#3b82f6' },
-                { label: 'Actioned Items', value: '134', change: '15.8%', icon: ThumbsUp, color: '#10b981' },
-                { label: 'Avg Response Time', value: '1.8 days', change: '-32%', icon: Clock, color: '#8b5cf6' },
-                { label: 'Crisis Fixes', value: '12', change: 'Critical', icon: Shield, color: '#ef4444' },
+                { label: 'Feedback Received', value: '—', change: 'Pending', icon: MessageSquare, color: '#3b82f6' },
+                { label: 'Actioned Items', value: '—', change: 'Pending', icon: ThumbsUp, color: '#10b981' },
+                { label: 'Avg Response Time', value: '—', change: 'Pending', icon: Clock, color: '#8b5cf6' },
+                { label: 'Crisis Fixes', value: '—', change: 'Pending', icon: Shield, color: '#ef4444' },
               ].map((metric) => {
                 const MIcon = metric.icon
                 return (
@@ -1818,7 +1797,7 @@ export default function ResponsibleAIPage() {
 
           {/* Feedback Examples */}
           <div className="space-y-6">
-            <h3 className="text-[16px] font-bold text-gray-900 tracking-tight text-center">Anonymized Feedback Examples</h3>
+            <h3 className="text-[16px] font-bold text-gray-900 tracking-tight text-center">Example Feedback (Illustrative)</h3>
             {feedbackExamples.map((fb, i) => (
               <motion.div
                 key={fb.id}
@@ -1972,9 +1951,9 @@ export default function ResponsibleAIPage() {
               </span>
             </motion.h2>
             <motion.p variants={staggerItem} className="text-[16px] text-gray-500 mt-4 max-w-2xl mx-auto">
-              Our privacy-by-design architecture makes compliance the default, not the exception.
-              Because we don&apos;t store personal data, many regulatory requirements are automatically
-              satisfied by our system design.
+              Our privacy-by-design architecture makes alignment with regulations the default, not the exception.
+              Because guest sessions don&apos;t persist personal data, many regulatory requirements are automatically
+              satisfied by our system design. Formal compliance certifications are pending.
             </motion.p>
           </motion.div>
 
@@ -2023,14 +2002,14 @@ export default function ResponsibleAIPage() {
                 <div className="w-9 h-9 rounded-lg bg-teal-50 flex items-center justify-center shrink-0">
                   <UserCheck className="w-4 h-4 text-teal-600" />
                 </div>
-                <h3 className="text-[15px] font-bold text-gray-900 tracking-tight mt-1">Data Protection Officer</h3>
+                <h3 className="text-[15px] font-bold text-gray-900 tracking-tight mt-1">Privacy Contact</h3>
               </div>
               <div className="pl-0 md:pl-12 space-y-2.5">
-                <p className="text-[13px] text-gray-700 font-medium">Dr. Priya Patel</p>
-                <p className="text-[12px] text-gray-500">Data Privacy & Compliance Lead, AI Ethics Committee</p>
+                <p className="text-[13px] text-gray-700 font-medium">For privacy inquiries, contact us through our contact page</p>
+                <p className="text-[12px] text-gray-500">We are actively recruiting a Data Protection Officer. In the meantime, direct all privacy questions to our general contact.</p>
                 <div className="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-teal-50/40 border border-teal-100/60 mt-2">
                   <Mail className="w-3.5 h-3.5 text-teal-500" />
-                  <a href="mailto:dpo@clearpath-ai.org" className="text-[12px] font-medium text-teal-600 hover:text-teal-500 transition-colors">dpo@clearpath-ai.org</a>
+                  <Link href="/contact" className="text-[12px] font-medium text-teal-600 hover:text-teal-500 transition-colors">Contact Page</Link>
                 </div>
               </div>
             </motion.div>
@@ -2051,7 +2030,7 @@ export default function ResponsibleAIPage() {
                 {[
                   { label: 'Internal bias audit', freq: 'Quarterly' },
                   { label: 'External security audit', freq: 'Annually' },
-                  { label: 'GDPR compliance review', freq: 'Semi-annually' },
+                  { label: 'GDPR alignment review', freq: 'Semi-annually' },
                   { label: 'Ethics Committee review', freq: 'Quarterly' },
                   { label: 'Incident response drill', freq: 'Semi-annually' },
                 ].map((item, i) => (

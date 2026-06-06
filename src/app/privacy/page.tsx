@@ -160,9 +160,10 @@ export default function PrivacyPage() {
                 </p>
                 <p>
                   We built ClearPath AI with a <span className="font-semibold text-gray-700">privacy-first approach</span>.
-                  Unlike many AI services, we do not store your conversations, we do not train models on your data,
-                  and we do not share your information with advertisers. Our architecture was designed from the ground
-                  up to minimize data collection and maximize your control.
+                  We do not train models on your data, and we do not share your information with advertisers. Guest sessions
+                  are ephemeral by design. For authenticated users, we store only what is needed to provide cross-session
+                  functionality. Our architecture was designed from the ground up to minimize data collection and maximize
+                  your control.
                 </p>
                 <p>
                   By using ClearPath AI, you agree to the practices described in this policy. If you have any
@@ -206,8 +207,8 @@ export default function PrivacyPage() {
                     <div>
                       <p className="font-semibold text-gray-800 text-[14px]">What you type</p>
                       <p className="text-[13px] text-gray-400 mt-0.5">
-                        Your search queries and conversation inputs are processed in-memory only to classify
-                        your needs and find relevant resources. Nothing is written to disk.
+                        Your search queries and conversation inputs are processed to classify
+                        your needs and find relevant resources. For guests, processing is in-memory only and nothing is written to disk. For authenticated users, conversations are stored for cross-session access.
                       </p>
                     </div>
                   </div>
@@ -217,7 +218,7 @@ export default function PrivacyPage() {
                       <p className="font-semibold text-gray-800 text-[14px]">Classification results</p>
                       <p className="text-[13px] text-gray-400 mt-0.5">
                         The AI-generated category labels and confidence scores are generated in real-time
-                        and displayed to you. They are not stored after your session ends.
+                        and displayed to you. For guests, they are not stored after your session ends. For account holders, they are saved as part of conversation history.
                       </p>
                     </div>
                   </div>
@@ -322,7 +323,7 @@ export default function PrivacyPage() {
               <div className="space-y-4 text-[15px] text-gray-500 leading-relaxed pl-0 md:pl-14">
                 <div className="p-5 rounded-xl bg-emerald-50/50 border border-emerald-100">
                   <p className="text-2xl sm:text-3xl font-black text-emerald-700 tracking-tight">
-                    We do NOT store your conversation data. Period.
+                    If you create an account, your conversation history and saved resources are stored securely in our database so you can access them across sessions. If you use the app as a guest, no data is persisted.
                   </p>
                 </div>
                 <p>
@@ -331,10 +332,10 @@ export default function PrivacyPage() {
                 </p>
                 <ul className="space-y-2.5">
                   {[
-                    'Your inputs are processed in RAM and never written to persistent storage',
-                    'No database stores your conversations, queries, or results',
-                    'When you close the browser tab or navigate away, all session data is gone',
-                    'There is no way for anyone — including us — to retrieve past conversations',
+                    'Guest sessions are processed in-memory and no data is written to persistent storage',
+                    'For authenticated users, conversations are stored in an encrypted SQLite database to provide history and resource tracking',
+                    'Guest session data is gone when you close the browser tab or navigate away',
+                    'Account holders can access past conversations; guest sessions cannot be retrieved',
                   ].map((item, i) => (
                     <li key={i} className="flex items-start gap-3">
                       <CheckCircle2 className="w-4 h-4 text-emerald-500 mt-1 shrink-0" />
@@ -345,7 +346,7 @@ export default function PrivacyPage() {
                 <div className="flex items-center gap-2 px-4 py-3 rounded-xl bg-gray-50/60 border border-gray-100 mt-4">
                   <Lock className="w-4 h-4 text-gray-400" />
                   <span className="text-[13px] text-gray-400">
-                    Zero storage = zero risk of data breaches involving your conversations
+                    Guest sessions leave no trace; authenticated data is encrypted at rest
                   </span>
                 </div>
               </div>
@@ -491,15 +492,15 @@ export default function PrivacyPage() {
                   {[
                     {
                       title: 'Right to Know',
-                      desc: 'You have the right to know what data we process. Since we don\'t store anything, the answer is simple: we only process what you type, in real-time, and nothing persists.',
+                      desc: 'You have the right to know what data we process. Guest sessions are processed in real-time with no persistence. For account holders, we store conversation history and saved resources — you can view and request a copy of your data at any time.',
                     },
                     {
                       title: 'Right to Delete',
-                      desc: 'You have the right to request deletion of your data. Since we don\'t store any conversation data, there\'s nothing to delete — but if you ever have concerns, contact us and we\'ll confirm.',
+                      desc: 'You have the right to request deletion of your data. Guest sessions have no persistent data to delete. Account holders can request full data deletion at any time through our contact page — we will remove all stored data within 30 days.',
                     },
                     {
                       title: 'Right to Opt Out',
-                      desc: 'You can stop using the service at any time. Since no data persists after your session, opting out is as simple as closing the browser tab.',
+                      desc: 'You can stop using the service at any time. Guest sessions leave no trace when you close the tab. Account holders can delete their account and all associated data at any time.',
                     },
                   ].map((right, i) => (
                     <div key={i} className="flex items-start gap-3 p-4 rounded-xl bg-gray-50/60 border border-gray-100">
@@ -539,14 +540,14 @@ export default function PrivacyPage() {
               </div>
               <div className="space-y-4 text-[15px] text-gray-500 leading-relaxed pl-0 md:pl-14">
                 <p>
-                  ClearPath AI is <span className="font-semibold text-gray-700">COPPA compliant</span> and designed
-                  for users of all ages, including children and teenagers who may need community resources.
+                  ClearPath AI is designed with <span className="font-semibold text-gray-700">privacy-first principles aligned with COPPA best practices</span> for
+                  users of all ages, including children and teenagers who may need community resources. Formal compliance certification is pending.
                 </p>
                 <ul className="space-y-2.5">
                   {[
                     'We do not knowingly collect personal information from children under 13',
-                    'No account creation is required — no names, emails, or birthdays are collected',
-                    'Our in-memory processing means no children\'s data is ever stored',
+                    'Account creation is optional — guests need no names, emails, or birthdays; accounts require minimal information',
+                    'Guest sessions are in-memory only; authenticated children\'s data would require parental consent per COPPA',
                     'Crisis detection works the same way for all users, including children, ensuring immediate access to help',
                   ].map((item, i) => (
                     <li key={i} className="flex items-start gap-3">
@@ -557,8 +558,8 @@ export default function PrivacyPage() {
                 </ul>
                 <p>
                   If you are a parent or guardian and believe your child has interacted with our service
-                  and have concerns, please contact us. Since we store no data, there is nothing to
-                  remove — but we take all concerns seriously.
+                  and have concerns, please contact us. Guest sessions leave no persistent data to remove.
+                  For account holders, we can delete all stored data upon request — and we take all concerns seriously.
                 </p>
               </div>
             </motion.div>
@@ -598,8 +599,8 @@ export default function PrivacyPage() {
                     },
                     {
                       icon: Database,
-                      title: 'No Database',
-                      desc: 'Zero persistent storage means zero attack surface for data theft',
+                      title: 'Encrypted Storage',
+                      desc: 'Authenticated user data encrypted at rest; guest sessions never touch disk',
                       color: '#3b82f6',
                     },
                     {
@@ -622,8 +623,8 @@ export default function PrivacyPage() {
                   })}
                 </div>
                 <p>
-                  While no system is 100% secure, our approach of not storing data eliminates entire
-                  categories of security risks. You can&apos;t breach what doesn&apos;t exist.
+                  While no system is 100% secure, our approach minimizes data exposure. Guest sessions leave no trace,
+                  and authenticated user data is encrypted at rest. You can&apos;t breach what was never stored.
                 </p>
               </div>
             </motion.div>
@@ -695,9 +696,8 @@ export default function PrivacyPage() {
                       <p className="font-semibold text-gray-700 text-[13px]">Data Controller Information</p>
                       <p className="text-[12px] text-gray-400 mt-1">
                         ClearPath AI is the data controller for all processing described in this policy.
-                        Our Data Protection Officer is Dr. Priya Patel, reachable at{' '}
-                        <a href="mailto:dpo@clearpath-ai.org" className="text-blue-500 hover:text-blue-400 font-medium">dpo@clearpath-ai.org</a>.
-                        We have no data processors acting on our behalf, as all processing occurs within our system architecture.
+                        For privacy inquiries, contact us through our <a href="/contact" className="text-blue-500 hover:text-blue-400 font-medium">contact page</a>.
+                        We use the Hugging Face Inference API for text classification. Hugging Face may process your text temporarily as part of their API service. We do not send personal identifiers to Hugging Face.
                       </p>
                     </div>
                   </div>
@@ -739,11 +739,11 @@ export default function PrivacyPage() {
                     },
                     {
                       title: 'Safeguards in place',
-                      description: 'Because we do not store personal data, the risk from international transfers is minimal. Query text is processed in real-time and immediately discarded. No persistent data crosses borders. All data in transit is encrypted using TLS 1.3 regardless of destination.',
+                      description: 'Guest session data is not stored, so the risk from international transfers is minimal for guests. For authenticated users, data is stored in an encrypted database. Query text is processed in real-time via the Hugging Face API. All data in transit is encrypted using TLS 1.3 regardless of destination.',
                     },
                     {
                       title: 'Standard contractual clauses',
-                      description: 'Where our third-party service providers (Hugging Face) may process data outside the EEA, they operate under Standard Contractual Clauses (SCCs) approved by the European Commission. However, since no personal data is stored and all processing is ephemeral, the practical impact of these transfers is negligible.',
+                      description: 'Where our third-party service providers (Hugging Face) may process data outside the EEA, they operate under Standard Contractual Clauses (SCCs) approved by the European Commission. For guest sessions, all processing is ephemeral. For account data, we apply appropriate safeguards for cross-border transfers.',
                     },
                   ].map((item, i) => (
                     <div key={i} className="p-4 rounded-xl bg-gray-50/60 border border-gray-100">
@@ -854,7 +854,7 @@ export default function PrivacyPage() {
               </div>
               <div className="space-y-4 text-[15px] text-gray-500 leading-relaxed pl-0 md:pl-14">
                 <p>
-                  Our data retention is simple: <span className="font-semibold text-gray-700">we don&apos;t retain data</span>.
+                  Our data retention is simple: <span className="font-semibold text-gray-700">we don&apos;t retain guest data; account data is kept only as long as needed</span>.
                   Here is the complete schedule showing what happens to each type of data:
                 </p>
                 <div className="overflow-x-auto">
@@ -868,9 +868,11 @@ export default function PrivacyPage() {
                     </thead>
                     <tbody>
                       {[
-                        { type: 'Query text', period: 'Session only (seconds)', reason: 'Processed in-memory for classification, discarded immediately after' },
-                        { type: 'Classification results', period: 'Session only (seconds)', reason: 'Displayed to user, then purged from memory' },
-                        { type: 'Confidence scores', period: 'Session only (seconds)', reason: 'Generated for display, never persisted to disk' },
+                        { type: 'Query text (guest)', period: 'Session only (seconds)', reason: 'Processed in-memory for classification, discarded immediately after' },
+                        { type: 'Query text (account)', period: 'Until account deletion', reason: 'Stored for conversation history and cross-session access in encrypted database' },
+                        { type: 'Classification results (guest)', period: 'Session only (seconds)', reason: 'Displayed to user, then purged from memory' },
+                        { type: 'Classification results (account)', period: 'Until account deletion', reason: 'Saved as part of conversation history for authenticated users' },
+                        { type: 'Confidence scores', period: 'Session only (guest) / Until deletion (account)', reason: 'Guest sessions: never persisted. Accounts: saved with conversation history' },
                         { type: 'Crisis keyword matches', period: 'Not stored at all', reason: 'Detection triggers response, no record of detection is kept' },
                         { type: 'Location data (ZIP)', period: 'Session only (if provided)', reason: 'Opt-in only, used for resource filtering, cleared on session end' },
                         { type: 'Session metadata', period: 'Session only', reason: 'Browser session token, no personal identifiers, cleared on close' },
@@ -1009,10 +1011,10 @@ export default function PrivacyPage() {
                   <h4 className="text-[14px] font-bold text-gray-800 mb-3">Architecture Decisions for Privacy</h4>
                   <div className="space-y-2.5">
                     {[
-                      { decision: 'In-memory processing only', rationale: 'Eliminates entire categories of data breach risk. You cannot exfiltrate data that was never stored.' },
-                      { decision: 'No user accounts', rationale: 'Accounts require email, passwords, and session persistence — all of which create privacy risk. We chose anonymity by default.' },
+                      { decision: 'In-memory processing for guests', rationale: 'Guest sessions eliminate entire categories of data breach risk. You cannot exfiltrate data that was never stored.' },
+                      { decision: 'Optional user accounts', rationale: 'Accounts are optional — guests can use the service with no identifiers. Authenticated users get cross-session history, with data encrypted at rest and minimal information collected.' },
                       { decision: 'Zero-shot classification', rationale: 'We use a pre-trained model without fine-tuning on user data. Your queries improve nothing about the model.' },
-                      { decision: 'Session-based architecture', rationale: 'All state is ephemeral. When you close the tab, every trace of your interaction is gone from our servers.' },
+                      { decision: 'Session-based guest architecture', rationale: 'Guest state is ephemeral. When you close the tab, every trace of your guest interaction is gone from our servers. Account data persists securely for cross-session access.' },
                       { decision: 'Opt-in location sharing', rationale: 'Location is never requested automatically. If you choose to share a ZIP code for better results, it stays in your session only.' },
                     ].map((item, i) => (
                       <div key={i} className="flex items-start gap-3 p-3 rounded-xl bg-gray-50/60 border border-gray-100">
@@ -1033,11 +1035,11 @@ export default function PrivacyPage() {
                   <h4 className="text-[14px] font-bold text-gray-800 mb-3">Privacy Impact Assessment Results</h4>
                   <div className="p-4 rounded-xl bg-emerald-50/30 border border-emerald-100/40">
                     <p className="text-[13px] text-gray-500 leading-relaxed">
-                      We conducted a Privacy Impact Assessment (PIA) prior to launch. Key findings: (1) No personal
-                      data is collected, eliminating GDPR Articles 13-20 obligations for data storage; (2) In-memory
-                      processing architecture reduces data breach risk to near-zero; (3) Crisis detection operates
-                      without storing sensitive health information; (4) No third-party data sharing eliminates
-                      controller-processor agreement requirements; (5) Overall privacy risk rating: <span className="font-bold text-emerald-600">Minimal</span>.
+                      We conducted a Privacy Impact Assessment (PIA) prior to launch. Key findings: (1) Guest sessions collect no personal
+                      data; authenticated accounts collect minimal data; (2) In-memory processing for guests reduces
+                      data breach risk; encrypted storage for accounts protects data at rest; (3) Crisis detection operates
+                      without storing sensitive health information; (4) Hugging Face API processes text temporarily
+                      as a data processor; we do not send personal identifiers; (5) Overall privacy risk rating: <span className="font-bold text-emerald-600">Low</span>.
                     </p>
                   </div>
                 </div>
@@ -1048,11 +1050,11 @@ export default function PrivacyPage() {
                   <div className="grid sm:grid-cols-2 gap-3">
                     {[
                       { icon: Lock, title: 'TLS 1.3 Encryption', desc: 'All data in transit encrypted end-to-end', color: '#3b82f6' },
-                      { icon: Cpu, title: 'In-Memory Only', desc: 'RAM processing with no disk persistence', color: '#10b981' },
+                      { icon: Cpu, title: 'In-Memory for Guests', desc: 'Guest sessions use RAM processing with no disk persistence', color: '#10b981' },
                       { icon: Shield, title: 'Input Sanitization', desc: 'All user inputs sanitized before processing', color: '#8b5cf6' },
-                      { icon: Database, title: 'Zero Storage', desc: 'No database, no files, no logs of user content', color: '#f59e0b' },
+                      { icon: Database, title: 'Encrypted at Rest', desc: 'Authenticated data encrypted in SQLite; guest sessions never persisted', color: '#f59e0b' },
                       { icon: Eye, title: 'No Tracking', desc: 'No analytics, pixels, or behavioral tracking', color: '#ef4444' },
-                      { icon: UserCheck, title: 'Anonymity Default', desc: 'No accounts, no email, no identifiers', color: '#06b6d4' },
+                      { icon: UserCheck, title: 'Optional Accounts', desc: 'Guests need no identifiers; accounts are optional', color: '#06b6d4' },
                     ].map((safeguard) => {
                       const SIcon = safeguard.icon
                       return (
@@ -1110,13 +1112,12 @@ export default function PrivacyPage() {
                   </div>
                   <div className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-emerald-50/60 border border-emerald-100">
                     <Shield className="w-4 h-4 text-emerald-500" />
-                    <a
-                      href="mailto:dpo@clearpath-ai.org"
+                    <Link
+                      href="/contact"
                       className="text-[14px] font-semibold text-emerald-600 hover:text-emerald-500 transition-colors"
                     >
-                      dpo@clearpath-ai.org
-                    </a>
-                    <span className="text-[11px] text-gray-400">(Data Protection Officer)</span>
+                      Contact us for privacy inquiries
+                    </Link>
                   </div>
                 </div>
                 <p className="text-[13px] text-gray-400 mt-4">
@@ -1143,7 +1144,7 @@ export default function PrivacyPage() {
               </div>
               <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-gray-900">Privacy is a feature, not a trade-off</h2>
               <p className="text-[15px] text-gray-500 mt-4 max-w-lg mx-auto leading-relaxed">
-                Experience AI that respects your privacy by default. No data stored, no compromises.
+                Experience AI that respects your privacy by default. Minimal data collection, optional accounts, no compromises.
               </p>
               <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mt-8">
                 <Link

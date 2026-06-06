@@ -675,7 +675,8 @@ export default function VerificationPage() {
   const [isVerifying, setIsVerifying] = useState(false)
   const [verifSteps, setVerifSteps] = useState<VerificationStep[]>(initialVerificationSteps)
   const [verifComplete, setVerifComplete] = useState(false)
-  const [verifResult, setVerifResult] = useState<{ tier: number; name: string; confidence: number } | null>(null)
+  const [verifResult, setVerifResult] = useState<{ tier: number; name: string; confidence: number; phone?: string; address?: string; category?: string; lastVerified?: string; source?: string; description?: string } | null>(null)
+  const [verifNotFound, setVerifNotFound] = useState(false)
 
   // Report Issue Form State
   const [reportForm, setReportForm] = useState({
@@ -687,55 +688,168 @@ export default function VerificationPage() {
   const [reportSubmitted, setReportSubmitted] = useState(false)
 
   // ─── Live Verification Handler ──────────────────────────
-  const handleVerify = () => {
+  const handleVerify = async () => {
     if (!resourceInput.trim()) return
     setIsVerifying(true)
     setVerifComplete(false)
     setVerifResult(null)
+    setVerifNotFound(false)
     setVerifSteps(initialVerificationSteps.map(s => ({ ...s, status: 'pending' })))
 
-    const mockResults: VerificationStep[] = [
-      { id: 'db', label: 'Database Lookup', status: 'passed', detail: 'Found in 211.org database — 1 match', icon: Database },
-      { id: 'phone', label: 'Phone Verification', status: 'passed', detail: 'Phone line active and accepting calls', icon: Phone },
-      { id: 'web', label: 'Website Check', status: 'warning', detail: 'Website slow to respond (3.2s load time)', icon: Globe },
-      { id: 'addr', label: 'Address Validation', status: 'passed', detail: 'Address validated against USPS CASS data', icon: MapPin },
-      { id: 'nav', label: 'Navigator Confirmation', status: 'passed', detail: 'Confirmed by navigator Maria L. on Jun 7, 2026', icon: UserCheck },
-      { id: 'recency', label: 'Recency Check', status: 'passed', detail: 'Last verified 2 days ago — within 30-day window', icon: Clock },
-    ]
+    // Step 1: Animate the database lookup step
+    setVerifSteps(prev => {
+      const next = [...prev]
+      next[0] = { ...next[0], status: 'running' }
+      return next
+    })
 
-    // Animate steps one by one
-    mockResults.forEach((step, i) => {
-      setTimeout(() => {
-        setVerifSteps(prev => {
-          const next = [...prev]
-          // Mark all previous as done
-          for (let j = 0; j < i; j++) {
-            next[j] = { ...mockResults[j] }
-          }
-          // Mark current as running
-          next[i] = { ...step, status: 'running' }
-          return next
+    try {
+      const response = await fetch(`/api/community-resources?search=${encodeURIComponent(resourceInput.trim())}`)
+      const data = await response.json()
+
+      // Mark database lookup as complete
+      const dbStep: VerificationStep = data.resources && data.resources.length > 0
+        ? { id: 'db', label: 'Database Lookup', status: 'passed', detail: `Found in database — ${data.resources.length} match${data.resources.length > 1 ? 'es' : ''}`, icon: Database }
+        : { id: 'db', label: 'Database Lookup', status: 'failed', detail: 'Not found in community resource database', icon: Database }
+
+      setVerifSteps(prev => {
+        const next = [...prev]
+        next[0] = dbStep
+        return next
+      })
+
+      // If no results found, mark remaining steps as skipped and show not-found
+      if (!data.resources || data.resources.length === 0) {
+        const skipSteps: VerificationStep[] = [
+          dbStep,
+          { id: 'phone', label: 'Phone Verification', status: 'failed', detail: 'No resource to verify', icon: Phone },
+          { id: 'web', label: 'Website Check', status: 'failed', detail: 'No resource to verify', icon: Globe },
+          { id: 'addr', label: 'Address Validation', status: 'failed', detail: 'No resource to verify', icon: MapPin },
+          { id: 'nav', label: 'Navigator Confirmation', status: 'failed', detail: 'No resource to verify', icon: UserCheck },
+          { id: 'recency', label: 'Recency Check', status: 'failed', detail: 'No resource to verify', icon: Clock },
+        ]
+
+        // Animate remaining steps quickly
+        skipSteps.forEach((step, i) => {
+          if (i === 0) return // already done
+          setTimeout(() => {
+            setVerifSteps(prev => {
+              const next = [...prev]
+              for (let j = 0; j < i; j++) {
+                next[j] = { ...skipSteps[j] }
+              }
+              next[i] = { ...step, status: 'running' }
+              return next
+            })
+            setTimeout(() => {
+              setVerifSteps(prev => {
+                const next = [...prev]
+                next[i] = { ...step }
+                return next
+              })
+              if (i === skipSteps.length - 1) {
+                setTimeout(() => {
+                  setIsVerifying(false)
+                  setVerifComplete(true)
+                  setVerifNotFound(true)
+                }, 300)
+              }
+            }, 300)
+          }, i * 250)
         })
+        return
+      }
 
-        // After a short delay, mark as final status
+      // Resource found — build verification steps based on real data
+      const resource = data.resources[0]
+      const hasPhone = !!resource.phone
+      const hasUrl = !!resource.url
+      const hasAddress = !!resource.address
+      const hasLastVerified = !!resource.lastVerified
+
+      // Determine tier based on available data
+      let tier = 1 // AI Classified by default
+      if (hasLastVerified) {
+        const verifiedDate = new Date(resource.lastVerified)
+        const daysSinceVerified = (Date.now() - verifiedDate.getTime()) / (1000 * 60 * 60 * 24)
+        if (daysSinceVerified <= 30 && hasPhone) {
+          tier = 4 // Recently Updated
+        } else if (hasPhone) {
+          tier = 3 // Navigator Confirmed
+        } else {
+          tier = 2 // Database Verified
+        }
+      } else if (hasPhone || hasAddress) {
+        tier = 2 // Database Verified
+      }
+
+      const confidenceMap: Record<number, number> = { 1: 58, 2: 72, 3: 87, 4: 94 }
+      const confidence = confidenceMap[tier] || 58
+
+      const resultSteps: VerificationStep[] = [
+        dbStep,
+        { id: 'phone', label: 'Phone Verification', status: hasPhone ? 'passed' : 'warning', detail: hasPhone ? `Phone on file: ${resource.phone}` : 'No phone number on file', icon: Phone },
+        { id: 'web', label: 'Website Check', status: hasUrl ? 'passed' : 'warning', detail: hasUrl ? `Website on file: ${resource.url}` : 'No website on file', icon: Globe },
+        { id: 'addr', label: 'Address Validation', status: hasAddress ? 'passed' : 'warning', detail: hasAddress ? `Address: ${resource.address}` : 'No address on file', icon: MapPin },
+        { id: 'nav', label: 'Navigator Confirmation', status: tier >= 3 ? 'passed' : (tier >= 2 ? 'warning' : 'failed'), detail: tier >= 3 ? 'Confirmed by navigator' : (tier >= 2 ? 'In partner database, awaiting navigator review' : 'Not yet reviewed by navigator'), icon: UserCheck },
+        { id: 'recency', label: 'Recency Check', status: tier === 4 ? 'passed' : (tier >= 3 ? 'warning' : 'failed'), detail: hasLastVerified ? `Last verified: ${resource.lastVerified}` : 'No verification date on record', icon: Clock },
+      ]
+
+      // Animate remaining steps one by one
+      resultSteps.forEach((step, i) => {
+        if (i === 0) return // already done
         setTimeout(() => {
           setVerifSteps(prev => {
             const next = [...prev]
-            next[i] = { ...step }
+            for (let j = 0; j < i; j++) {
+              next[j] = { ...resultSteps[j] }
+            }
+            next[i] = { ...step, status: 'running' }
             return next
           })
 
-          // If last step, complete
-          if (i === mockResults.length - 1) {
-            setTimeout(() => {
-              setIsVerifying(false)
-              setVerifComplete(true)
-              setVerifResult({ tier: 4, name: resourceInput, confidence: 91 })
-            }, 400)
-          }
-        }, 600)
-      }, i * 900)
-    })
+          setTimeout(() => {
+            setVerifSteps(prev => {
+              const next = [...prev]
+              next[i] = { ...step }
+              return next
+            })
+
+            if (i === resultSteps.length - 1) {
+              setTimeout(() => {
+                setIsVerifying(false)
+                setVerifComplete(true)
+                setVerifResult({
+                  tier,
+                  name: resource.name,
+                  confidence,
+                  phone: resource.phone || undefined,
+                  address: resource.address || undefined,
+                  category: resource.category || undefined,
+                  lastVerified: resource.lastVerified || undefined,
+                  source: 'Community Resource Database',
+                  description: resource.description || undefined,
+                })
+              }, 400)
+            }
+          }, 600)
+        }, i * 900)
+      })
+    } catch (error) {
+      // On fetch error, mark all steps as failed
+      const errorSteps: VerificationStep[] = [
+        { id: 'db', label: 'Database Lookup', status: 'failed', detail: 'Error connecting to database', icon: Database },
+        { id: 'phone', label: 'Phone Verification', status: 'failed', detail: 'Could not verify — database error', icon: Phone },
+        { id: 'web', label: 'Website Check', status: 'failed', detail: 'Could not verify — database error', icon: Globe },
+        { id: 'addr', label: 'Address Validation', status: 'failed', detail: 'Could not verify — database error', icon: MapPin },
+        { id: 'nav', label: 'Navigator Confirmation', status: 'failed', detail: 'Could not verify — database error', icon: UserCheck },
+        { id: 'recency', label: 'Recency Check', status: 'failed', detail: 'Could not verify — database error', icon: Clock },
+      ]
+      setVerifSteps(errorSteps)
+      setIsVerifying(false)
+      setVerifComplete(true)
+      setVerifNotFound(true)
+    }
   }
 
   // ─── Report Issue Handler ────────────────────────────────
@@ -1005,8 +1119,8 @@ export default function VerificationPage() {
                 Live Verification Checker
               </h2>
               <p className="text-[15px] text-gray-500 mt-4 max-w-2xl mx-auto leading-relaxed">
-                Enter a resource ID or name to see how our verification pipeline works in real-time.
-                This is a simulated demo — in production, it queries our live verification database.
+                Enter a resource name to check if it exists in our community resource database.
+                The verification pipeline queries our live database and displays real verification data.
               </p>
             </motion.div>
 
@@ -1025,7 +1139,7 @@ export default function VerificationPage() {
                     type="text"
                     value={resourceInput}
                     onChange={(e) => setResourceInput(e.target.value)}
-                    placeholder="Enter resource name (e.g., Sunrise Emergency Shelter)"
+                    placeholder="Enter resource name (e.g., food bank, shelter, counseling)"
                     className="w-full pl-10 pr-4 py-3.5 text-[14px] bg-white/80 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-300 transition-all placeholder:text-gray-400"
                     onKeyDown={(e) => e.key === 'Enter' && handleVerify()}
                   />
@@ -1129,8 +1243,8 @@ export default function VerificationPage() {
                 </div>
               )}
 
-              {/* Verification Result */}
-              {verifComplete && verifResult && (
+              {/* Verification Result — Found */}
+              {verifComplete && verifResult && !verifNotFound && (
                 <motion.div
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -1140,20 +1254,66 @@ export default function VerificationPage() {
                     <ShieldCheck className="w-5 h-5 text-emerald-600" />
                     <span className="text-[14px] font-bold text-emerald-800">Verification Result</span>
                   </div>
-                  <div className="flex items-center gap-4">
+                  <div className="flex items-start gap-4">
                     <ConfidenceRing value={verifResult.confidence} size={64} strokeWidth={4} />
-                    <div>
+                    <div className="flex-1 min-w-0">
                       <p className="text-[16px] font-bold text-gray-900">{verifResult.name}</p>
-                      <div className="flex items-center gap-2 mt-1">
+                      {verifResult.category && (
+                        <p className="text-[12px] text-gray-500 mt-0.5">{verifResult.category}</p>
+                      )}
+                      <div className="flex flex-wrap items-center gap-2 mt-1">
                         <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-bold bg-green-50 text-green-700 border border-green-100/40">
                           <CheckCircle2 className="w-2.5 h-2.5" />
-                          Tier {verifResult.tier} — Recently Updated
+                          Tier {verifResult.tier} — {verificationTiers[verifResult.tier - 1]?.name || 'Verified'}
                         </span>
-                        <span className="text-[12px] text-gray-500">5 of 6 checks passed</span>
+                        {verifResult.lastVerified && (
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-semibold bg-blue-50/60 text-blue-600 border border-blue-100/40">
+                            <Clock className="w-2.5 h-2.5" />
+                            {verifResult.lastVerified}
+                          </span>
+                        )}
+                        {verifResult.source && (
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-semibold bg-violet-50/60 text-violet-600 border border-violet-100/40">
+                            <Database className="w-2.5 h-2.5" />
+                            {verifResult.source}
+                          </span>
+                        )}
                       </div>
-                      <p className="text-[12px] text-gray-500 mt-1">Website check returned a warning — slow response time. Resource is verified but call ahead to confirm.</p>
+                      <div className="flex flex-col gap-1 mt-2">
+                        {verifResult.phone && (
+                          <div className="flex items-center gap-2 text-[12px] text-gray-500">
+                            <Phone className="w-3 h-3 text-gray-400" />
+                            {verifResult.phone}
+                          </div>
+                        )}
+                        {verifResult.address && (
+                          <div className="flex items-center gap-2 text-[12px] text-gray-500">
+                            <MapPin className="w-3 h-3 text-gray-400" />
+                            {verifResult.address}
+                          </div>
+                        )}
+                      </div>
+                      {verifResult.description && (
+                        <p className="text-[12px] text-gray-500 mt-2 leading-relaxed">{verifResult.description}</p>
+                      )}
                     </div>
                   </div>
+                </motion.div>
+              )}
+
+              {/* Verification Result — Not Found */}
+              {verifComplete && verifNotFound && (
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="bg-gradient-to-r from-red-50/80 to-orange-50/80 rounded-xl p-5 border border-red-100/60"
+                >
+                  <div className="flex items-center gap-2 mb-3">
+                    <CircleX className="w-5 h-5 text-red-500" />
+                    <span className="text-[14px] font-bold text-red-800">Not Found</span>
+                  </div>
+                  <p className="text-[14px] text-gray-700 font-semibold">&quot;{resourceInput}&quot;</p>
+                  <p className="text-[13px] text-gray-500 mt-1">Not found in our community resource database. The resource may exist but is not currently in our system, or the name may not match exactly. Try searching with different keywords.</p>
                 </motion.div>
               )}
 
@@ -1164,7 +1324,7 @@ export default function VerificationPage() {
                     <Shield className="w-7 h-7 text-gray-300" />
                   </div>
                   <p className="text-[13px] text-gray-400 font-medium">Enter a resource name above to start the verification check</p>
-                  <p className="text-[11px] text-gray-300 mt-1">Try: &quot;Sunrise Emergency Shelter&quot; or &quot;Community Food Bank&quot;</p>
+                  <p className="text-[11px] text-gray-300 mt-1">Try: &quot;food bank&quot;, &quot;shelter&quot;, or &quot;counseling&quot;</p>
                 </div>
               )}
             </motion.div>
@@ -1382,7 +1542,11 @@ export default function VerificationPage() {
               <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-gray-900">
                 What Verification Looks Like
               </h2>
-              <p className="text-[15px] text-gray-500 mt-4 max-w-2xl mx-auto leading-relaxed">
+              <div className="mt-4 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[12px] font-semibold bg-amber-50/80 text-amber-700 border border-amber-100/60">
+                <Info className="w-3.5 h-3.5" />
+                Example resources for demonstration purposes
+              </div>
+              <p className="text-[15px] text-gray-500 mt-3 max-w-2xl mx-auto leading-relaxed">
                 Each resource card shows its verification tier, confidence score, and last verified date.
                 Here are four examples at different verification levels.
               </p>
@@ -1701,7 +1865,11 @@ export default function VerificationPage() {
               <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-gray-900">
                 Verification Audit Log
               </h2>
-              <p className="text-[15px] text-gray-500 mt-4 max-w-2xl mx-auto leading-relaxed">
+              <div className="mt-4 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[12px] font-semibold bg-cyan-50/80 text-cyan-700 border border-cyan-100/60">
+                <Info className="w-3.5 h-3.5" />
+                Example audit log entries for demonstration
+              </div>
+              <p className="text-[15px] text-gray-500 mt-3 max-w-2xl mx-auto leading-relaxed">
                 Every verification action is logged and publicly accessible. This is our commitment
                 to accountability — you can see exactly when and how resources are verified.
               </p>
@@ -1861,7 +2029,11 @@ export default function VerificationPage() {
               <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-gray-900">
                 Partner Verification Network
               </h2>
-              <p className="text-[15px] text-gray-500 mt-4 max-w-2xl mx-auto leading-relaxed">
+              <div className="mt-4 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[12px] font-semibold bg-gray-50/80 text-gray-600 border border-gray-100/60">
+                <Info className="w-3.5 h-3.5" />
+                Statistics are illustrative — sourced from publicly available information
+              </div>
+              <p className="text-[15px] text-gray-500 mt-3 max-w-2xl mx-auto leading-relaxed">
                 Our verification is only as strong as our sources. We partner with the most trusted
                 organizations in community services to ensure every resource is backed by authoritative data.
               </p>

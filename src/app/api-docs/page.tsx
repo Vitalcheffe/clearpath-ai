@@ -22,11 +22,9 @@ import {
   Clock,
   AlertTriangle,
   CheckCircle2,
-  XCircle,
   Info,
   Play,
   Send,
-  Webhook,
   FileText,
   Sparkles,
   Lock,
@@ -43,8 +41,6 @@ import {
   Braces,
   ArrowUpRight,
   ExternalLink,
-  MousePointerClick,
-  ToggleLeft,
   Gauge,
 } from 'lucide-react'
 import Navbar from '@/components/Navbar'
@@ -194,8 +190,6 @@ const tocSections = [
   { id: 'endpoints', label: 'Endpoints', icon: Terminal },
   { id: 'response-format', label: 'Response Format', icon: Braces },
   { id: 'rate-limits', label: 'Rate Limits', icon: Gauge },
-  { id: 'sdks', label: 'SDKs', icon: Code2 },
-  { id: 'webhooks', label: 'Webhooks', icon: Webhook },
   { id: 'changelog', label: 'Changelog', icon: FileText },
   { id: 'playground', label: 'Playground', icon: Play },
   { id: 'faq', label: 'FAQ', icon: MessageSquare },
@@ -205,20 +199,16 @@ const tocSections = [
 // ENDPOINT DATA
 // ═══════════════════════════════════════════════════════════
 const endpoints = [
+  // ─── Classification ───
   {
     method: 'POST' as const,
     path: '/api/classify',
     title: 'Classify a Query',
-    description: 'The primary endpoint for classifying user queries against our 8-category system powered by BART-large-MNLI zero-shot classification. Returns confidence scores, reasoning, and matched resources.',
+    description: 'Classify user text against our category system powered by BART-large-MNLI zero-shot classification. Returns categories with confidence scores, reasoning, and crisis detection.',
+    auth: true,
     requestExample: `{
   "query": "I lost my job and can't pay rent, my kids need food",
-  "location": "30318",
-  "options": {
-    "multi_label": true,
-    "confidence_threshold": 0.7,
-    "include_resources": true,
-    "max_results": 5
-  }
+  "location": "30318"
 }`,
     responseExample: `{
   "success": true,
@@ -228,88 +218,435 @@ const endpoints = [
       {
         "category": "Housing Assistance",
         "confidence": 0.87,
-        "calibrated": true,
-        "reasoning": "Query mentions inability to pay rent — immediate housing risk identified",
-        "alternatives": [
-          { "category": "Food Assistance", "confidence": 0.72 },
-          { "category": "Employment Services", "confidence": 0.65 },
-          { "category": "General Financial Aid", "confidence": 0.31 }
-        ],
-        "resources": [
-          {
-            "id": "res_2847",
-            "name": "Emergency Rental Assistance Program",
-            "provider": "HUD / Local Housing Authority",
-            "description": "Federal rental assistance for families facing eviction",
-            "eligibility": "Income below 50% AMI, eviction notice required",
-            "contact": "1-800-569-4287",
-            "last_verified": "2026-05-18",
-            "verification_status": "verified",
-            "url": "https://www.hud.gov/rental-assistance"
-          },
-          {
-            "id": "res_3091",
-            "name": "Section 8 Emergency Transfer",
-            "provider": "Local Public Housing Agency",
-            "description": "Emergency housing voucher transfer for crisis situations",
-            "eligibility": "Current Section 8 recipient, documented emergency",
-            "contact": "Contact local PHA",
-            "last_verified": "2026-06-01",
-            "verification_status": "verified",
-            "url": "https://www.hud.gov/topics/housing_choice_voucher_program_section_8"
-          }
-        ]
+        "reasoning": "Query mentions inability to pay rent — immediate housing risk identified"
       },
       {
         "category": "Food Assistance",
         "confidence": 0.72,
-        "calibrated": true,
-        "reasoning": "Query mentions children needing food — SNAP/WIC eligibility likely",
-        "alternatives": [
-          { "category": "Housing Assistance", "confidence": 0.87 },
-          { "category": "Employment Services", "confidence": 0.65 }
-        ],
-        "resources": [
-          {
-            "id": "res_4102",
-            "name": "SNAP Benefits Application",
-            "provider": "USDA / State DHS",
-            "description": "Supplemental Nutrition Assistance Program for low-income families",
-            "eligibility": "Income below 130% of federal poverty level",
-            "contact": "1-800-221-5689",
-            "last_verified": "2026-05-22",
-            "verification_status": "verified",
-            "url": "https://www.fns.usda.gov/snap"
-          }
-        ]
+        "reasoning": "Query mentions children needing food — SNAP/WIC eligibility likely"
       }
     ],
     "crisis_detected": false,
     "clarification_needed": false,
-    "processing_time_ms": 1247,
-    "model": "BART-large-MNLI",
-    "model_version": "v2.4.1"
-  },
-  "meta": {
-    "request_id": "req_7k2m9n4p1q8r",
-    "timestamp": "2026-06-05T14:32:18.429Z",
-    "api_version": "v1"
+    "processing_time_ms": 1247
   }
 }`,
     parameters: [
       { name: 'query', type: 'string', required: true, description: 'The natural language query to classify. Minimum 3 characters, maximum 2000 characters.' },
       { name: 'location', type: 'string', required: false, description: 'ZIP code, city, or state for location-aware resource matching. Defaults to national results.' },
-      { name: 'options.multi_label', type: 'boolean', required: false, description: 'Return multiple category matches. Default: true.' },
-      { name: 'options.confidence_threshold', type: 'number', required: false, description: 'Minimum confidence score (0-1) to return. Default: 0.7. Range: 0.0 - 1.0.' },
-      { name: 'options.include_resources', type: 'boolean', required: false, description: 'Include matched resources in the response. Default: true.' },
-      { name: 'options.max_results', type: 'integer', required: false, description: 'Maximum number of resources per category. Default: 5. Range: 1 - 20.' },
+    ],
+  },
+  // ─── Conversations ───
+  {
+    method: 'GET' as const,
+    path: '/api/conversations',
+    title: 'List Conversations',
+    description: 'Retrieve a paginated list of conversations for a user. Supports filtering by category and full-text search.',
+    auth: true,
+    requestExample: null,
+    responseExample: `{
+  "success": true,
+  "data": {
+    "conversations": [
+      {
+        "id": "conv_abc123",
+        "title": "Housing and food assistance",
+        "category": "Housing Assistance",
+        "messageCount": 5,
+        "createdAt": "2026-06-05T14:32:18.429Z",
+        "updatedAt": "2026-06-05T15:10:00.000Z"
+      }
+    ],
+    "total": 12,
+    "skip": 0,
+    "take": 20
+  }
+}`,
+    parameters: [
+      { name: 'userId', type: 'string', required: true, description: 'The user ID to fetch conversations for.' },
+      { name: 'category', type: 'string', required: false, description: 'Filter by classification category (e.g., housing, food, mental_health).' },
+      { name: 'search', type: 'string', required: false, description: 'Full-text search across conversation titles and messages.' },
+      { name: 'skip', type: 'integer', required: false, description: 'Number of results to skip for pagination. Default: 0.' },
+      { name: 'take', type: 'integer', required: false, description: 'Maximum number of results to return. Default: 20.' },
     ],
   },
   {
     method: 'GET' as const,
-    path: '/api/resources',
-    title: 'Retrieve Verified Resources',
-    description: 'Query the verified resource database directly. Filter by category, location, eligibility, or verification status. All resources are sourced from verified partners like 211.org and government databases.',
+    path: '/api/conversations/[id]',
+    title: 'Get Conversation',
+    description: 'Retrieve a single conversation with all its messages.',
+    auth: true,
+    requestExample: null,
+    responseExample: `{
+  "success": true,
+  "data": {
+    "id": "conv_abc123",
+    "title": "Housing and food assistance",
+    "category": "Housing Assistance",
+    "userId": "user_456",
+    "messages": [
+      {
+        "id": "msg_001",
+        "role": "user",
+        "content": "I lost my job and can't pay rent",
+        "createdAt": "2026-06-05T14:32:18.429Z"
+      },
+      {
+        "id": "msg_002",
+        "role": "assistant",
+        "content": "I understand you're facing housing challenges. Here are some resources that may help...",
+        "createdAt": "2026-06-05T14:32:20.100Z"
+      }
+    ],
+    "createdAt": "2026-06-05T14:32:18.429Z"
+  }
+}`,
+    parameters: [
+      { name: 'id', type: 'string', required: true, description: 'The conversation ID (path parameter).' },
+    ],
+  },
+  {
+    method: 'DELETE' as const,
+    path: '/api/conversations/[id]',
+    title: 'Delete Conversation',
+    description: 'Delete a conversation and all its messages permanently.',
+    auth: true,
+    requestExample: null,
+    responseExample: `{
+  "success": true,
+  "data": {
+    "id": "conv_abc123",
+    "deleted": true
+  }
+}`,
+    parameters: [
+      { name: 'id', type: 'string', required: true, description: 'The conversation ID to delete (path parameter).' },
+    ],
+  },
+  {
+    method: 'POST' as const,
+    path: '/api/conversations/[id]/messages',
+    title: 'Add Message to Conversation',
+    description: 'Add a new message to an existing conversation. The assistant will generate a response based on conversation context.',
+    auth: true,
+    requestExample: `{
+  "content": "Can you also help me find food assistance programs?"
+}`,
+    responseExample: `{
+  "success": true,
+  "data": {
+    "id": "msg_003",
+    "role": "user",
+    "content": "Can you also help me find food assistance programs?",
+    "createdAt": "2026-06-05T15:10:00.000Z"
+  }
+}`,
+    parameters: [
+      { name: 'id', type: 'string', required: true, description: 'The conversation ID (path parameter).' },
+      { name: 'content', type: 'string', required: true, description: 'The message content. Maximum 5000 characters.' },
+    ],
+  },
+  // ─── User ───
+  {
+    method: 'GET' as const,
+    path: '/api/user/profile',
+    title: 'Get User Profile',
+    description: 'Retrieve the profile information for a user.',
+    auth: true,
+    requestExample: null,
+    responseExample: `{
+  "success": true,
+  "data": {
+    "id": "user_456",
+    "name": "Jane Doe",
+    "email": "jane@example.com",
+    "phone": "404-555-0123",
+    "location": "Atlanta, GA",
+    "createdAt": "2026-05-01T10:00:00.000Z"
+  }
+}`,
+    parameters: [
+      { name: 'userId', type: 'string', required: true, description: 'The user ID to fetch the profile for (query parameter).' },
+    ],
+  },
+  {
+    method: 'PUT' as const,
+    path: '/api/user/profile',
+    title: 'Update User Profile',
+    description: 'Update the profile information for a user. Only included fields will be updated.',
+    auth: true,
+    requestExample: `{
+  "userId": "user_456",
+  "name": "Jane Doe",
+  "email": "jane@example.com",
+  "phone": "404-555-9999",
+  "location": "Atlanta, GA 30318"
+}`,
+    responseExample: `{
+  "success": true,
+  "data": {
+    "id": "user_456",
+    "name": "Jane Doe",
+    "email": "jane@example.com",
+    "phone": "404-555-9999",
+    "location": "Atlanta, GA 30318",
+    "updatedAt": "2026-06-05T16:00:00.000Z"
+  }
+}`,
+    parameters: [
+      { name: 'userId', type: 'string', required: true, description: 'The user ID to update.' },
+      { name: 'name', type: 'string', required: false, description: 'Full name of the user.' },
+      { name: 'email', type: 'string', required: false, description: 'Email address.' },
+      { name: 'phone', type: 'string', required: false, description: 'Phone number.' },
+      { name: 'location', type: 'string', required: false, description: 'Location (city, state, or ZIP).' },
+    ],
+  },
+  {
+    method: 'GET' as const,
+    path: '/api/user/settings',
+    title: 'Get User Settings',
+    description: 'Retrieve the settings and preferences for a user.',
+    auth: true,
+    requestExample: null,
+    responseExample: `{
+  "success": true,
+  "data": {
+    "userId": "user_456",
+    "notifications": true,
+    "crisisAlerts": true,
+    "preferredLanguage": "en",
+    "accessibilityMode": false,
+    "darkMode": false,
+    "locationSharing": true
+  }
+}`,
+    parameters: [
+      { name: 'userId', type: 'string', required: true, description: 'The user ID to fetch settings for (query parameter).' },
+    ],
+  },
+  {
+    method: 'PUT' as const,
+    path: '/api/user/settings',
+    title: 'Update User Settings',
+    description: 'Update the settings and preferences for a user. Only included fields will be updated.',
+    auth: true,
+    requestExample: `{
+  "userId": "user_456",
+  "notifications": true,
+  "crisisAlerts": true,
+  "preferredLanguage": "en",
+  "darkMode": true
+}`,
+    responseExample: `{
+  "success": true,
+  "data": {
+    "userId": "user_456",
+    "notifications": true,
+    "crisisAlerts": true,
+    "preferredLanguage": "en",
+    "accessibilityMode": false,
+    "darkMode": true,
+    "locationSharing": true,
+    "updatedAt": "2026-06-05T16:05:00.000Z"
+  }
+}`,
+    parameters: [
+      { name: 'userId', type: 'string', required: true, description: 'The user ID to update settings for.' },
+      { name: 'notifications', type: 'boolean', required: false, description: 'Enable or disable notifications.' },
+      { name: 'crisisAlerts', type: 'boolean', required: false, description: 'Enable or disable crisis alert popups.' },
+      { name: 'preferredLanguage', type: 'string', required: false, description: 'Preferred language code (e.g., en, es).' },
+      { name: 'accessibilityMode', type: 'boolean', required: false, description: 'Enable accessibility-enhanced UI.' },
+      { name: 'darkMode', type: 'boolean', required: false, description: 'Enable dark mode theme.' },
+      { name: 'locationSharing', type: 'boolean', required: false, description: 'Allow location sharing for better resource matching.' },
+    ],
+  },
+  {
+    method: 'GET' as const,
+    path: '/api/user/stats',
+    title: 'Get User Statistics',
+    description: 'Retrieve usage statistics and summary data for a user.',
+    auth: true,
+    requestExample: null,
+    responseExample: `{
+  "success": true,
+  "data": {
+    "userId": "user_456",
+    "totalConversations": 12,
+    "totalMessages": 47,
+    "topCategories": [
+      { "category": "Housing Assistance", "count": 5 },
+      { "category": "Food Assistance", "count": 4 },
+      { "category": "Employment Services", "count": 3 }
+    ],
+    "savedResources": 8,
+    "accountAge": "36 days",
+    "lastActive": "2026-06-05T15:10:00.000Z"
+  }
+}`,
+    parameters: [
+      { name: 'userId', type: 'string', required: true, description: 'The user ID to fetch statistics for (query parameter).' },
+    ],
+  },
+  // ─── Saved Resources ───
+  {
+    method: 'GET' as const,
+    path: '/api/saved-resources',
+    title: 'List Saved Resources',
+    description: 'Retrieve all resources saved/bookmarked by a user.',
+    auth: true,
+    requestExample: null,
+    responseExample: `{
+  "success": true,
+  "data": {
+    "resources": [
+      {
+        "id": "saved_001",
+        "title": "Emergency Rental Assistance Program",
+        "category": "Housing Assistance",
+        "provider": "HUD / Local Housing Authority",
+        "savedAt": "2026-06-05T14:35:00.000Z"
+      },
+      {
+        "id": "saved_002",
+        "title": "SNAP Benefits Application",
+        "category": "Food Assistance",
+        "provider": "USDA / State DHS",
+        "savedAt": "2026-06-04T10:20:00.000Z"
+      }
+    ],
+    "total": 2
+  }
+}`,
+    parameters: [
+      { name: 'userId', type: 'string', required: true, description: 'The user ID to fetch saved resources for (query parameter).' },
+    ],
+  },
+  {
+    method: 'POST' as const,
+    path: '/api/saved-resources',
+    title: 'Save a Resource',
+    description: 'Save/bookmark a resource to the user\'s saved resources list.',
+    auth: true,
+    requestExample: `{
+  "userId": "user_456",
+  "title": "Emergency Rental Assistance Program",
+  "category": "Housing Assistance",
+  "provider": "HUD / Local Housing Authority",
+  "description": "Federal rental assistance for families facing eviction",
+  "contact": "1-800-569-4287",
+  "url": "https://www.hud.gov/rental-assistance"
+}`,
+    responseExample: `{
+  "success": true,
+  "data": {
+    "id": "saved_003",
+    "title": "Emergency Rental Assistance Program",
+    "category": "Housing Assistance",
+    "provider": "HUD / Local Housing Authority",
+    "savedAt": "2026-06-05T16:30:00.000Z"
+  }
+}`,
+    parameters: [
+      { name: 'userId', type: 'string', required: true, description: 'The user ID saving the resource.' },
+      { name: 'title', type: 'string', required: true, description: 'Title of the resource.' },
+      { name: 'category', type: 'string', required: true, description: 'Category of the resource (e.g., housing, food, mental_health).' },
+      { name: 'provider', type: 'string', required: false, description: 'Organization providing the resource.' },
+      { name: 'description', type: 'string', required: false, description: 'Description of the resource.' },
+      { name: 'contact', type: 'string', required: false, description: 'Contact information for the resource.' },
+      { name: 'url', type: 'string', required: false, description: 'URL for more information.' },
+    ],
+  },
+  {
+    method: 'DELETE' as const,
+    path: '/api/saved-resources/[id]',
+    title: 'Remove Saved Resource',
+    description: 'Remove a saved resource from the user\'s bookmarks.',
+    auth: true,
+    requestExample: null,
+    responseExample: `{
+  "success": true,
+  "data": {
+    "id": "saved_001",
+    "deleted": true
+  }
+}`,
+    parameters: [
+      { name: 'id', type: 'string', required: true, description: 'The saved resource ID to remove (path parameter).' },
+    ],
+  },
+  // ─── Auth ───
+  {
+    method: 'POST' as const,
+    path: '/api/auth/register',
+    title: 'Register Account',
+    description: 'Create a new user account. Returns the created user object. After registration, use NextAuth.js sign-in to authenticate.',
+    auth: false,
+    requestExample: `{
+  "name": "Jane Doe",
+  "email": "jane@example.com",
+  "password": "SecureP@ss123"
+}`,
+    responseExample: `{
+  "success": true,
+  "data": {
+    "id": "user_456",
+    "name": "Jane Doe",
+    "email": "jane@example.com",
+    "createdAt": "2026-06-05T14:00:00.000Z"
+  }
+}`,
+    parameters: [
+      { name: 'name', type: 'string', required: true, description: 'Full name of the user.' },
+      { name: 'email', type: 'string', required: true, description: 'Valid email address for the account.' },
+      { name: 'password', type: 'string', required: true, description: 'Password (minimum 8 characters, must include uppercase, lowercase, and number).' },
+    ],
+  },
+  {
+    method: 'POST' as const,
+    path: '/api/auth/forgot-password',
+    title: 'Request Password Reset',
+    description: 'Send a password reset email to the specified address. The email contains a time-limited reset link.',
+    auth: false,
+    requestExample: `{
+  "email": "jane@example.com"
+}`,
+    responseExample: `{
+  "success": true,
+  "data": {
+    "message": "If an account with that email exists, a password reset link has been sent."
+  }
+}`,
+    parameters: [
+      { name: 'email', type: 'string', required: true, description: 'The email address associated with the account.' },
+    ],
+  },
+  {
+    method: 'GET' as const,
+    path: '/api/auth/[...nextauth]',
+    title: 'NextAuth.js Endpoints',
+    description: 'NextAuth.js authentication endpoints including sign-in, sign-out, session management, and callback handling. These endpoints are managed by NextAuth.js and follow the standard NextAuth.js API.',
+    auth: false,
+    requestExample: null,
+    responseExample: `// GET /api/auth/session
+{
+  "user": {
+    "name": "Jane Doe",
+    "email": "jane@example.com"
+  },
+  "expires": "2026-06-19T14:00:00.000Z"
+}`,
+    parameters: [
+      { name: 'provider', type: 'string', required: false, description: 'OAuth provider slug (path parameter, e.g., credentials, google).' },
+      { name: 'action', type: 'string', required: false, description: 'NextAuth action (path parameter: signin, signout, callback, session).' },
+    ],
+  },
+  // ─── Public ───
+  {
+    method: 'GET' as const,
+    path: '/api/community-resources',
+    title: 'List Community Resources',
+    description: 'Retrieve publicly available community resources. No authentication required. Filter by category or search by keyword.',
+    auth: false,
     requestExample: null,
     responseExample: `{
   "success": true,
@@ -321,11 +658,7 @@ const endpoints = [
         "category": "Housing Assistance",
         "provider": "HUD / Local Housing Authority",
         "description": "Federal rental assistance for families facing eviction",
-        "eligibility": "Income below 50% AMI, eviction notice required",
         "contact": "1-800-569-4287",
-        "location": "National",
-        "last_verified": "2026-05-18",
-        "verification_status": "verified",
         "url": "https://www.hud.gov/rental-assistance"
       },
       {
@@ -333,233 +666,23 @@ const endpoints = [
         "name": "SNAP Benefits Application",
         "category": "Food Assistance",
         "provider": "USDA / State DHS",
-        "description": "Supplemental Nutrition Assistance Program",
-        "eligibility": "Income below 130% of federal poverty level",
+        "description": "Supplemental Nutrition Assistance Program for low-income families",
         "contact": "1-800-221-5689",
-        "location": "National",
-        "last_verified": "2026-05-22",
-        "verification_status": "verified",
         "url": "https://www.fns.usda.gov/snap"
       }
     ],
-    "total": 2847,
-    "page": 1,
-    "per_page": 20,
-    "total_pages": 143
-  },
-  "meta": {
-    "request_id": "req_3b7k2m9n4p1q",
-    "timestamp": "2026-06-05T14:35:42.118Z",
-    "api_version": "v1"
+    "total": 2847
   }
 }`,
     parameters: [
-      { name: 'category', type: 'string', required: false, description: 'Filter by category. One of: housing, food, mental_health, employment, legal, healthcare, crisis, senior.' },
-      { name: 'location', type: 'string', required: false, description: 'ZIP code, city, or state for location filtering.' },
-      { name: 'verification_status', type: 'string', required: false, description: 'Filter by verification status. One of: verified, pending, expired.' },
-      { name: 'page', type: 'integer', required: false, description: 'Page number for pagination. Default: 1.' },
-      { name: 'per_page', type: 'integer', required: false, description: 'Results per page. Default: 20. Max: 100.' },
-      { name: 'sort', type: 'string', required: false, description: 'Sort order. One of: relevance, verified_date, name. Default: relevance.' },
-    ],
-  },
-  {
-    method: 'POST' as const,
-    path: '/api/verify',
-    title: 'Verify a Resource',
-    description: 'Submit a resource for verification review. Our team of community navigators reviews submissions within 48 hours. Verified resources appear in the public database after passing quality checks.',
-    requestExample: `{
-  "resource": {
-    "name": "Community Food Bank of Metro Atlanta",
-    "category": "Food Assistance",
-    "provider": "Atlanta Community Food Bank",
-    "description": "Free food distribution for families and individuals in the metro Atlanta area",
-    "eligibility": "No documentation required, walk-ins welcome",
-    "contact": "404-892-3333",
-    "address": "732 Joseph E Lowery Blvd NW, Atlanta, GA 30318",
-    "url": "https://www.acfb.org",
-    "hours": "Mon-Fri 9am-5pm, Sat 10am-2pm",
-    "source": "211.org listing"
-  },
-  "submitter": {
-    "name": "Jane Smith",
-    "role": "community_navigator",
-    "organization": "United Way of Greater Atlanta"
-  }
-}`,
-    responseExample: `{
-  "success": true,
-  "data": {
-    "verification_id": "ver_5m8n2k9p3q7r",
-    "status": "pending_review",
-    "estimated_review_time": "48 hours",
-    "submitted_at": "2026-06-05T14:40:00.000Z",
-    "resource": {
-      "name": "Community Food Bank of Metro Atlanta",
-      "category": "Food Assistance",
-      "provider": "Atlanta Community Food Bank"
-    }
-  },
-  "meta": {
-    "request_id": "req_9n4p1q8r3b7k",
-    "timestamp": "2026-06-05T14:40:00.429Z",
-    "api_version": "v1"
-  }
-}`,
-    parameters: [
-      { name: 'resource.name', type: 'string', required: true, description: 'Name of the resource or program.' },
-      { name: 'resource.category', type: 'string', required: true, description: 'Primary category. One of: housing, food, mental_health, employment, legal, healthcare, crisis, senior.' },
-      { name: 'resource.provider', type: 'string', required: true, description: 'Organization that provides this resource.' },
-      { name: 'resource.description', type: 'string', required: true, description: 'Clear description of what the resource offers.' },
-      { name: 'resource.contact', type: 'string', required: true, description: 'Phone number, email, or contact method.' },
-      { name: 'resource.address', type: 'string', required: false, description: 'Physical address if applicable.' },
-      { name: 'resource.url', type: 'string', required: false, description: 'Website URL for the resource.' },
-      { name: 'submitter.name', type: 'string', required: true, description: 'Name of the person submitting the resource.' },
-      { name: 'submitter.role', type: 'string', required: true, description: 'Role of submitter. One of: community_navigator, social_worker, organization, individual.' },
-    ],
-  },
-  {
-    method: 'GET' as const,
-    path: '/api/categories',
-    title: 'List All Categories',
-    description: 'Retrieve the full list of classification categories with descriptions, resource counts, and subcategories. Use this to dynamically build category selection UIs or validate category parameters.',
-    requestExample: null,
-    responseExample: `{
-  "success": true,
-  "data": {
-    "categories": [
-      {
-        "id": "housing",
-        "name": "Housing Assistance",
-        "description": "Emergency shelter, rental help, Section 8, transitional housing",
-        "resource_count": 423,
-        "subcategories": ["Emergency Shelter", "Rental Assistance", "Section 8 Vouchers", "Transitional Housing", "Homelessness Prevention"],
-        "icon": "home",
-        "color": "#3b82f6"
-      },
-      {
-        "id": "food",
-        "name": "Food Assistance",
-        "description": "SNAP, food banks, meal programs, WIC, school meals",
-        "resource_count": 387,
-        "subcategories": ["SNAP Benefits", "Food Banks", "Meal Programs", "WIC", "School Meals"],
-        "icon": "utensils",
-        "color": "#10b981"
-      },
-      {
-        "id": "mental_health",
-        "name": "Mental Health",
-        "description": "Counseling, crisis lines, support groups, therapy",
-        "resource_count": 298,
-        "subcategories": ["Counseling", "Crisis Lines", "Support Groups", "Therapy", "Substance Use"],
-        "icon": "heart",
-        "color": "#8b5cf6"
-      },
-      {
-        "id": "employment",
-        "name": "Employment Services",
-        "description": "Job training, career services, unemployment benefits",
-        "resource_count": 256,
-        "subcategories": ["Job Training", "Career Services", "Unemployment", "Resume Help", "Workforce Development"],
-        "icon": "briefcase",
-        "color": "#f59e0b"
-      },
-      {
-        "id": "legal",
-        "name": "Legal Aid",
-        "description": "Immigration, tenant rights, public defender, civil legal",
-        "resource_count": 198,
-        "subcategories": ["Immigration", "Tenant Rights", "Public Defender", "Civil Legal", "Family Law"],
-        "icon": "scale",
-        "color": "#ef4444"
-      },
-      {
-        "id": "healthcare",
-        "name": "Healthcare",
-        "description": "Community clinics, prescription assistance, Medicaid",
-        "resource_count": 342,
-        "subcategories": ["Community Clinics", "Prescription Assistance", "Medicaid", "Dental Care", "Vision Care"],
-        "icon": "stethoscope",
-        "color": "#06b6d4"
-      },
-      {
-        "id": "crisis",
-        "name": "Crisis Support",
-        "description": "988, domestic violence, substance abuse emergencies",
-        "resource_count": 167,
-        "subcategories": ["988 Lifeline", "Domestic Violence", "Substance Abuse", "Sexual Assault", "Runaway Youth"],
-        "icon": "shield",
-        "color": "#dc2626"
-      },
-      {
-        "id": "senior",
-        "name": "Senior Services",
-        "description": "Meals on Wheels, Medicare help, senior centers",
-        "resource_count": 215,
-        "subcategories": ["Meals on Wheels", "Medicare", "Senior Centers", "In-Home Care", "Transportation"],
-        "icon": "users",
-        "color": "#64748b"
-      }
-    ],
-    "total_categories": 8,
-    "total_resources": 2286
-  },
-  "meta": {
-    "request_id": "req_2m9n4p1q8r3b",
-    "timestamp": "2026-06-05T14:45:12.334Z",
-    "api_version": "v1"
-  }
-}`,
-    parameters: [
-      { name: 'include_subcategories', type: 'boolean', required: false, description: 'Include subcategories in the response. Default: true.' },
-      { name: 'include_counts', type: 'boolean', required: false, description: 'Include resource counts per category. Default: true.' },
-    ],
-  },
-  {
-    method: 'POST' as const,
-    path: '/api/feedback',
-    title: 'Submit User Feedback',
-    description: 'Submit feedback about classification accuracy, resource quality, or general experience. Feedback is used to calibrate confidence scores and improve the classification engine over time. All feedback is anonymized.',
-    requestExample: `{
-  "query_id": "qry_a8f3c2d1e4b5",
-  "feedback_type": "classification_inaccurate",
-  "rating": 3,
-  "comment": "The housing resources were helpful but I also needed utility assistance which wasn't included in the results",
-  "suggested_category": "Utility Assistance",
-  "details": {
-    "expected_categories": ["Housing Assistance", "Food Assistance", "Utility Assistance"],
-    "actual_categories": ["Housing Assistance", "Food Assistance", "Employment Services"],
-    "resource_helpful": true,
-    "would_contact_navigator": false
-  }
-}`,
-    responseExample: `{
-  "success": true,
-  "data": {
-    "feedback_id": "fbk_3q7r5m8n2k9p",
-    "status": "received",
-    "message": "Thank you for your feedback. It will be reviewed by our team and used to improve classification accuracy.",
-    "will_update_model": true,
-    "reviewed_within": "7 business days"
-  },
-  "meta": {
-    "request_id": "req_8r3b7k2m9n4p",
-    "timestamp": "2026-06-05T14:50:22.789Z",
-    "api_version": "v1"
-  }
-}`,
-    parameters: [
-      { name: 'query_id', type: 'string', required: true, description: 'The query ID from the original classification response.' },
-      { name: 'feedback_type', type: 'string', required: true, description: 'Type of feedback. One of: classification_accurate, classification_inaccurate, resource_helpful, resource_outdated, resource_incorrect, general.' },
-      { name: 'rating', type: 'integer', required: false, description: 'Rating from 1-5. 1 = very poor, 5 = excellent.' },
-      { name: 'comment', type: 'string', required: false, description: 'Free-text feedback. Max 2000 characters.' },
-      { name: 'suggested_category', type: 'string', required: false, description: 'Suggested category that was missed or incorrect.' },
-      { name: 'details', type: 'object', required: false, description: 'Structured feedback details. All fields optional.' },
+      { name: 'category', type: 'string', required: false, description: 'Filter by category (e.g., housing, food, mental_health, employment, legal, healthcare, crisis, senior).' },
+      { name: 'search', type: 'string', required: false, description: 'Full-text search across resource names and descriptions.' },
     ],
   },
 ]
 
 // ═══════════════════════════════════════════════════════════
-// RATE LIMIT DATA
+// RATE LIMIT DATA (TBD)
 // ═══════════════════════════════════════════════════════════
 const rateLimitTiers = [
   {
@@ -569,31 +692,25 @@ const rateLimitTiers = [
     iconBg: 'bg-gray-50',
     iconColor: 'text-gray-500',
     limits: [
-      { label: 'Requests per minute', value: '10' },
-      { label: 'Requests per day', value: '500' },
-      { label: 'Requests per month', value: '10,000' },
-      { label: 'Concurrent requests', value: '2' },
-      { label: 'Max query length', value: '500 chars' },
-      { label: 'Resource results per query', value: '3' },
+      { label: 'Requests per minute', value: 'TBD' },
+      { label: 'Requests per day', value: 'TBD' },
+      { label: 'Requests per month', value: 'TBD' },
     ],
-    features: ['Standard classification speed', '8 core categories', 'Basic resource matching'],
+    features: ['Standard classification speed', 'Core categories', 'Basic resource matching'],
   },
   {
     name: 'Pro',
-    price: '$12/mo',
+    price: 'TBD',
     icon: Zap,
     iconBg: 'bg-blue-50',
     iconColor: 'text-blue-500',
     popular: true,
     limits: [
-      { label: 'Requests per minute', value: '60' },
-      { label: 'Requests per day', value: '5,000' },
-      { label: 'Requests per month', value: '100,000' },
-      { label: 'Concurrent requests', value: '10' },
-      { label: 'Max query length', value: '2,000 chars' },
-      { label: 'Resource results per query', value: '10' },
+      { label: 'Requests per minute', value: 'TBD' },
+      { label: 'Requests per day', value: 'TBD' },
+      { label: 'Requests per month', value: 'TBD' },
     ],
-    features: ['2x priority speed', 'Multi-label classification', 'Advanced clarification engine', 'Eligibility pre-check', 'Saved history API'],
+    features: ['Priority speed', 'Multi-label classification', 'Advanced clarification engine', 'Saved history API'],
   },
   {
     name: 'Enterprise',
@@ -602,14 +719,11 @@ const rateLimitTiers = [
     iconBg: 'bg-emerald-50',
     iconColor: 'text-emerald-500',
     limits: [
-      { label: 'Requests per minute', value: '200' },
-      { label: 'Requests per day', value: 'Unlimited' },
-      { label: 'Requests per month', value: 'Unlimited' },
-      { label: 'Concurrent requests', value: '50' },
-      { label: 'Max query length', value: '5,000 chars' },
-      { label: 'Resource results per query', value: '20' },
+      { label: 'Requests per minute', value: 'TBD' },
+      { label: 'Requests per day', value: 'TBD' },
+      { label: 'Requests per month', value: 'TBD' },
     ],
-    features: ['4x dedicated speed', 'Custom categories & taxonomy', 'Webhook support', 'SLA guarantee (99.9%)', 'Custom resource databases', 'White-label options'],
+    features: ['Dedicated speed', 'Custom categories', 'SLA guarantee', 'Custom resource databases'],
   },
 ]
 
@@ -618,165 +732,18 @@ const rateLimitTiers = [
 // ═══════════════════════════════════════════════════════════
 const changelogEntries = [
   {
-    version: 'v1.4.0',
-    date: 'June 2, 2026',
-    type: 'feature',
-    title: 'Multi-turn Clarification API',
-    changes: [
-      'Added clarification question support in /api/classify responses when confidence is below threshold',
-      'New clarification_id field enables multi-turn conversations for ambiguous queries',
-      'Added suggested_responses array to help users provide structured answers',
-      'Updated confidence_threshold parameter to accept custom values per request',
-    ],
-  },
-  {
-    version: 'v1.3.2',
-    date: 'May 20, 2026',
-    type: 'improvement',
-    title: 'Calibration Engine v2.4',
-    changes: [
-      'Improved confidence score calibration — scores now match true accuracy within ±3%',
-      'Fixed over-classification bias toward Mental Health category for stress-related queries',
-      'Reduced median processing time from 1.8s to 1.2s through API call optimization',
-      'Added model_version field to all classification responses',
-    ],
-  },
-  {
-    version: 'v1.3.0',
-    date: 'May 5, 2026',
-    type: 'feature',
-    title: 'Feedback API & Resource Verification',
-    changes: [
-      'New POST /api/feedback endpoint for classification accuracy feedback',
-      'New POST /api/verify endpoint for community resource submissions',
-      'Added verification_status field to resource objects',
-      'Webhook support for verification status change notifications',
-    ],
-  },
-  {
-    version: 'v1.2.1',
-    date: 'April 18, 2026',
-    type: 'fix',
-    title: 'Location Filtering Fix',
-    changes: [
-      'Fixed ZIP code lookup returning incorrect state boundaries for border areas',
-      'Improved location ranking to prioritize resources within 25 miles',
-      'Added support for city + state format in location parameter',
-    ],
-  },
-  {
-    version: 'v1.2.0',
-    date: 'April 1, 2026',
-    type: 'feature',
-    title: 'Resource Database Expansion',
-    changes: [
-      'Expanded verified resource database from 1,200 to 2,286 resources',
-      'Added Senior Services as 8th classification category',
-      'New GET /api/categories endpoint with subcategory support',
-      'Added last_verified timestamps and "Call to confirm" notices for resources older than 30 days',
-    ],
-  },
-  {
-    version: 'v1.1.0',
-    date: 'March 15, 2026',
-    type: 'feature',
-    title: 'SDK Release & Pagination',
-    changes: [
-      'Released official JavaScript SDK (@clearpath-ai/sdk-js v1.1.0)',
-      'Released official Python SDK (clearpath-ai v1.1.0)',
-      'Added pagination to GET /api/resources with page, per_page, and total_pages',
-      'Added sort parameter with relevance, verified_date, and name options',
-    ],
-  },
-  {
     version: 'v1.0.0',
-    date: 'March 1, 2026',
+    date: 'June 2026',
     type: 'release',
-    title: 'Initial Public API Release',
+    title: 'Initial Release',
     changes: [
-      'POST /api/classify endpoint with BART-large-MNLI zero-shot classification',
-      'GET /api/resources endpoint with category and location filtering',
-      '7 classification categories: Housing, Food, Mental Health, Employment, Legal, Healthcare, Crisis',
-      'API key authentication via Bearer token',
-      'Standard rate limits: 10 req/min (Free), 60 req/min (Pro)',
+      'POST /api/classify — Classify user text with confidence scores and crisis detection',
+      'Conversation management — Create, read, delete conversations and messages',
+      'User profile and settings — Full profile and preferences management',
+      'Saved resources — Bookmark and manage resource listings',
+      'Authentication — Register, password reset, and NextAuth.js integration',
+      'Community resources — Public resource directory with search and filtering',
     ],
-  },
-]
-
-// ═══════════════════════════════════════════════════════════
-// WEBHOOK EVENTS DATA
-// ═══════════════════════════════════════════════════════════
-const webhookEvents = [
-  {
-    event: 'classification.completed',
-    description: 'Fired when a classification request finishes processing. Includes full results and confidence scores.',
-    payload: `{
-  "event": "classification.completed",
-  "timestamp": "2026-06-05T14:32:18.429Z",
-  "data": {
-    "query_id": "qry_a8f3c2d1e4b5",
-    "categories": ["Housing Assistance", "Food Assistance"],
-    "top_confidence": 0.87,
-    "crisis_detected": false
-  }
-}`,
-  },
-  {
-    event: 'resource.verified',
-    description: 'Fired when a submitted resource passes verification review and is added to the public database.',
-    payload: `{
-  "event": "resource.verified",
-  "timestamp": "2026-06-05T16:00:00.000Z",
-  "data": {
-    "verification_id": "ver_5m8n2k9p3q7r",
-    "resource_id": "res_4521",
-    "name": "Community Food Bank of Metro Atlanta",
-    "category": "Food Assistance"
-  }
-}`,
-  },
-  {
-    event: 'resource.expired',
-    description: 'Fired when a resource verification expires (30+ days since last verification). Resources receive a "Call to confirm" notice.',
-    payload: `{
-  "event": "resource.expired",
-  "timestamp": "2026-06-05T09:00:00.000Z",
-  "data": {
-    "resource_id": "res_1205",
-    "name": " Downtown Job Center",
-    "category": "Employment Services",
-    "last_verified": "2026-05-04",
-    "status": "call_to_confirm"
-  }
-}`,
-  },
-  {
-    event: 'feedback.received',
-    description: 'Fired when user feedback is submitted for a classification. Useful for monitoring classification quality.',
-    payload: `{
-  "event": "feedback.received",
-  "timestamp": "2026-06-05T14:50:22.789Z",
-  "data": {
-    "feedback_id": "fbk_3q7r5m8n2k9p",
-    "query_id": "qry_a8f3c2d1e4b5",
-    "feedback_type": "classification_inaccurate",
-    "rating": 3
-  }
-}`,
-  },
-  {
-    event: 'rate_limit.warning',
-    description: 'Fired when API usage reaches 80% of the rate limit. Useful for proactive monitoring.',
-    payload: `{
-  "event": "rate_limit.warning",
-  "timestamp": "2026-06-05T13:45:00.000Z",
-  "data": {
-    "tier": "pro",
-    "usage_percent": 80,
-    "requests_remaining": 20000,
-    "reset_at": "2026-07-01T00:00:00.000Z"
-  }
-}`,
   },
 ]
 
@@ -786,43 +753,35 @@ const webhookEvents = [
 const apiFAQs = [
   {
     question: 'How do I get an API key?',
-    answer: 'Sign up for a free ClearPath AI account and navigate to your Dashboard. Under the API Keys section, click "Generate New Key." Your key will be displayed once — store it securely. Free tier keys support up to 10,000 requests per month. For higher limits, upgrade to Pro or contact sales for Enterprise access.',
+    answer: 'Sign up for a free account and navigate to your Dashboard. Under the API Keys section, click "Generate New Key." Your key will be displayed once — store it securely. Rate limits are currently TBD during the initial release phase.',
   },
   {
     question: 'What happens when I exceed my rate limit?',
-    answer: 'When you exceed your rate limit, the API returns a 429 Too Many Requests response with a Retry-After header indicating when you can make your next request. We implement a sliding window algorithm, so you don\'t need to wait for a full reset — just the time specified in the header. Pro and Enterprise users can configure burst allowances for temporary spikes.',
+    answer: 'When you exceed your rate limit, the API returns a 429 Too Many Requests response with a Retry-After header indicating when you can make your next request. Implement exponential backoff for retry logic.',
   },
   {
     question: 'Is the API suitable for production use?',
-    answer: 'Yes. The ClearPath AI API is designed for production workloads with 99.9% uptime SLA (Enterprise), automatic failover, and global edge caching. Our classification engine processes over 50,000 queries per day with a median response time under 1.5 seconds. However, remember that the API is a classification tool — it should complement, not replace, human judgment in resource navigation.',
-  },
-  {
-    question: 'Can I use the API for batch processing?',
-    answer: 'Batch processing is supported on Pro and Enterprise plans. You can send up to 100 queries per batch request to POST /api/classify/batch (Enterprise only). For Pro users, we recommend implementing a queue with appropriate delays between requests to stay within rate limits. Contact our team for custom batch processing solutions.',
+    answer: 'The API is currently in its initial release (v1.0.0). It supports classification, conversation management, user profiles, saved resources, and community resources. Remember that the API is a classification tool — it should complement, not replace, human judgment in resource navigation.',
   },
   {
     question: 'How does the classification engine handle ambiguous queries?',
-    answer: 'When confidence scores fall below the threshold (default 70%), the API returns a clarification_needed flag with suggested clarification questions. You can present these to your users for multi-turn refinement. The clarification_id parameter lets you continue the conversation while maintaining context. This is our "ask, don\'t guess" philosophy in API form.',
+    answer: 'When confidence scores fall below the threshold, the API returns a clarification_needed flag. You can present these to your users for multi-turn refinement using the conversations API to maintain context.',
   },
   {
     question: 'What data does the API log?',
-    answer: 'We log minimal metadata for each request: timestamp, API key hash (not the key itself), response status, and processing time. We do NOT log query text, classification results, or any personally identifiable information. Our zero-retention policy means your users\' queries are processed and immediately discarded. See our Privacy Policy for full details.',
-  },
-  {
-    question: 'Can I customize the classification categories?',
-    answer: 'Custom categories are available on the Enterprise plan. You can define up to 20 custom categories that replace or extend our standard 8-category taxonomy. Custom categories work with the same zero-shot classification engine — just provide your category names and descriptions, and we\'ll configure them within 24 hours. Contact your account manager for setup.',
+    answer: 'We log minimal metadata for each request: timestamp, response status, and processing time. We do NOT log query text, classification results, or any personally identifiable information. See our Privacy Policy for full details.',
   },
   {
     question: 'How do I handle errors gracefully?',
     answer: 'All errors follow a consistent JSON structure with error code, message, and suggested action. Implement exponential backoff for 429 and 503 errors (retry after the time in Retry-After header). For 401/403 errors, check your API key. For 422 errors, validate your request body against the schema. We recommend wrapping API calls in try/catch blocks and providing fallback UI for your users.',
   },
   {
-    question: 'Is there a sandbox environment for testing?',
-    answer: 'Yes! Every API key has access to our sandbox environment at api-sandbox.clearpath-ai.org. The sandbox returns mock data that matches our production response format exactly, but doesn\'t consume your rate limit. Use the sandbox to build and test your integration before going live. No additional configuration needed — just point your base URL to the sandbox.',
+    question: 'What authentication methods are supported?',
+    answer: 'The API uses NextAuth.js for authentication. You can register via POST /api/auth/register, use the forgot-password flow via POST /api/auth/forgot-password, and authenticate through the standard NextAuth.js endpoints at /api/auth/[...nextauth]. Most endpoints require a valid session.',
   },
   {
-    question: 'What is the SLA for the API?',
-    answer: 'Free and Pro plans have a best-effort SLA with no guaranteed uptime (historically 99.5%+). Enterprise plans include a 99.9% uptime SLA with priority incident response (4-hour resolution target for P1 issues). We publish real-time status at status.clearpath-ai.org and notify via webhooks for any degradation. All plans include crisis detection — this layer is architecturally separate and has never experienced downtime.',
+    question: 'Can I access community resources without authentication?',
+    answer: 'Yes! The GET /api/community-resources endpoint is publicly accessible and does not require authentication. You can filter by category and search by keyword. This is useful for building public-facing resource directories.',
   },
 ]
 
@@ -1172,6 +1131,12 @@ function EndpointCard({ endpoint, index }: { endpoint: typeof endpoints[0]; inde
           <MethodBadge method={endpoint.method} />
           <span className="text-[15px] font-semibold text-gray-900 font-mono">{endpoint.path}</span>
           <span className="text-[14px] text-gray-500 hidden sm:inline">&mdash; {endpoint.title}</span>
+          {endpoint.auth && (
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-[10px] font-bold bg-amber-50 text-amber-600 border border-amber-200/60">
+              <Lock className="w-3 h-3" />
+              Auth Required
+            </span>
+          )}
         </div>
         <motion.div
           animate={{ rotate: expanded ? 180 : 0 }}
@@ -1289,7 +1254,7 @@ export default function ApiDocsPage() {
           >
             <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-[12px] font-semibold bg-blue-50/80 text-blue-700 border border-blue-100/60 backdrop-blur-sm">
               <Code2 className="w-3.5 h-3.5" />
-              API v1.4.0 — Developer Documentation
+              API v1.0.0 — Developer Documentation
             </span>
           </motion.div>
 
@@ -1311,8 +1276,8 @@ export default function ApiDocsPage() {
             transition={{ duration: 0.6, delay: 0.3 }}
             className="text-lg sm:text-xl text-gray-500 mt-6 max-w-2xl mx-auto leading-relaxed"
           >
-            Build with ClearPath AI&apos;s classification engine. Classify queries against 8 verified categories,
-            retrieve resources, and integrate calibrated transparency into your applications.
+            Build with our classification engine. Classify queries against verified categories,
+            manage conversations, user profiles, saved resources, and integrate crisis detection into your applications.
           </motion.p>
 
           {/* Quick stats */}
@@ -1325,7 +1290,7 @@ export default function ApiDocsPage() {
             {[
               { icon: Cpu, text: 'BART-large-MNLI', color: '#6366f1' },
               { icon: Shield, text: 'Crisis detection', color: '#ef4444' },
-              { icon: Database, text: '2,286+ verified resources', color: '#10b981' },
+              { icon: Database, text: 'Community resource database', color: '#10b981' },
               { icon: Clock, text: '<1.5s median response', color: '#f59e0b' },
             ].map((stat) => {
               const SIcon = stat.icon
@@ -1411,7 +1376,7 @@ export default function ApiDocsPage() {
                         <div className="flex-1 space-y-3">
                           <h3 className="text-[15px] font-bold text-gray-900">Get Your API Key</h3>
                           <p className="text-[14px] text-gray-600 leading-relaxed">
-                            Sign up at <InlineCode>clearpath-ai.org</InlineCode> and navigate to Dashboard → API Keys. Click &ldquo;Generate New Key&rdquo; to create your first key. Store it securely — it won&apos;t be shown again.
+                            Sign up for a free account and navigate to Dashboard → API Keys. Click &ldquo;Generate New Key&rdquo; to create your first key. Store it securely — it won&apos;t be shown again.
                           </p>
                         </div>
                       </div>
@@ -1424,20 +1389,14 @@ export default function ApiDocsPage() {
                         <div className="flex-1 space-y-3">
                           <h3 className="text-[15px] font-bold text-gray-900">Make Your First Request</h3>
                           <p className="text-[14px] text-gray-600 leading-relaxed">
-                            Classify a query against our 8 categories with a single POST request. Include your API key in the Authorization header and your query in the request body.
+                            Classify a query against our categories with a single POST request. Include your query in the request body.
                           </p>
                           <CodeBlock
-                            code={`curl -X POST https://api.clearpath-ai.org/v1/classify \\
-  -H "Authorization: Bearer cpk_live_your_api_key_here" \\
+                            code={`curl -X POST http://localhost:3000/api/classify \\
   -H "Content-Type: application/json" \\
   -d '{
     "query": "I need help paying my electricity bill",
-    "location": "30318",
-    "options": {
-      "multi_label": true,
-      "confidence_threshold": 0.7,
-      "include_resources": true
-    }
+    "location": "30318"
   }'`}
                             language="bash"
                             filename="Terminal"
@@ -1457,10 +1416,9 @@ export default function ApiDocsPage() {
                           </p>
                           <CodeBlock
                             code={`// JavaScript example
-const response = await fetch('https://api.clearpath-ai.org/v1/classify', {
+const response = await fetch('http://localhost:3000/api/classify', {
   method: 'POST',
   headers: {
-    'Authorization': 'Bearer cpk_live_your_api_key_here',
     'Content-Type': 'application/json',
   },
   body: JSON.stringify({
@@ -1491,30 +1449,6 @@ result.data.classifications.forEach((cls) => {
                       </div>
                     </div>
 
-                    {/* Step 4 */}
-                    <div className="glass-card rounded-2xl p-6 shadow-premium">
-                      <div className="flex items-start gap-4">
-                        <div className="w-8 h-8 rounded-lg bg-gradient-to-b from-blue-600 to-blue-700 flex items-center justify-center text-white text-[13px] font-bold shrink-0">4</div>
-                        <div className="flex-1 space-y-3">
-                          <h3 className="text-[15px] font-bold text-gray-900">Install the SDK (Optional)</h3>
-                          <p className="text-[14px] text-gray-600 leading-relaxed">
-                            For a better developer experience, use our official SDKs. They handle authentication, retries, and type safety out of the box.
-                          </p>
-                          <div className="grid md:grid-cols-2 gap-4">
-                            <CodeBlock
-                              code={`npm install @clearpath-ai/sdk-js`}
-                              language="bash"
-                              filename="JavaScript SDK"
-                            />
-                            <CodeBlock
-                              code={`pip install clearpath-ai`}
-                              language="bash"
-                              filename="Python SDK"
-                            />
-                          </div>
-                        </div>
-                      </div>
-                    </div>
                   </motion.div>
                 </motion.div>
               </section>
@@ -1541,14 +1475,14 @@ result.data.classifications.forEach((cls) => {
                     {/* API Key overview */}
                     <div className="glass-card rounded-2xl p-6 shadow-premium">
                       <p className="text-[14px] text-gray-600 leading-relaxed mb-4">
-                        All API requests require authentication via a Bearer token in the <InlineCode>Authorization</InlineCode> header.
-                        API keys are prefixed with <InlineCode>cpk_live_</InlineCode> (production) or <InlineCode>cpk_test_</InlineCode> (sandbox).
-                        Keys can be managed from your Dashboard under the API Keys section.
+                        Most API requests require authentication via a session cookie established through NextAuth.js.
+                        Register via <InlineCode>POST /api/auth/register</InlineCode> and sign in through the NextAuth.js endpoints.
+                        Public endpoints like <InlineCode>GET /api/community-resources</InlineCode> do not require authentication.
                       </p>
                       <CodeBlock
-                        code={`# Include your API key in every request
-curl -X GET https://api.clearpath-ai.org/v1/resources \\
-  -H "Authorization: Bearer cpk_live_abc123def456ghi789" \\
+                        code={`# Include session cookie in every authenticated request
+curl -X GET http://localhost:3000/api/conversations?userId=user_456 \\
+  -H "Cookie: next-auth.session-token=your_session_token" \\
   -H "Content-Type: application/json"`}
                         language="bash"
                         filename="Authorization Header"
@@ -1562,26 +1496,26 @@ curl -X GET https://api.clearpath-ai.org/v1/resources \\
                           <div className="w-8 h-8 rounded-lg bg-emerald-50 flex items-center justify-center">
                             <CheckCircle2 className="w-4 h-4 text-emerald-500" />
                           </div>
-                          <h3 className="text-[15px] font-bold text-gray-900">Production Keys</h3>
+                          <h3 className="text-[15px] font-bold text-gray-900">Authenticated Endpoints</h3>
                         </div>
                         <div className="space-y-2">
-                          <p className="text-[13px] text-gray-600 leading-relaxed">Prefix: <InlineCode>cpk_live_</InlineCode></p>
-                          <p className="text-[13px] text-gray-600 leading-relaxed">Use for production applications consuming real API quota.</p>
-                          <p className="text-[13px] text-gray-600 leading-relaxed">Returns real classification results and verified resources.</p>
+                          <p className="text-[13px] text-gray-600 leading-relaxed">Requires a valid NextAuth.js session.</p>
+                          <p className="text-[13px] text-gray-600 leading-relaxed">Includes: conversations, user profile/settings, saved resources, classify.</p>
+                          <p className="text-[13px] text-gray-600 leading-relaxed">Session is managed via HTTP-only cookies.</p>
                         </div>
                       </div>
 
                       <div className="glass-card rounded-2xl p-6 shadow-premium">
                         <div className="flex items-center gap-3 mb-4">
                           <div className="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center">
-                            <BeakerIcon className="w-4 h-4 text-blue-500" />
+                            <Globe className="w-4 h-4 text-blue-500" />
                           </div>
-                          <h3 className="text-[15px] font-bold text-gray-900">Sandbox Keys</h3>
+                          <h3 className="text-[15px] font-bold text-gray-900">Public Endpoints</h3>
                         </div>
                         <div className="space-y-2">
-                          <p className="text-[13px] text-gray-600 leading-relaxed">Prefix: <InlineCode>cpk_test_</InlineCode></p>
-                          <p className="text-[13px] text-gray-600 leading-relaxed">Use for development and testing. Returns mock data.</p>
-                          <p className="text-[13px] text-gray-600 leading-relaxed">Does not consume your API rate limit.</p>
+                          <p className="text-[13px] text-gray-600 leading-relaxed">No authentication required.</p>
+                          <p className="text-[13px] text-gray-600 leading-relaxed">Includes: community resources, auth register, forgot-password.</p>
+                          <p className="text-[13px] text-gray-600 leading-relaxed">Safe to use in client-side code without sessions.</p>
                         </div>
                       </div>
                     </div>
@@ -1594,12 +1528,12 @@ curl -X GET https://api.clearpath-ai.org/v1/resources \\
                       </div>
                       <ul className="space-y-3">
                         {[
-                          'Never expose your API key in client-side code, public repositories, or browser DevTools.',
-                          'Use environment variables (e.g., CLEARPATH_API_KEY) to store keys server-side.',
-                          'Rotate your API keys regularly — you can regenerate keys from your Dashboard without downtime.',
-                          'Use sandbox keys (cpk_test_) for all development and testing.',
-                          'Set up key restrictions in your Dashboard to limit keys by IP address or domain.',
-                          'Monitor your usage dashboard for unexpected spikes that may indicate key compromise.',
+                          'Never expose session tokens in client-side code or public repositories.',
+                          'Use environment variables to store sensitive configuration server-side.',
+                          'Rotate session secrets regularly — update NEXTAUTH_SECRET in your environment.',
+                          'Always use HTTPS in production to protect session cookies.',
+                          'Validate user input on both client and server to prevent injection attacks.',
+                          'Implement rate limiting on authentication endpoints to prevent brute-force attacks.',
                         ].map((tip, i) => (
                           <li key={i} className="flex items-start gap-2">
                             <ChevronRight className="w-4 h-4 text-amber-400 mt-0.5 shrink-0" />
@@ -1636,12 +1570,7 @@ curl -X GET https://api.clearpath-ai.org/v1/resources \\
                       <div className="flex items-center gap-3 flex-wrap">
                         <span className="text-[13px] font-semibold text-gray-500">Base URL:</span>
                         <code className="px-3 py-1.5 rounded-lg bg-gray-900 text-emerald-400 text-[13px] font-mono">
-                          https://api.clearpath-ai.org/v1
-                        </code>
-                        <span className="text-[12px] text-gray-400">|</span>
-                        <span className="text-[13px] font-semibold text-gray-500">Sandbox:</span>
-                        <code className="px-3 py-1.5 rounded-lg bg-gray-900 text-blue-400 text-[13px] font-mono">
-                          https://api-sandbox.clearpath-ai.org/v1
+                          http://localhost:3000
                         </code>
                       </div>
                     </div>
@@ -1765,22 +1694,19 @@ curl -X GET https://api.clearpath-ai.org/v1/resources \\
                     <div className="glass-card rounded-2xl p-6 shadow-premium">
                       <h3 className="text-[15px] font-bold text-gray-900 mb-4">Pagination</h3>
                       <p className="text-[14px] text-gray-600 leading-relaxed mb-4">
-                        Endpoints that return lists support cursor-based pagination. Include <InlineCode>page</InlineCode> and <InlineCode>per_page</InlineCode>
-                        parameters in your request. The response includes total count and page metadata.
+                        Endpoints that return lists support pagination. Include <InlineCode>skip</InlineCode> and <InlineCode>take</InlineCode>
+                        parameters in your request. The response includes total count and pagination metadata.
                       </p>
                       <CodeBlock
-                        code={`// Request: GET /api/resources?category=housing&page=2&per_page=20
+                        code={`// Request: GET /api/conversations?userId=user_456&skip=0&take=20
 
 {
   "success": true,
   "data": {
-    "resources": [...],     // Array of 20 resources
-    "total": 423,           // Total matching resources
-    "page": 2,              // Current page number
-    "per_page": 20,         // Results per page
-    "total_pages": 22,      // Total number of pages
-    "has_next": true,       // More pages available
-    "has_prev": true        // Previous page exists
+    "conversations": [...],  // Array of conversations
+    "total": 12,            // Total matching conversations
+    "skip": 0,              // Results skipped
+    "take": 20              // Results per page
   },
   "meta": { ... }
 }`}
@@ -1843,11 +1769,17 @@ curl -X GET https://api.clearpath-ai.org/v1/resources \\
                   </motion.div>
 
                   <motion.div variants={staggerItem} className="space-y-6">
-                    <p className="text-[14px] text-gray-600 leading-relaxed">
-                      Rate limits are applied per API key using a sliding window algorithm. Limits vary by plan tier.
-                      When you approach your limit, the API returns a <InlineCode>429 Too Many Requests</InlineCode> response
-                      with a <InlineCode>Retry-After</InlineCode> header.
-                    </p>
+                    <div className="glass-card rounded-2xl p-6 shadow-premium border-l-4 border-l-orange-400">
+                      <div className="flex items-center gap-2 mb-3">
+                        <Info className="w-5 h-5 text-orange-500" />
+                        <h3 className="text-[15px] font-bold text-gray-900">Rate Limits — To Be Determined</h3>
+                      </div>
+                      <p className="text-[14px] text-gray-600 leading-relaxed">
+                        Rate limits are currently being finalized. The tiers below show planned structures with specific limits to be announced.
+                        When you exceed your rate limit, the API will return a <InlineCode>429 Too Many Requests</InlineCode> response
+                        with a <InlineCode>Retry-After</InlineCode> header.
+                      </p>
+                    </div>
 
                     <div className="grid lg:grid-cols-3 gap-6">
                       {rateLimitTiers.map((tier) => {
@@ -1911,8 +1843,8 @@ curl -X GET https://api.clearpath-ai.org/v1/resources \\
                           },
                           {
                             icon: Clock,
-                            title: 'Batch Where Possible',
-                            desc: 'Use the batch endpoint (Enterprise) or group similar queries to reduce total API calls.',
+                            title: 'Space Out Requests',
+                            desc: 'Avoid sending many requests in rapid succession. Add small delays between API calls to stay within limits.',
                           },
                           {
                             icon: BarChart3,
@@ -1934,341 +1866,6 @@ curl -X GET https://api.clearpath-ai.org/v1/resources \\
                           )
                         })}
                       </div>
-                    </div>
-                  </motion.div>
-                </motion.div>
-              </section>
-
-              {/* ─── SDK SECTION ─── */}
-              <section id="sdks" className="py-20 md:py-28 border-t border-gray-100/60">
-                <motion.div
-                  initial="hidden"
-                  whileInView="visible"
-                  viewport={{ once: true, margin: '-80px' }}
-                  variants={staggerContainer}
-                >
-                  <motion.div variants={staggerItem} className="flex items-center gap-3 mb-6">
-                    <div className="w-10 h-10 rounded-xl bg-indigo-50 flex items-center justify-center">
-                      <Code2 className="w-5 h-5 text-indigo-500" />
-                    </div>
-                    <div>
-                      <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-gray-900">SDKs</h2>
-                      <p className="text-[14px] text-gray-500">Official client libraries for JavaScript and Python</p>
-                    </div>
-                  </motion.div>
-
-                  <motion.div variants={staggerItem} className="space-y-8">
-                    {/* JavaScript SDK */}
-                    <div className="glass-card rounded-2xl p-6 shadow-premium">
-                      <div className="flex items-center gap-3 mb-4">
-                        <div className="w-8 h-8 rounded-lg bg-yellow-50 flex items-center justify-center">
-                          <span className="text-[14px] font-bold text-yellow-600">JS</span>
-                        </div>
-                        <div>
-                          <h3 className="text-[15px] font-bold text-gray-900">JavaScript SDK</h3>
-                          <p className="text-[12px] text-gray-500">@clearpath-ai/sdk-js v1.4.0</p>
-                        </div>
-                        <code className="ml-auto px-3 py-1 rounded-lg bg-gray-900 text-emerald-400 text-[12px] font-mono">
-                          npm install @clearpath-ai/sdk-js
-                        </code>
-                      </div>
-
-                      <CodeBlock
-                        code={`import { ClearPathAI } from '@clearpath-ai/sdk-js';
-
-// Initialize the client
-const client = new ClearPathAI({
-  apiKey: process.env.CLEARPATH_API_KEY,
-  // Optional: use sandbox for testing
-  // baseURL: 'https://api-sandbox.clearpath-ai.org/v1',
-});
-
-// Classify a query
-const result = await client.classify({
-  query: 'I lost my job and can\'t pay rent, my kids need food',
-  location: '30318',
-  options: {
-    multiLabel: true,
-    confidenceThreshold: 0.7,
-    includeResources: true,
-    maxResults: 5,
-  },
-});
-
-// Always check for crisis detection first
-if (result.data.crisisDetected) {
-  console.error('Crisis detected:', result.data.crisisResponse);
-  // Display crisis resources immediately
-  return;
-}
-
-// Access classifications with full type safety
-result.data.classifications.forEach((cls) => {
-  console.log(\`\${cls.category}: \${Math.round(cls.confidence * 100)}%\`);
-  console.log(\`  Reasoning: \${cls.reasoning}\`);
-  console.log(\`  Alternatives: \${cls.alternatives.map(a => a.category).join(', ')}\`);
-
-  // Access matched resources
-  cls.resources?.forEach((resource) => {
-    console.log(\`  - \${resource.name} (\${resource.provider})\`);
-    console.log(\`    Verified: \${resource.lastVerified}\`);
-  });
-});
-
-// Retrieve resources by category
-const resources = await client.resources.list({
-  category: 'housing',
-  location: '30318',
-  page: 1,
-  perPage: 20,
-});
-
-// Submit feedback
-await client.feedback.submit({
-  queryId: result.data.queryId,
-  feedbackType: 'classification_accurate',
-  rating: 5,
-  comment: 'Results were very helpful and accurate!',
-});`}
-                        language="javascript"
-                        filename="JavaScript SDK Usage"
-                      />
-                    </div>
-
-                    {/* Python SDK */}
-                    <div className="glass-card rounded-2xl p-6 shadow-premium">
-                      <div className="flex items-center gap-3 mb-4">
-                        <div className="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center">
-                          <span className="text-[14px] font-bold text-blue-600">Py</span>
-                        </div>
-                        <div>
-                          <h3 className="text-[15px] font-bold text-gray-900">Python SDK</h3>
-                          <p className="text-[12px] text-gray-500">clearpath-ai v1.4.0</p>
-                        </div>
-                        <code className="ml-auto px-3 py-1 rounded-lg bg-gray-900 text-emerald-400 text-[12px] font-mono">
-                          pip install clearpath-ai
-                        </code>
-                      </div>
-
-                      <CodeBlock
-                        code={`import os
-from clearpath_ai import ClearPathAI
-
-# Initialize the client
-client = ClearPathAI(
-    api_key=os.environ.get("CLEARPATH_API_KEY"),
-    # Optional: use sandbox for testing
-    # base_url="https://api-sandbox.clearpath-ai.org/v1",
-)
-
-# Classify a query
-result = client.classify(
-    query="I lost my job and can't pay rent, my kids need food",
-    location="30318",
-    multi_label=True,
-    confidence_threshold=0.7,
-    include_resources=True,
-    max_results=5,
-)
-
-# Always check for crisis detection first
-if result.data.crisis_detected:
-    print(f"Crisis detected: {result.data.crisis_response}")
-    # Display crisis resources immediately
-    exit()
-
-# Access classifications with full type safety
-for cls in result.data.classifications:
-    print(f"{cls.category}: {round(cls.confidence * 100)}%")
-    print(f"  Reasoning: {cls.reasoning}")
-    print(f"  Alternatives: {', '.join(a.category for a in cls.alternatives)}")
-
-    # Access matched resources
-    for resource in (cls.resources or []):
-        print(f"  - {resource.name} ({resource.provider})")
-        print(f"    Verified: {resource.last_verified}")
-
-# Retrieve resources by category
-resources = client.resources.list(
-    category="housing",
-    location="30318",
-    page=1,
-    per_page=20,
-)
-
-# Submit feedback
-client.feedback.submit(
-    query_id=result.data.query_id,
-    feedback_type="classification_accurate",
-    rating=5,
-    comment="Results were very helpful and accurate!",
-)
-
-# Context manager support (auto-closes connections)
-with ClearPathAI(api_key=os.environ["CLEARPATH_API_KEY"]) as client:
-    result = client.classify(query="I need help with my electricity bill")
-    print(f"Top category: {result.data.classifications[0].category}")`}
-                        language="python"
-                        filename="Python SDK Usage"
-                      />
-                    </div>
-
-                    {/* SDK features comparison */}
-                    <div className="glass-card rounded-2xl p-6 shadow-premium">
-                      <h3 className="text-[15px] font-bold text-gray-900 mb-4">SDK Features</h3>
-                      <div className="overflow-x-auto rounded-xl border border-gray-100/60">
-                        <table className="w-full text-left">
-                          <thead>
-                            <tr className="bg-gray-50/80">
-                              <th className="px-4 py-3 text-[11px] font-bold text-gray-500 uppercase tracking-wider">Feature</th>
-                              <th className="px-4 py-3 text-[11px] font-bold text-gray-500 uppercase tracking-wider">JavaScript</th>
-                              <th className="px-4 py-3 text-[11px] font-bold text-gray-500 uppercase tracking-wider">Python</th>
-                            </tr>
-                          </thead>
-                          <tbody className="divide-y divide-gray-50">
-                            {[
-                              { feature: 'TypeScript types', js: true, py: true },
-                              { feature: 'Automatic retries', js: true, py: true },
-                              { feature: 'Rate limit handling', js: true, py: true },
-                              { feature: 'Crisis detection helpers', js: true, py: true },
-                              { feature: 'Streaming support', js: true, py: false },
-                              { feature: 'Context manager', js: false, py: true },
-                              { feature: 'Webhook verification', js: true, py: true },
-                              { feature: 'Request timeout config', js: true, py: true },
-                              { feature: 'Tree-shakeable', js: true, py: false },
-                            ].map((row) => (
-                              <tr key={row.feature} className="hover:bg-gray-50/40 transition-colors">
-                                <td className="px-4 py-3 text-[13px] font-medium text-gray-900">{row.feature}</td>
-                                <td className="px-4 py-3">
-                                  {row.js ? <CheckCircle2 className="w-4 h-4 text-emerald-500" /> : <XCircle className="w-4 h-4 text-gray-300" />}
-                                </td>
-                                <td className="px-4 py-3">
-                                  {row.py ? <CheckCircle2 className="w-4 h-4 text-emerald-500" /> : <XCircle className="w-4 h-4 text-gray-300" />}
-                                </td>
-                              </tr>
-                            ))}
-                          </tbody>
-                        </table>
-                      </div>
-                    </div>
-                  </motion.div>
-                </motion.div>
-              </section>
-
-              {/* ─── WEBHOOKS SECTION ─── */}
-              <section id="webhooks" className="py-20 md:py-28 border-t border-gray-100/60">
-                <motion.div
-                  initial="hidden"
-                  whileInView="visible"
-                  viewport={{ once: true, margin: '-80px' }}
-                  variants={staggerContainer}
-                >
-                  <motion.div variants={staggerItem} className="flex items-center gap-3 mb-6">
-                    <div className="w-10 h-10 rounded-xl bg-pink-50 flex items-center justify-center">
-                      <Webhook className="w-5 h-5 text-pink-500" />
-                    </div>
-                    <div>
-                      <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-gray-900">Webhooks</h2>
-                      <p className="text-[14px] text-gray-500">Real-time event notifications</p>
-                    </div>
-                  </motion.div>
-
-                  <motion.div variants={staggerItem} className="space-y-8">
-                    <p className="text-[14px] text-gray-600 leading-relaxed">
-                      Webhooks let you receive real-time notifications when events occur in your ClearPath AI account.
-                      Configure webhook endpoints in your Dashboard, and we&apos;ll send HTTP POST requests to your server whenever
-                      an event fires. Webhooks are available on Pro and Enterprise plans.
-                    </p>
-
-                    {/* Setup instructions */}
-                    <div className="glass-card rounded-2xl p-6 shadow-premium">
-                      <h3 className="text-[15px] font-bold text-gray-900 mb-4">Setup Instructions</h3>
-                      <CodeBlock
-                        code={`// 1. Create a webhook endpoint on your server
-app.post('/webhooks/clearpath', (req, res) => {
-  // 2. Verify the webhook signature
-  const signature = req.headers['x-clearpath-signature'];
-  const payload = JSON.stringify(req.body);
-
-  const expectedSignature = crypto
-    .createHmac('sha256', process.env.CLEARPATH_WEBHOOK_SECRET)
-    .update(payload)
-    .digest('hex');
-
-  if (signature !== expectedSignature) {
-    return res.status(401).send('Invalid signature');
-  }
-
-  // 3. Process the event
-  const { event, data } = req.body;
-
-  switch (event) {
-    case 'classification.completed':
-      handleClassificationComplete(data);
-      break;
-    case 'resource.verified':
-      handleResourceVerified(data);
-      break;
-    case 'resource.expired':
-      handleResourceExpired(data);
-      break;
-    case 'feedback.received':
-      handleFeedbackReceived(data);
-      break;
-    case 'rate_limit.warning':
-      handleRateLimitWarning(data);
-      break;
-    default:
-      console.log('Unknown event:', event);
-  }
-
-  // 4. Always respond with 200 OK
-  res.status(200).send('OK');
-});`}
-                        language="javascript"
-                        filename="Webhook Handler (Express.js)"
-                      />
-                    </div>
-
-                    {/* Webhook events */}
-                    <div>
-                      <h3 className="text-[15px] font-bold text-gray-900 mb-4">Available Events</h3>
-                      <div className="space-y-4">
-                        {webhookEvents.map((webhook) => (
-                          <div key={webhook.event} className="glass-card rounded-2xl p-6 shadow-premium">
-                            <div className="flex items-center gap-3 mb-3">
-                              <code className="px-3 py-1 rounded-lg bg-gray-900 text-emerald-400 text-[12px] font-mono">
-                                {webhook.event}
-                              </code>
-                            </div>
-                            <p className="text-[13px] text-gray-600 leading-relaxed mb-4">{webhook.description}</p>
-                            <CodeBlock code={webhook.payload} language="json" filename="Payload" />
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-
-                    {/* Webhook security */}
-                    <div className="glass-card rounded-2xl p-6 shadow-premium border-l-4 border-l-pink-400">
-                      <div className="flex items-center gap-2 mb-4">
-                        <Shield className="w-5 h-5 text-pink-500" />
-                        <h3 className="text-[15px] font-bold text-gray-900">Webhook Security</h3>
-                      </div>
-                      <ul className="space-y-2">
-                        {[
-                          'All webhooks are sent over HTTPS with TLS 1.2+ encryption.',
-                          'Each webhook includes an X-Clearpath-Signature header (HMAC-SHA256) for verification.',
-                          'Webhook secrets are unique per endpoint and can be rotated from your Dashboard.',
-                          'Failed deliveries are retried up to 5 times with exponential backoff (1min, 5min, 30min, 2hr, 12hr).',
-                          'You can view delivery history and retry individual webhooks from your Dashboard.',
-                          'IP whitelisting is available for Enterprise customers — contact support to configure.',
-                        ].map((tip, i) => (
-                          <li key={i} className="flex items-start gap-2">
-                            <Check className="w-4 h-4 text-pink-400 mt-0.5 shrink-0" />
-                            <span className="text-[13px] text-gray-600 leading-relaxed">{tip}</span>
-                          </li>
-                        ))}
-                      </ul>
                     </div>
                   </motion.div>
                 </motion.div>
@@ -2425,8 +2022,8 @@ app.post('/webhooks/clearpath', (req, res) => {
                         Get Your API Key
                       </h2>
                       <p className="text-[15px] text-gray-500 max-w-xl mx-auto leading-relaxed mb-8">
-                        Start building with ClearPath AI&apos;s classification engine today. Free tier includes 10,000
-                        requests per month — no credit card required. Crisis detection is always on.
+                        Start building with our classification engine today. Free tier available —
+                        no credit card required. Crisis detection is always on.
                       </p>
 
                       <div className="flex flex-wrap items-center justify-center gap-4">
@@ -2489,13 +2086,9 @@ app.post('/webhooks/clearpath', (req, res) => {
               <span className="text-[11px] text-gray-400">— Community Resource Navigator</span>
             </div>
             <div className="flex items-center gap-4">
-              <span className="text-[11px] text-gray-400">API v1.4.0</span>
+              <span className="text-[11px] text-gray-400">API v1.0.0</span>
               <span className="text-[11px] text-gray-300">|</span>
-              <a href="https://status.clearpath-ai.org" target="_blank" rel="noopener noreferrer" className="text-[11px] text-gray-400 hover:text-gray-600 transition-colors flex items-center gap-1">
-                <Activity className="w-3 h-3" />
-                Status
-                <ExternalLink className="w-2.5 h-2.5" />
-              </a>
+              <span className="text-[11px] text-gray-400">localhost:3000</span>
               <span className="text-[11px] text-gray-300">|</span>
               <span className="text-[11px] text-gray-400">USAII Global AI Hackathon 2026</span>
             </div>
@@ -2507,24 +2100,4 @@ app.post('/webhooks/clearpath', (req, res) => {
   )
 }
 
-// ═══════════════════════════════════════════════════════════
-// HELPER ICON COMPONENT (for Sandbox keys)
-// ═══════════════════════════════════════════════════════════
-function BeakerIcon({ className }: { className?: string }) {
-  return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      className={className}
-    >
-      <path d="M4.5 3h15" />
-      <path d="M6 3v16a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V3" />
-      <path d="M6 14h12" />
-    </svg>
-  )
-}
+

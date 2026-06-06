@@ -163,7 +163,7 @@ const faqs = [
   {
     question: 'Is my data stored?',
     answer:
-      'No. ClearPath AI does not store any conversation data, ever. Your searches and conversations are processed in real-time and immediately discarded. We believe that people seeking community resources deserve absolute privacy. This is true across all plans — Free, Pro, and Enterprise. On Pro and Enterprise, your saved conversation history is stored locally on your device and never on our servers.',
+      'Guest sessions are processed in-memory and not stored. If you create an account, your conversations are stored securely on our servers so you can access them later. For authenticated users, conversation history is stored securely on our servers. Guest sessions are not persisted. We believe that people seeking community resources deserve strong privacy protections across all plans.',
   },
   {
     question: 'Can I switch between plans?',
@@ -213,7 +213,7 @@ const faqs = [
   {
     question: 'Is ClearPath AI HIPAA compliant?',
     answer:
-      'ClearPath AI does not store Protected Health Information (PHI) and processes all data in real-time with zero retention. While this zero-storage architecture inherently supports HIPAA compliance, we are working toward formal HIPAA BAA availability for Enterprise customers. Contact our sales team for the latest compliance status and timeline.',
+      'ClearPath AI is designed with privacy principles aligned with HIPAA best practices. Formal compliance certification is pending. We do not store Protected Health Information (PHI) for guest sessions, and authenticated user data is encrypted at rest. We are working toward formal HIPAA BAA availability for Enterprise customers. Contact our sales team for the latest compliance status and timeline.',
   },
 ]
 
@@ -273,7 +273,7 @@ const testimonials = [
   {
     initials: 'LC',
     name: 'Linda Chen',
-    role: 'Individual User · Free Plan',
+    role: 'Individual User · Free Plan (Illustrative testimonial for demonstration purposes)',
     quote: 'I was looking for food assistance programs and ClearPath found me three resources I didn\'t even know existed. The confidence scores helped me trust the results.',
     color: 'bg-violet-100 text-violet-700',
     tier: 'Free',
@@ -281,7 +281,7 @@ const testimonials = [
   {
     initials: 'JK',
     name: 'James Kim',
-    role: 'Social Worker · Pro Plan',
+    role: 'Social Worker · Pro Plan (Illustrative testimonial for demonstration purposes)',
     quote: "Pro's saved history means I can follow up with clients across sessions. I don't have to re-explain their situation every time. It saves me at least 30 minutes per client.",
     color: 'bg-blue-100 text-blue-700',
     tier: 'Pro',
@@ -289,7 +289,7 @@ const testimonials = [
   {
     initials: 'MR',
     name: 'Maria Rodriguez',
-    role: 'Nonprofit Director · Pro Plan',
+    role: 'Nonprofit Director · Pro Plan (Illustrative testimonial for demonstration purposes)',
     quote: 'The eligibility pre-check alone saves our team hours per week. We used to send people to programs they didn\'t qualify for — now we know upfront.',
     color: 'bg-emerald-100 text-emerald-700',
     tier: 'Pro',
@@ -297,7 +297,7 @@ const testimonials = [
   {
     initials: 'DW',
     name: 'Dr. David Washington',
-    role: 'Hospital Administrator · Enterprise',
+    role: 'Hospital Administrator · Enterprise (Illustrative testimonial for demonstration purposes)',
     quote: 'The API integration lets us embed ClearPath directly into our patient intake workflow. Our social workers don\'t have to switch tools anymore.',
     color: 'bg-amber-100 text-amber-700',
     tier: 'Enterprise',
@@ -305,7 +305,7 @@ const testimonials = [
   {
     initials: 'PA',
     name: 'Patricia Adams',
-    role: 'Government Agency · Enterprise',
+    role: 'Government Agency · Enterprise (Illustrative testimonial for demonstration purposes)',
     quote: 'Having a white-labeled version means our constituents trust the tool immediately. It looks like our website, feels like our services.',
     color: 'bg-rose-100 text-rose-700',
     tier: 'Enterprise',
@@ -313,7 +313,7 @@ const testimonials = [
   {
     initials: 'TN',
     name: 'Tyler Nguyen',
-    role: 'Graduate Student · Free Plan',
+    role: 'Graduate Student · Free Plan (Illustrative testimonial for demonstration purposes)',
     quote: 'As a social work student, ClearPath AI helps me understand what resources exist in my community. The crisis detection feature gives me confidence that it\'s safe to recommend.',
     color: 'bg-cyan-100 text-cyan-700',
     tier: 'Free',
@@ -507,7 +507,7 @@ const featureSpotlights = [
           <span className="text-emerald-400">= await</span>
           <span className="text-amber-300"> fetch</span>
           <span className="text-gray-300">{'('}</span>
-          <span className="text-emerald-300">&apos;https://api.clearpath-ai.org/v1/classify&apos;</span>
+          <span className="text-emerald-300">&apos;http://localhost:3000/api/classify&apos;</span>
           <span className="text-gray-300">{', {'}</span>
           <br />
           <span className="text-gray-300">{'  '}</span>
