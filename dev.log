@@ -1,11 +1,15 @@
 ▲ Next.js 16.1.3 (Turbopack)
 - Local:         http://localhost:3000
-- Network:       http://21.0.8.133:3000
+- Network:       http://21.0.15.77:3000
 - Environments: .env
 
 ✓ Starting...
-✓ Ready in 554ms
-prisma:query SELECT `main`.`Resource`.`id`, `main`.`Resource`.`name`, `main`.`Resource`.`category`, `main`.`Resource`.`description`, `main`.`Resource`.`phone`, `main`.`Resource`.`address`, `main`.`Resource`.`hours`, `main`.`Resource`.`eligibility`, `main`.`Resource`.`services`, `main`.`Resource`.`languages`, `main`.`Resource`.`lastVerified`, `main`.`Resource`.`url`, `main`.`Resource`.`createdAt` FROM `main`.`Resource` WHERE (`main`.`Resource`.`name` LIKE ? OR `main`.`Resource`.`description` LIKE ? OR `main`.`Resource`.`services` LIKE ?) ORDER BY `main`.`Resource`.`name` ASC LIMIT ? OFFSET ?
-prisma:query SELECT `main`.`Resource`.`id`, `main`.`Resource`.`category` FROM `main`.`Resource` WHERE 1=1 ORDER BY `main`.`Resource`.`category` ASC LIMIT ? OFFSET ?
- GET /api/community-resources?search=food 200 in 334ms (compile: 300ms, render: 34ms)
- 334ms (compile: 300ms, render: 34ms)
+Attention: Next.js now collects completely anonymous telemetry regarding usage.
+This information is used to shape Next.js' roadmap and prioritize features.
+You can learn more, including how to opt-out if you'd not like to participate in this anonymous program, by visiting the following URL:
+https://nextjs.org/telemetry
+
+✓ Ready in 689ms
+○ Compiling / ...
+ GET / 200 in 67ms (compile: 3ms, render: 63ms)
+ GET / 200 in 62ms (compile: 3ms, render: 59ms)
