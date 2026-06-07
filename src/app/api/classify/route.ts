@@ -94,26 +94,26 @@ const CRISIS_PATTERNS = [
 // ─── Descriptive Labels for BART-large-MNLI ───
 // Ultra-specific labels give BART maximum semantic signal for NLI matching.
 const CANDIDATE_LABELS = [
-  'rent, mortgage, eviction, being evicted, losing my home, homelessness, shelter, emergency housing, section 8, housing assistance, no money for rent, need financial help, utility assistance, about to lose my apartment, can\'t afford rent, broke, no money',
-  'needing food, getting free food, food pantry, free groceries, meals, food stamps, SNAP, food bank, hungry, starving, no money for food, where to get food, feeding family, no food at home',
-  'feeling alone, lonely, isolated, no one to talk to, I am alone, social isolation, therapy, counseling, psychiatrist, depression, feeling depressed, anxiety, feeling anxious, mental health treatment, emotional support, PTSD, stressed, overwhelmed, loneliness, need someone to talk to',
-  'job search, resume help, career training, unemployment benefits, employment, looking for work, fired, laid off, need money, no money, unemployed, need income, financial stability, workforce development, broke, can\'t afford, need cash',
-  'free lawyer, legal aid, immigration attorney, court representation, legal help, deportation, custody, divorce',
-  'doctor, medical clinic, health insurance, prescription, healthcare, medical care, sick, cancer treatment, dying of illness, hospital, clinic, health center',
-  'suicidal thoughts, wanting to kill myself, self-harm, or immediate danger to life',
-  'elderly care, senior meals, home delivery, transportation for older adults, aging parent, elderly mother, senior citizen services, senior, older adult, Medicare',
+  'rent help, emergency shelter, facing eviction, homeless, housing assistance, can\'t afford rent, mortgage help',
+  'food pantry, free groceries, SNAP benefits, hunger, food bank, need food, feeding my family',
+  'feeling alone, lonely, isolated, no one to talk to, depression, anxiety, PTSD, counseling, emotional support',
+  'job search, career training, unemployed, need work, job placement, workforce development',
+  'legal aid, immigration help, court assistance, lawyer, legal rights, asylum, citizenship',
+  'medical care, health clinic, doctor, prescription help, health insurance, dying of illness',
+  'suicide, self-harm, want to die, end my life, hurting myself, crisis intervention',
+  'senior services, elderly care, aging, meals for seniors, caregiver support, adults 60+',
 ];
 
 // Map descriptive labels back to short display names
 const LABEL_TO_CATEGORY: Record<string, string> = {
-  'rent, mortgage, eviction, being evicted, losing my home, homelessness, shelter, emergency housing, section 8, housing assistance, no money for rent, need financial help, utility assistance, about to lose my apartment, can\'t afford rent, broke, no money': 'Housing Assistance',
-  'needing food, getting free food, food pantry, free groceries, meals, food stamps, SNAP, food bank, hungry, starving, no money for food, where to get food, feeding family, no food at home': 'Food Assistance',
-  'feeling alone, lonely, isolated, no one to talk to, I am alone, social isolation, therapy, counseling, psychiatrist, depression, feeling depressed, anxiety, feeling anxious, mental health treatment, emotional support, PTSD, stressed, overwhelmed, loneliness, need someone to talk to': 'Mental Health',
-  'job search, resume help, career training, unemployment benefits, employment, looking for work, fired, laid off, need money, no money, unemployed, need income, financial stability, workforce development, broke, can\'t afford, need cash': 'Employment Services',
-  'free lawyer, legal aid, immigration attorney, court representation, legal help, deportation, custody, divorce': 'Legal Aid',
-  'doctor, medical clinic, health insurance, prescription, healthcare, medical care, sick, cancer treatment, dying of illness, hospital, clinic, health center': 'Healthcare',
-  'suicidal thoughts, wanting to kill myself, self-harm, or immediate danger to life': 'Crisis Support',
-  'elderly care, senior meals, home delivery, transportation for older adults, aging parent, elderly mother, senior citizen services, senior, older adult, Medicare': 'Senior Services',
+  'rent help, emergency shelter, facing eviction, homeless, housing assistance, can\'t afford rent, mortgage help': 'Housing Assistance',
+  'food pantry, free groceries, SNAP benefits, hunger, food bank, need food, feeding my family': 'Food Assistance',
+  'feeling alone, lonely, isolated, no one to talk to, depression, anxiety, PTSD, counseling, emotional support': 'Mental Health',
+  'job search, career training, unemployed, need work, job placement, workforce development': 'Employment Services',
+  'legal aid, immigration help, court assistance, lawyer, legal rights, asylum, citizenship': 'Legal Aid',
+  'medical care, health clinic, doctor, prescription help, health insurance, dying of illness': 'Healthcare',
+  'suicide, self-harm, want to die, end my life, hurting myself, crisis intervention': 'Crisis Support',
+  'senior services, elderly care, aging, meals for seniors, caregiver support, adults 60+': 'Senior Services',
 };
 
 const LABELS = [
