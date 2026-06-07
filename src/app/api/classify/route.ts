@@ -157,10 +157,19 @@ function detectCrisis(text: string): boolean {
   return CRISIS_PATTERNS.some(pattern => pattern.test(text));
 }
 
-// ─── Classification via HuggingFace ────────────────────────
-async function classifyWithHF(text: string): Promise<Array<{ label: string; score: number }>> {
+// ─── Classification result with source tracking ────────────
+interface ClassificationResult {
+  label: string;
+  score: number;
+  source: 'bart' | 'keyword';
+}
+
+// ─── Classification via HuggingFace BART-large-MNLI ────────
+async function classifyWithBART(text: string): Promise<ClassificationResult[]> {
+  // ── HONEST GATE: No API key = no BART. Never fake it. ──
   if (!HF_API_KEY || HF_API_KEY === "hf_xxxxx") {
-    return simulateClassification(text);
+    console.warn("[classify] No HUGGINGFACE_API_KEY configured — using keyword matching");
+    return keywordClassify(text);
   }
 
   try {
@@ -180,8 +189,10 @@ async function classifyWithHF(text: string): Promise<Array<{ label: string; scor
     });
 
     if (!response.ok) {
-      console.error("HF API error:", response.status, await response.text());
-      return simulateClassification(text);
+      const errBody = await response.text();
+      console.error(`[classify] HF API error ${response.status}: ${errBody}`);
+      // HF failed — fall back to keyword, but mark it honestly
+      return keywordClassify(text);
     }
 
     const result = await response.json();
@@ -191,20 +202,23 @@ async function classifyWithHF(text: string): Promise<Array<{ label: string; scor
       return result.labels.map((label: string, i: number) => ({
         label: LABEL_TO_CATEGORY[label] || label,
         score: result.scores[i],
+        source: 'bart' as const,
       }));
     }
 
-    return simulateClassification(text);
+    // Unexpected response format — fall back honestly
+    console.warn("[classify] Unexpected HF response format — falling back to keyword matching");
+    return keywordClassify(text);
   } catch (error) {
-    console.error("Classification error:", error);
-    return simulateClassification(text);
+    console.error("[classify] HF API call failed:", error);
+    return keywordClassify(text);
   }
 }
 
-// ─── Simulated Classification (fallback when HF API unavailable) ───
-function simulateClassification(text: string): Array<{ label: string; score: number }> {
+// ─── Keyword Classification (HONEST fallback — never pretends to be BART) ───
+function keywordClassify(text: string): ClassificationResult[] {
   const lower = text.toLowerCase();
-  const results: Array<{ label: string; score: number }> = [];
+  const results: ClassificationResult[] = [];
 
   const labelKeywords: Record<string, string[]> = {
     "Housing Assistance": ["housing", "rent", "shelter", "homeless", "eviction", "evicted", "apartment", "mortgage", "section 8", "losing my home", "no money for rent", "financial help", "utility"],
@@ -234,10 +248,10 @@ function simulateClassification(text: string): Array<{ label: string; score: num
         score *= 0.7;
       }
     } else {
-      score = 0.1 + Math.random() * 0.15;
+      score = 0.05 + Math.random() * 0.1; // Low baseline noise
     }
 
-    results.push({ label, score: Math.round(score * 100) / 100 });
+    results.push({ label, score: Math.round(score * 100) / 100, source: 'keyword' });
   }
 
   results.sort((a, b) => b.score - a.score);
@@ -251,10 +265,8 @@ function getResourcesForCategory(category: string, userLat?: number, userLng?: n
     // Smart distance display
     let distance: string | null = null;
     if (userLat !== undefined && userLng !== undefined) {
-      // User has geolocation — calculate distance from Houston center
       const miles = haversineMi(userLat, userLng, HOUSTON_LAT, HOUSTON_LNG);
       if (miles <= HOUSTON_METRO_RADIUS_MI) {
-        // Local Houston — show address-based distance (approximate from center)
         distance = `${miles.toFixed(1)} mi`;
       } else if (miles <= 100) {
         distance = `${Math.round(miles)} mi (outside Houston metro)`;
@@ -306,7 +318,6 @@ export async function POST(request: NextRequest) {
         { name: "911", action: "Immediate danger — call now", call: "911" },
       ];
 
-      // Also include Crisis Support resources
       const crisisResources = getResourcesForCategory("Crisis Support", userLat, userLng);
 
       return NextResponse.json({
@@ -325,11 +336,13 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    // Layer 2: AI Classification
-    const classifications = await classifyWithHF(text);
+    // Layer 2: AI Classification (BART if available, keyword if not — ALWAYS HONEST)
+    const classifications = await classifyWithBART(text);
+
+    // Determine classification source for honest reporting
+    const classificationSource = classifications.length > 0 ? classifications[0].source : 'keyword';
 
     // Layer 3: Confidence-gated response
-    // Multi-need: show all categories ≥ 10%, max 5
     const MULTI_NEED_THRESHOLD = 0.10;
     const MAX_CATEGORIES = 5;
     let significantCategories = classifications
@@ -337,10 +350,7 @@ export async function POST(request: NextRequest) {
       .slice(0, MAX_CATEGORIES);
 
     // ── NEVER return empty categories ──
-    // If BART returns 0 categories above threshold, broaden to top result
-    // so the user always sees SOMETHING — even if confidence is low.
     if (significantCategories.length === 0 && classifications.length > 0) {
-      // Take the top-scoring category regardless of threshold
       significantCategories = [classifications[0]];
     }
 
@@ -351,7 +361,9 @@ export async function POST(request: NextRequest) {
       label: c.label,
       confidence: Math.round(c.score * 100),
       resources: getResourcesForCategory(c.label, userLat, userLng),
-      why: `Matched based on semantic analysis of your description.`,
+      why: classificationSource === 'bart'
+        ? 'Matched by BART-large-MNLI semantic analysis of your description.'
+        : 'Matched by keyword analysis. For more accurate results, BART AI classification requires an API key.',
       also: significantCategories.length > 1
         ? `You may also benefit from ${significantCategories.slice(1, 3).map(sc => sc.label).join(" and ")} services.`
         : undefined,
@@ -360,8 +372,13 @@ export async function POST(request: NextRequest) {
         : undefined,
     }));
 
-    // If even the broadened result is extremely low confidence, show clarification
     const noResults = categoriesWithResources.length === 0;
+
+    // ── HONEST model reporting ──
+    // If using keyword matching, say so explicitly
+    const modelLabel = classificationSource === 'bart'
+      ? "BART-large-MNLI (live)"
+      : "Keyword matching (BART API key not configured)";
 
     return NextResponse.json({
       isCrisis: false,
@@ -372,7 +389,8 @@ export async function POST(request: NextRequest) {
         : needsClarification
         ? "Your request scored below 50% — try providing more detail for better matches"
         : null,
-      model: HF_API_KEY && HF_API_KEY !== "hf_xxxxx" ? "BART-large-MNLI (live)" : "BART-large-MNLI (simulated)",
+      model: modelLabel,
+      classificationSource, // Expose source so frontend can display honestly
       hasLocation: userLat !== undefined,
       outsideServiceArea: userLat !== undefined && isOutsideServiceArea(userLat, userLng!),
       serviceArea: 'Houston, TX metro area',
@@ -388,11 +406,14 @@ export async function POST(request: NextRequest) {
 
 // ─── GET Handler (health check) ────────────────────────────
 export async function GET() {
+  const hasApiKey = !!(HF_API_KEY && HF_API_KEY !== "hf_xxxxx");
   return NextResponse.json({
     status: "ok",
     service: "ClearPath AI Classification API",
-    version: "2.0.0",
+    version: "3.0.0",
     model: "facebook/bart-large-mnli",
+    bartAvailable: hasApiKey,
+    classificationMode: hasApiKey ? "BART-large-MNLI (live)" : "Keyword matching (fallback — set HUGGINGFACE_API_KEY)",
     crisisDetection: "regex-based (deterministic)",
     labels: LABELS,
     resourceCount: HOUSTON_RESOURCES.length,
