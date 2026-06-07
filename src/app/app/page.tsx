@@ -75,12 +75,11 @@ interface CrisisLine {
 
 interface ClassifyResponse {
   isCrisis: boolean
-  categories: { label: string; confidence: number }[]
+  categories: Category[]
   needsClarification: boolean
   clarificationMessage: string | null
   crisisLines?: CrisisLine[]
   note?: string
-  conversationId?: string
   model: string
   hasLocation?: boolean
   outsideServiceArea?: boolean
@@ -132,14 +131,14 @@ const alsoMap: Record<string, string> = {
   'Senior Services': 'SNAP Online, Congregate meals, Medicare counseling',
 }
 
-function enrichCategories(rawCategories: { label: string; confidence: number }[], resourcesMap: Record<string, Resource[]> = {}): Category[] {
+function enrichCategories(rawCategories: Category[], resourcesMap: Record<string, Resource[]> = {}): Category[] {
   return rawCategories.map(c => ({
-    label: c.label,
-    confidence: c.confidence,
-    resources: resourcesMap[c.label] || [],
-    why: whyMap[c.label] || `Matched to ${c.label} category`,
-    also: alsoMap[c.label],
-    warning: c.confidence < 70 ? `${c.confidence}% confidence — consider providing more detail for better matches` : undefined,
+    ...c,
+    // If API already provided resources, use them; otherwise fall back to resourcesMap
+    resources: c.resources && c.resources.length > 0 ? c.resources : (resourcesMap[c.label] || []),
+    why: c.why || whyMap[c.label] || `Matched to ${c.label} category`,
+    also: c.also || alsoMap[c.label],
+    warning: c.warning || (c.confidence < 70 ? `${c.confidence}% confidence — consider providing more detail for better matches` : undefined),
   }))
 }
 
@@ -1428,6 +1427,9 @@ export default function Home() {
   const [headerScrolled, setHeaderScrolled] = useState(false)
   const [sidebarOpen, setSidebarOpen] = useState(true)
   const [activeConversationId, setActiveConversationId] = useState<string | null>(null)
+  // Conversations not tracked — stateless chat
+  const [conversations, setConversations] = useState<ConversationHistory[]>([])
+  const [isLoadingConversations, setIsLoadingConversations] = useState(false)
   const [showHowItWorks, setShowHowItWorks] = useState(false)
   const [showDemoScenarios, setShowDemoScenarios] = useState(false)
   const [activeNav, setActiveNav] = useState<'home' | 'how-it-works' | 'demo-scenarios' | null>(null)
@@ -1460,12 +1462,6 @@ export default function Home() {
     )
   }, [])
 
-  // Conversation history from API
-  const [conversations, setConversations] = useState<ConversationHistory[]>([])
-  const [isLoadingConversations, setIsLoadingConversations] = useState(false)
-
-  // Current conversation ID from /api/classify response
-  const currentConvIdRef = useRef<string | null>(null)
   // Track the previous confidence for upgrade detection
   const previousConfidenceRef = useRef<number | null>(null)
 
@@ -1473,63 +1469,8 @@ export default function Home() {
   const [showCrisisOverlay, setShowCrisisOverlay] = useState(false)
   const [crisisOverlayLines, setCrisisOverlayLines] = useState<CrisisLine[]>([])
 
-  // DB resources fetched from /api/community-resources, grouped by category
-  const [dbResources, setDbResources] = useState<Record<string, Resource[]>>({})
-
-  // Fetch community resources on mount
-  useEffect(() => {
-    fetch('/api/community-resources')
-      .then(res => res.json())
-      .then(data => {
-        if (data.resources && Array.isArray(data.resources)) {
-          const grouped: Record<string, Resource[]> = {}
-          for (const r of data.resources) {
-            const cat = r.category
-            if (!grouped[cat]) grouped[cat] = []
-            // Smart distance: show "📍 Houston, TX" by default, real distance if geolocation is available
-            grouped[cat].push({
-              name: r.name,
-              detail: r.description + (r.phone ? ` Call ${r.phone}` : '') + (r.hours ? ` Hours: ${r.hours}` : ''),
-              verified: r.lastVerified || undefined,
-              distance: '📍 Houston, TX',  // Default — replaced with real distance if user shares location
-            })
-          }
-          setDbResources(grouped)
-        }
-      })
-      .catch(() => {}) // silent fail, fallback to empty
-  }, [])
-
-  // Fetch conversations from API
-  const fetchConversations = useCallback(async () => {
-    setIsLoadingConversations(true)
-    try {
-      const res = await fetch('/api/conversations')
-      if (res.ok) {
-        const data = await res.json()
-        const mapped: ConversationHistory[] = data.map((c: Record<string, unknown>) => ({
-          id: c.id as string,
-          title: c.title as string,
-          preview: c.preview as string,
-          timestamp: formatTimeAgo(c.createdAt as string),
-          category: (c.category as string) || null,
-          categoryColor: (c.categoryColor as string) || null,
-          confidence: c.confidence as number,
-          isCrisis: c.isCrisis as boolean,
-          createdAt: c.createdAt as string,
-        }))
-        setConversations(mapped)
-      }
-    } catch {
-      // Silently fail — sidebar will show empty state
-    } finally {
-      setIsLoadingConversations(false)
-    }
-  }, [])
-
-  useEffect(() => {
-    fetchConversations()
-  }, [fetchConversations])
+  // Resources now come directly from the classify API response — no separate fetch needed
+  // No conversation tracking — stateless chat
 
   const scrollToBottom = useCallback(() => {
     setTimeout(() => {
@@ -1552,9 +1493,7 @@ export default function Home() {
     try {
       // Build request body — include conversationId and location if available
       const requestBody: Record<string, string | number> = { text: userText }
-      if (currentConvIdRef.current) {
-        requestBody.conversationId = currentConvIdRef.current
-      }
+      // No conversationId — stateless
       if (userLocation) {
         requestBody.lat = userLocation.lat
         requestBody.lng = userLocation.lng
@@ -1583,14 +1522,8 @@ export default function Home() {
 
       const data: ClassifyResponse = await res.json()
 
-      // Track conversationId from the API response
-      if (data.conversationId) {
-        currentConvIdRef.current = data.conversationId
-        setActiveConversationId(data.conversationId)
-      }
-
-      // Enrich categories with resources, why, also, warning
-      const enrichedCategories = enrichCategories(data.categories, dbResources)
+      // Enrich categories with why, also, warning (resources come from API)
+      const enrichedCategories = enrichCategories(data.categories)
 
       // Determine status badge and type
       let statusBadge: 'crisis' | 'clarify' | 'verified' | 'upgrade' | undefined
@@ -1675,8 +1608,6 @@ export default function Home() {
         setSuggestions([])
       }
 
-      // Refresh sidebar — the /api/classify already saved to DB
-      fetchConversations()
     } catch {
       setIsTyping(false)
       setMessages(prev => [...prev, {
@@ -1690,7 +1621,7 @@ export default function Home() {
         serviceArea: undefined,
       }])
     }
-  }, [isTyping, fetchConversations])
+  }, [isTyping])
 
   // Handle starter card selection — pre-fill and submit
   const handleSelectStarter = useCallback((id: string, _label: string) => {
@@ -1736,7 +1667,7 @@ export default function Home() {
     setMessages([])
     setSuggestions(starters)
     setActiveConversationId(null)
-    currentConvIdRef.current = null
+    // Reset state for new session
     previousConfidenceRef.current = null
     setInputText('')
     setShowCrisisOverlay(false)

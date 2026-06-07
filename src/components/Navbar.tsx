@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Layers, Menu, X, ChevronDown, Shield } from 'lucide-react'
+import { Menu, X, ChevronDown } from 'lucide-react'
 import Image from 'next/image'
 
 interface NavbarProps {
@@ -26,11 +26,8 @@ export default function Navbar({ scrolled: scrolledProp }: NavbarProps) {
     { label: 'How It Works', href: '/how-it-works' },
     { label: 'About', href: '/about' },
     { label: 'Responsible AI', href: '/responsible-ai' },
-    { label: 'Pricing', href: '/pricing' },
     { label: 'Blog', href: '/blog' },
-    { label: 'API Docs', href: '/api-docs' },
     { label: 'Team', href: '/team' },
-    { label: 'Verification', href: '/verification' },
     { label: 'Contact', href: '/contact' },
   ]
 
@@ -50,9 +47,6 @@ export default function Navbar({ scrolled: scrolledProp }: NavbarProps) {
               </div>
               <span className="text-[15px] font-bold tracking-tight text-gray-900">
                 ClearPath AI
-              </span>
-              <span className="hidden sm:inline-flex items-center px-2 py-0.5 rounded-md text-[9px] font-bold tracking-wider uppercase bg-emerald-50 text-emerald-600 border border-emerald-100/60">
-                Demo
               </span>
             </Link>
 
@@ -82,23 +76,12 @@ export default function Navbar({ scrolled: scrolledProp }: NavbarProps) {
                       {link.label}
                     </Link>
                   ))}
-                  <div className="border-t border-gray-100 my-1" />
-                  <Link href="/dashboard" className="block px-4 py-2.5 text-[13px] font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50 transition-all">Dashboard</Link>
-                  <Link href="/history" className="block px-4 py-2.5 text-[13px] font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50 transition-all">History</Link>
-                  <Link href="/settings" className="block px-4 py-2.5 text-[13px] font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50 transition-all">Settings</Link>
-                  <Link href="/profile" className="block px-4 py-2.5 text-[13px] font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50 transition-all">Profile</Link>
                 </div>
               </div>
             </nav>
 
-            {/* Desktop CTAs */}
+            {/* Desktop CTA */}
             <div className="hidden md:flex items-center gap-3">
-              <Link
-                href="/dashboard"
-                className="px-4 py-2 text-[13px] font-medium text-gray-600 hover:text-gray-900 rounded-lg hover:bg-gray-50/80 transition-all"
-              >
-                Dashboard
-              </Link>
               <Link
                 href="/app"
                 className="px-5 py-2.5 text-[13px] font-semibold text-white rounded-xl bg-gradient-to-b from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 shadow-md shadow-blue-500/20 hover:shadow-lg hover:shadow-blue-500/30 transition-all active:scale-[0.97]"
@@ -160,7 +143,7 @@ export default function Navbar({ scrolled: scrolledProp }: NavbarProps) {
                       {link.label}
                     </Link>
                   ))}
-                  <p className="px-4 py-2 text-[10px] font-bold text-gray-400 uppercase tracking-wider mt-2">Resources</p>
+                  <p className="px-4 py-2 text-[10px] font-bold text-gray-400 uppercase tracking-wider mt-2">More</p>
                   {navLinks.slice(3).map((link) => (
                     <Link
                       key={link.label}
@@ -172,23 +155,10 @@ export default function Navbar({ scrolled: scrolledProp }: NavbarProps) {
                     </Link>
                   ))}
                   <div className="border-t border-gray-100 my-2" />
-                  <p className="px-4 py-2 text-[10px] font-bold text-gray-400 uppercase tracking-wider">App</p>
-                  <Link href="/dashboard" className="px-4 py-3 text-[14px] font-medium text-gray-700 hover:text-gray-900 rounded-xl hover:bg-gray-50 transition-all" onClick={() => setMobileOpen(false)}>Dashboard</Link>
-                  <Link href="/history" className="px-4 py-3 text-[14px] font-medium text-gray-700 hover:text-gray-900 rounded-xl hover:bg-gray-50 transition-all" onClick={() => setMobileOpen(false)}>History</Link>
-                  <Link href="/settings" className="px-4 py-3 text-[14px] font-medium text-gray-700 hover:text-gray-900 rounded-xl hover:bg-gray-50 transition-all" onClick={() => setMobileOpen(false)}>Settings</Link>
-                  <Link href="/profile" className="px-4 py-3 text-[14px] font-medium text-gray-700 hover:text-gray-900 rounded-xl hover:bg-gray-50 transition-all" onClick={() => setMobileOpen(false)}>Profile</Link>
-                  <div className="border-t border-gray-100 my-2" />
                   <Link href="/privacy" className="px-4 py-3 text-[13px] font-medium text-gray-500 hover:text-gray-700 rounded-xl hover:bg-gray-50 transition-all" onClick={() => setMobileOpen(false)}>Privacy</Link>
                   <Link href="/terms" className="px-4 py-3 text-[13px] font-medium text-gray-500 hover:text-gray-700 rounded-xl hover:bg-gray-50 transition-all" onClick={() => setMobileOpen(false)}>Terms</Link>
                 </nav>
-                <div className="mt-auto p-4 border-t border-gray-100 space-y-3">
-                  <Link
-                    href="/login"
-                    className="block w-full text-center px-4 py-3 text-[13px] font-medium text-gray-700 hover:text-gray-900 rounded-xl hover:bg-gray-50 transition-all"
-                    onClick={() => setMobileOpen(false)}
-                  >
-                    Log in
-                  </Link>
+                <div className="mt-auto p-4 border-t border-gray-100">
                   <Link
                     href="/app"
                     className="block w-full text-center px-5 py-3 text-[13px] font-semibold text-white rounded-xl bg-gradient-to-b from-blue-600 to-blue-700 shadow-md shadow-blue-500/20 transition-all"
