@@ -170,15 +170,48 @@ interface ClassificationResult {
   source: 'bart' | 'keyword';
 }
 
+// ─── Debug info for transparency ────────────────────────────
+interface DebugInfo {
+  keyPresent: boolean;
+  keyPrefix: string;
+  keyLength: number;
+  fetchAttempted: boolean;
+  fetchUrl: string;
+  fetchStatus: number | null;
+  fetchElapsedMs: number | null;
+  fetchError: string | null;
+  hfResponseBody: string | null;
+  fallbackUsed: boolean;
+  fallbackReason: string | null;
+}
+
 // ─── Classification via HuggingFace BART-large-MNLI ────────
-async function classifyWithBART(text: string): Promise<ClassificationResult[]> {
+async function classifyWithBART(text: string): Promise<{ results: ClassificationResult[]; debug: DebugInfo }> {
+  // ── Build debug info as we go ──
+  const debug: DebugInfo = {
+    keyPresent: !!(HF_API_KEY && HF_API_KEY !== "hf_xxxxx"),
+    keyPrefix: HF_API_KEY ? HF_API_KEY.substring(0, 6) + '...' : 'NONE',
+    keyLength: HF_API_KEY?.length ?? 0,
+    fetchAttempted: false,
+    fetchUrl: HF_API_URL,
+    fetchStatus: null,
+    fetchElapsedMs: null,
+    fetchError: null,
+    hfResponseBody: null,
+    fallbackUsed: false,
+    fallbackReason: null,
+  };
+
   // ── HONEST GATE: No API key = no BART. Never fake it. ──
   if (!HF_API_KEY || HF_API_KEY === "hf_xxxxx") {
     console.warn("[classify] No HUGGINGFACE_API_KEY configured — using keyword matching");
-    return keywordClassify(text);
+    debug.fallbackUsed = true;
+    debug.fallbackReason = 'No HUGGINGFACE_API_KEY configured';
+    return { results: keywordClassify(text), debug };
   }
 
   // ── CALLING HF API — with full diagnostic logging ──
+  debug.fetchAttempted = true;
   console.log(`[classify] Calling HF API at ${HF_API_URL}`);
   console.log(`[classify] Key prefix: ${HF_API_KEY.substring(0, 6)}...`);
   console.log(`[classify] Input text: "${text.substring(0, 80)}${text.length > 80 ? '...' : ''}"`);
@@ -205,16 +238,22 @@ async function classifyWithBART(text: string): Promise<ClassificationResult[]> {
     });
 
     const elapsed = Date.now() - startTime;
+    debug.fetchStatus = response.status;
+    debug.fetchElapsedMs = elapsed;
     console.log(`[classify] HF API responded in ${elapsed}ms with status ${response.status}`);
 
     if (!response.ok) {
       const errBody = await response.text();
+      debug.hfResponseBody = errBody.substring(0, 500);
       console.error(`[classify] HF API error ${response.status}: ${errBody}`);
       // HF failed — fall back to keyword, but mark it honestly
-      return keywordClassify(text);
+      debug.fallbackUsed = true;
+      debug.fallbackReason = `HF API returned ${response.status}: ${errBody.substring(0, 100)}`;
+      return { results: keywordClassify(text), debug };
     }
 
     const result = await response.json();
+    debug.hfResponseBody = JSON.stringify(result).substring(0, 500);
     console.log(`[classify] HF API response keys: ${Object.keys(result).join(', ')}`);
     console.log(`[classify] HF API returned ${result.labels?.length ?? 0} labels, ${result.scores?.length ?? 0} scores`);
 
@@ -226,21 +265,30 @@ async function classifyWithBART(text: string): Promise<ClassificationResult[]> {
       );
       console.log(`[classify] Top 3: ${top3.join(' | ')}`);
 
-      return result.labels.map((label: string, i: number) => ({
-        label: LABEL_TO_CATEGORY[label] || label,
-        score: result.scores[i],
-        source: 'bart' as const,
-      }));
+      return {
+        results: result.labels.map((label: string, i: number) => ({
+          label: LABEL_TO_CATEGORY[label] || label,
+          score: result.scores[i],
+          source: 'bart' as const,
+        })),
+        debug,
+      };
     }
 
     // Unexpected response format — fall back honestly
     console.warn("[classify] Unexpected HF response format — falling back to keyword matching");
     console.warn(`[classify] Response was: ${JSON.stringify(result).substring(0, 200)}`);
-    return keywordClassify(text);
+    debug.fallbackUsed = true;
+    debug.fallbackReason = `Unexpected HF response format: keys=${Object.keys(result).join(',')}`;
+    return { results: keywordClassify(text), debug };
   } catch (error) {
     const elapsed = Date.now() - startTime;
+    debug.fetchElapsedMs = elapsed;
+    debug.fetchError = error instanceof Error ? error.message : String(error);
     console.error(`[classify] HF API call FAILED after ${elapsed}ms:`, error);
-    return keywordClassify(text);
+    debug.fallbackUsed = true;
+    debug.fallbackReason = `Fetch error: ${debug.fetchError}`;
+    return { results: keywordClassify(text), debug };
   }
 }
 
@@ -365,7 +413,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Layer 2: AI Classification (BART if available, keyword if not — ALWAYS HONEST)
-    const classifications = await classifyWithBART(text);
+    const { results: classifications, debug: classificationDebug } = await classifyWithBART(text);
 
     const classificationSource = classifications.length > 0 ? classifications[0].source : 'keyword';
 
@@ -401,6 +449,8 @@ export async function POST(request: NextRequest) {
 
     const modelLabel = classificationSource === 'bart'
       ? "BART-large-MNLI (live)"
+      : classificationDebug.fallbackUsed && classificationDebug.fetchAttempted
+      ? `Keyword matching (BART call failed: ${classificationDebug.fetchStatus ?? classificationDebug.fetchError ?? 'unknown'})`
       : "Keyword matching (BART API key not configured)";
 
     return NextResponse.json({
@@ -417,6 +467,8 @@ export async function POST(request: NextRequest) {
       hasLocation: userLat !== undefined,
       outsideServiceArea: userLat !== undefined && isOutsideServiceArea(userLat, userLng!),
       serviceArea: 'Houston, TX metro area',
+      // ── DEBUG: Full transparency into classification pipeline ──
+      debug: classificationDebug,
     });
   } catch (error) {
     console.error("Classification API error:", error);

@@ -47,6 +47,20 @@ interface CrisisLine {
   call?: string
 }
 
+interface DebugInfo {
+  keyPresent: boolean
+  keyPrefix: string
+  keyLength: number
+  fetchAttempted: boolean
+  fetchUrl: string
+  fetchStatus: number | null
+  fetchElapsedMs: number | null
+  fetchError: string | null
+  hfResponseBody: string | null
+  fallbackUsed: boolean
+  fallbackReason: string | null
+}
+
 interface ClassifyResponse {
   isCrisis: boolean
   categories: Category[]
@@ -58,6 +72,7 @@ interface ClassifyResponse {
   hasLocation?: boolean
   outsideServiceArea?: boolean
   serviceArea?: string
+  debug?: DebugInfo
 }
 
 // ─── QUERY HISTORY ENTRY ────────────────────────────────
@@ -459,17 +474,45 @@ function QueryResultBlock({ entry, onClarify }: { entry: QueryEntry; onClarify: 
       <div className="ml-11 space-y-4">
         {/* Classification source badge — HONEST CONFIDENCE */}
         {!result.isCrisis && result.classificationSource && (
-          <div className="flex items-center gap-2 mb-1">
-            {result.classificationSource === 'bart' ? (
-              <span className="inline-flex items-center gap-1.5 text-[10px] font-semibold text-emerald-600 bg-emerald-50/60 px-2.5 py-1 rounded-lg border border-emerald-100/40">
-                <Layers className="w-3 h-3" />
-                Classified by BART-large-MNLI
-              </span>
-            ) : (
-              <span className="inline-flex items-center gap-1.5 text-[10px] font-semibold text-amber-600 bg-amber-50/60 px-2.5 py-1 rounded-lg border border-amber-100/40">
-                <HelpCircle className="w-3 h-3" />
-                Keyword match — BART AI not connected
-              </span>
+          <div className="space-y-2 mb-1">
+            <div className="flex items-center gap-2">
+              {result.classificationSource === 'bart' ? (
+                <span className="inline-flex items-center gap-1.5 text-[10px] font-semibold text-emerald-600 bg-emerald-50/60 px-2.5 py-1 rounded-lg border border-emerald-100/40">
+                  <Layers className="w-3 h-3" />
+                  Classified by BART-large-MNLI
+                </span>
+              ) : (
+                <span className="inline-flex items-center gap-1.5 text-[10px] font-semibold text-amber-600 bg-amber-50/60 px-2.5 py-1 rounded-lg border border-amber-100/40">
+                  <HelpCircle className="w-3 h-3" />
+                  Keyword match — BART AI not connected
+                </span>
+              )}
+            </div>
+            {/* Debug info — always visible for transparency */}
+            {result.debug && (
+              <details className="text-[10px] font-mono text-gray-400 bg-gray-50/50 border border-gray-100/40 rounded-lg px-3 py-2">
+                <summary className="cursor-pointer font-sans font-semibold text-gray-400 hover:text-gray-600">
+                  Classification debug info
+                </summary>
+                <div className="mt-2 space-y-0.5">
+                  <div>Key present: <span className={result.debug.keyPresent ? 'text-emerald-500' : 'text-red-500'}>{String(result.debug.keyPresent)}</span> (prefix: {result.debug.keyPrefix}, len: {result.debug.keyLength})</div>
+                  <div>Fetch attempted: <span className={result.debug.fetchAttempted ? 'text-blue-500' : 'text-gray-400'}>{String(result.debug.fetchAttempted)}</span></div>
+                  {result.debug.fetchAttempted && (
+                    <>
+                      <div>URL: {result.debug.fetchUrl}</div>
+                      <div>Status: <span className={result.debug.fetchStatus && result.debug.fetchStatus < 300 ? 'text-emerald-500' : 'text-red-500'}>{result.debug.fetchStatus ?? 'N/A'}</span></div>
+                      <div>Elapsed: {result.debug.fetchElapsedMs ?? 'N/A'}ms</div>
+                    </>
+                  )}
+                  {result.debug.fetchError && <div className="text-red-400">Error: {result.debug.fetchError}</div>}
+                  {result.debug.fallbackUsed && <div className="text-amber-500">Fallback: {result.debug.fallbackReason}</div>}
+                  {result.debug.hfResponseBody && (
+                    <div className="mt-1 text-gray-300 break-all max-h-20 overflow-auto">
+                      HF response: {result.debug.hfResponseBody}
+                    </div>
+                  )}
+                </div>
+              </details>
             )}
           </div>
         )}
