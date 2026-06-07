@@ -63,6 +63,7 @@ interface DebugInfo {
 
 interface ClassifyResponse {
   isCrisis: boolean
+  crisisType?: 'self-harm' | 'violence-others' | 'domestic' | 'medical' | 'general'
   categories: Category[]
   needsClarification: boolean
   clarificationMessage: string | null
@@ -277,7 +278,34 @@ function CategoryCard({ cat, index }: { cat: Category; index: number }) {
 }
 
 // ─── CRISIS BLOCK ────────────────────────────────────────
-function CrisisBlock({ lines }: { lines: CrisisLine[] }) {
+function CrisisBlock({ lines, crisisType }: { lines: CrisisLine[]; crisisType?: string }) {
+  // Title + subtitle tailored to crisis type
+  const crisisHeader = (() => {
+    switch (crisisType) {
+      case 'violence-others':
+        return {
+          title: 'Support is available.',
+          subtitle: 'If you\'re having thoughts of harming others, help is available right now',
+        }
+      case 'domestic':
+        return {
+          title: 'Your safety matters.',
+          subtitle: 'Confidential help is available right now — you don\'t have to face this alone',
+        }
+      case 'medical':
+        return {
+          title: 'Get help now.',
+          subtitle: 'This sounds like a medical emergency — please call for help immediately',
+        }
+      case 'self-harm':
+      default:
+        return {
+          title: 'You are not alone.',
+          subtitle: 'Help is available right now — you don\'t have to face this alone',
+        }
+    }
+  })()
+
   return (
     <motion.div
       initial={{ opacity: 0, scale: 0.97 }}
@@ -293,8 +321,8 @@ function CrisisBlock({ lines }: { lines: CrisisLine[] }) {
             <Shield className="w-6 h-6 text-white" />
           </div>
           <div>
-            <p className="text-[20px] font-bold text-white tracking-tight leading-tight">You are not alone.</p>
-            <p className="text-[12px] text-red-100/80 mt-1 font-medium">Help is available right now — you don&apos;t have to face this alone</p>
+            <p className="text-[20px] font-bold text-white tracking-tight leading-tight">{crisisHeader.title}</p>
+            <p className="text-[12px] text-red-100/80 mt-1 font-medium">{crisisHeader.subtitle}</p>
           </div>
         </div>
       </div>
@@ -519,7 +547,7 @@ function QueryResultBlock({ entry, onClarify }: { entry: QueryEntry; onClarify: 
 
         {/* Crisis */}
         {result.isCrisis && result.crisisLines && (
-          <CrisisBlock lines={result.crisisLines} />
+          <CrisisBlock lines={result.crisisLines} crisisType={result.crisisType} />
         )}
 
         {/* Clarification needed */}
