@@ -17,6 +17,8 @@ import {
   ArrowRight,
   Send,
   RotateCcw,
+  User,
+  Clock,
 } from 'lucide-react'
 
 // ─── TYPES ───────────────────────────────────────────────
@@ -57,6 +59,14 @@ interface ClassifyResponse {
   serviceArea?: string
 }
 
+// ─── QUERY HISTORY ENTRY ────────────────────────────────
+interface QueryEntry {
+  id: number
+  query: string
+  result: ClassifyResponse
+  timestamp: Date
+}
+
 // ─── STARTERS ────────────────────────────────────────────
 const starters = [
   { id: 'multi', label: 'Multi-Need', description: "I lost my job and can't pay rent. My kids need food.", icon: 'layers' },
@@ -86,6 +96,10 @@ function getConfidenceLabel(v: number): string {
   if (v > 70) return 'High'
   if (v >= 40) return 'Moderate'
   return 'Low'
+}
+
+function formatTime(d: Date): string {
+  return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
 }
 
 // ─── CONFIDENCE RING ─────────────────────────────────────
@@ -409,21 +423,96 @@ function LoadingIndicator() {
   )
 }
 
+// ─── QUERY RESULT BLOCK ──────────────────────────────────
+// Renders one query + its classification result
+function QueryResultBlock({ entry, onClarify }: { entry: QueryEntry; onClarify: (text: string) => void }) {
+  const { query, result, timestamp } = entry
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 16 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ type: 'spring', stiffness: 350, damping: 25 }}
+      className="space-y-4"
+    >
+      {/* User query bubble */}
+      <div className="flex items-start gap-3">
+        <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shrink-0 shadow-sm">
+          <User className="w-4 h-4 text-white" />
+        </div>
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2 mb-1">
+            <span className="text-[12px] font-semibold text-gray-700">You</span>
+            <span className="text-[10px] text-gray-300 flex items-center gap-1">
+              <Clock className="w-2.5 h-2.5" />
+              {formatTime(timestamp)}
+            </span>
+          </div>
+          <div className="rounded-2xl rounded-tl-md bg-white border border-gray-100/60 px-4 py-3 shadow-sm">
+            <p className="text-[14px] text-gray-800 font-medium leading-relaxed">{query}</p>
+          </div>
+        </div>
+      </div>
+
+      {/* Result */}
+      <div className="ml-11 space-y-4">
+        {/* Crisis */}
+        {result.isCrisis && result.crisisLines && (
+          <CrisisBlock lines={result.crisisLines} />
+        )}
+
+        {/* Clarification needed */}
+        {!result.isCrisis && result.needsClarification && (
+          <ClarifyPanel
+            confidence={result.categories[0]?.confidence || 0}
+            clarificationMessage={result.clarificationMessage}
+            onClarify={onClarify}
+          />
+        )}
+
+        {/* Categories */}
+        {!result.isCrisis && result.categories.length > 0 && !result.needsClarification && (
+          <div className="space-y-3">
+            {result.categories.map((cat, i) => (
+              <CategoryCard key={i} cat={cat} index={i} />
+            ))}
+          </div>
+        )}
+
+        {/* Low confidence categories still shown */}
+        {!result.isCrisis && result.categories.length > 0 && result.needsClarification && (
+          <div className="space-y-3">
+            <p className="text-[12px] text-gray-400 font-medium">Preliminary matches:</p>
+            {result.categories.map((cat, i) => (
+              <CategoryCard key={i} cat={cat} index={i} />
+            ))}
+          </div>
+        )}
+
+        {/* Outside service area warning */}
+        {result.outsideServiceArea && !result.isCrisis && (
+          <div className="flex items-start gap-2.5 px-4 py-3 rounded-xl bg-amber-50/60 border border-amber-100/40">
+            <MapPin className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" />
+            <div>
+              <p className="text-[12px] text-amber-800 font-semibold leading-snug">You appear to be outside our service area ({result.serviceArea || 'Houston, TX'}).</p>
+              <p className="text-[11px] text-amber-600 mt-1 leading-relaxed">These resources are located in Houston but may still be helpful as reference.</p>
+            </div>
+          </div>
+        )}
+      </div>
+    </motion.div>
+  )
+}
+
 // ─── MAIN ─────────────────────────────────────────────────
 export default function Home() {
-  const [result, setResult] = useState<{
-    isCrisis: boolean
-    categories: Category[]
-    needsClarification: boolean
-    clarificationMessage: string | null
-    crisisLines?: CrisisLine[]
-    model: string
-    outsideServiceArea?: boolean
-    serviceArea?: string
-  } | null>(null)
+  // History of queries + results
+  const [queries, setQueries] = useState<QueryEntry[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const [inputText, setInputText] = useState('')
   const textareaRef = useRef<HTMLTextAreaElement>(null)
+  const scrollRef = useRef<HTMLDivElement>(null)
+  const nextId = useRef(1)
 
   // Geolocation
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null)
@@ -445,6 +534,13 @@ export default function Home() {
     )
   }, [])
 
+  // Auto-scroll to bottom when new results arrive
+  useEffect(() => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollTop = scrollRef.current.scrollHeight
+    }
+  }, [queries, isLoading])
+
   // Main handler: send text to /api/classify
   const handleSend = useCallback(async (text: string) => {
     if (!text.trim() || isLoading) return
@@ -452,7 +548,6 @@ export default function Home() {
     const userText = text.trim()
     setInputText('')
     setIsLoading(true)
-    setResult(null)
 
     try {
       const requestBody: Record<string, string | number> = { text: userText }
@@ -469,28 +564,43 @@ export default function Home() {
 
       if (!res.ok) {
         setIsLoading(false)
-        setResult({
-          isCrisis: false,
-          categories: [],
-          needsClarification: true,
-          clarificationMessage: 'Something went wrong. Please try again.',
-          model: 'error',
-        })
+        setQueries(prev => [...prev, {
+          id: nextId.current++,
+          query: userText,
+          result: {
+            isCrisis: false,
+            categories: [],
+            needsClarification: true,
+            clarificationMessage: 'Something went wrong. Please try again.',
+            model: 'error',
+          },
+          timestamp: new Date(),
+        }])
         return
       }
 
       const data: ClassifyResponse = await res.json()
       setIsLoading(false)
-      setResult(data)
+      setQueries(prev => [...prev, {
+        id: nextId.current++,
+        query: userText,
+        result: data,
+        timestamp: new Date(),
+      }])
     } catch {
       setIsLoading(false)
-      setResult({
-        isCrisis: false,
-        categories: [],
-        needsClarification: true,
-        clarificationMessage: 'A network error occurred. Please try again.',
-        model: 'error',
-      })
+      setQueries(prev => [...prev, {
+        id: nextId.current++,
+        query: userText,
+        result: {
+          isCrisis: false,
+          categories: [],
+          needsClarification: true,
+          clarificationMessage: 'A network error occurred. Please try again.',
+          model: 'error',
+        },
+        timestamp: new Date(),
+      }])
     }
   }, [isLoading, userLocation])
 
@@ -522,12 +632,12 @@ export default function Home() {
     }
   }, [])
 
-  const reset = () => {
-    setResult(null)
+  const clearHistory = () => {
+    setQueries([])
     setInputText('')
   }
 
-  const hasResult = result !== null
+  const hasQueries = queries.length > 0
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-50/50">
@@ -541,13 +651,13 @@ export default function Home() {
             <span className="text-[15px] font-bold text-gray-900 tracking-tight">ClearPath AI</span>
             <span className="text-[10px] font-semibold text-amber-600 bg-amber-50/80 px-2 py-0.5 rounded-md border border-amber-200/40">LIVE</span>
           </div>
-          {hasResult && (
+          {hasQueries && (
             <button
-              onClick={reset}
+              onClick={clearHistory}
               className="flex items-center gap-1.5 text-[12px] font-medium text-gray-400 hover:text-gray-600 transition-colors"
             >
               <RotateCcw className="w-3.5 h-3.5" />
-              New search
+              Clear
             </button>
           )}
         </div>
@@ -571,11 +681,11 @@ export default function Home() {
         </div>
       </div>
 
-      {/* ─── MAIN CONTENT ─── */}
-      <main className="flex-1 max-w-[720px] w-full mx-auto px-4 sm:px-6 py-6">
+      {/* ─── SCROLLABLE CONTENT AREA ─── */}
+      <main ref={scrollRef} className="flex-1 overflow-y-auto max-w-[720px] w-full mx-auto px-4 sm:px-6 py-6">
 
         {/* Empty state: show starters */}
-        {!hasResult && !isLoading && (
+        {!hasQueries && !isLoading && (
           <div className="space-y-3">
             <div className="text-center mb-6">
               <h1 className="text-[24px] font-bold text-gray-900 tracking-tight">What do you need help with?</h1>
@@ -587,69 +697,22 @@ export default function Home() {
           </div>
         )}
 
-        {/* Loading */}
+        {/* Query history */}
+        {hasQueries && (
+          <div className="space-y-8">
+            {queries.map((entry) => (
+              <QueryResultBlock key={entry.id} entry={entry} onClarify={handleClarifySelect} />
+            ))}
+          </div>
+        )}
+
+        {/* Loading indicator at the bottom */}
         <AnimatePresence>
-          {isLoading && <LoadingIndicator />}
-        </AnimatePresence>
-
-        {/* Results */}
-        <AnimatePresence>
-          {hasResult && result && !isLoading && (
-            <motion.div
-              initial={{ opacity: 0, y: 12 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ type: 'spring', stiffness: 350, damping: 25 }}
-              className="space-y-4"
-            >
-              {/* Crisis */}
-              {result.isCrisis && result.crisisLines && (
-                <CrisisBlock lines={result.crisisLines} />
-              )}
-
-              {/* Clarification needed */}
-              {!result.isCrisis && result.needsClarification && (
-                <ClarifyPanel
-                  confidence={result.categories[0]?.confidence || 0}
-                  clarificationMessage={result.clarificationMessage}
-                  onClarify={handleClarifySelect}
-                />
-              )}
-
-              {/* Categories */}
-              {!result.isCrisis && result.categories.length > 0 && !result.needsClarification && (
-                <div className="space-y-3">
-                  {result.categories.map((cat, i) => (
-                    <CategoryCard key={i} cat={cat} index={i} />
-                  ))}
-                </div>
-              )}
-
-              {/* Low confidence categories still shown */}
-              {!result.isCrisis && result.categories.length > 0 && result.needsClarification && (
-                <div className="space-y-3 mt-4">
-                  <p className="text-[12px] text-gray-400 font-medium">Preliminary matches:</p>
-                  {result.categories.map((cat, i) => (
-                    <CategoryCard key={i} cat={cat} index={i} />
-                  ))}
-                </div>
-              )}
-
-              {/* Outside service area warning */}
-              {result.outsideServiceArea && !result.isCrisis && (
-                <div className="flex items-start gap-2.5 px-4 py-3 rounded-xl bg-amber-50/60 border border-amber-100/40">
-                  <MapPin className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" />
-                  <div>
-                    <p className="text-[12px] text-amber-800 font-semibold leading-snug">You appear to be outside our service area ({result.serviceArea || 'Houston, TX'}).</p>
-                    <p className="text-[11px] text-amber-600 mt-1 leading-relaxed">These resources are located in Houston but may still be helpful as reference.</p>
-                  </div>
-                </div>
-              )}
-            </motion.div>
-          )}
+          {isLoading && <div className="mt-6"><LoadingIndicator /></div>}
         </AnimatePresence>
       </main>
 
-      {/* ─── INPUT BAR ─── */}
+      {/* ─── INPUT BAR (sticky bottom) ─── */}
       <div className="shrink-0 border-t border-gray-200/40 bg-white/80 backdrop-blur-md">
         <div className="max-w-[720px] mx-auto px-4 sm:px-6 py-3">
           <div className="rounded-2xl border border-gray-200/60 focus-within:border-gray-300/80 bg-white transition-all duration-300 overflow-hidden">
@@ -681,20 +744,19 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Quick chips when no result */}
-          {!hasResult && !isLoading && (
-            <div className="flex flex-wrap gap-2 mt-3 justify-center">
-              {['I need housing help', 'Mental health support', 'Food assistance', 'Legal aid', 'Senior services'].map((chip, i) => (
-                <button
-                  key={i}
-                  onClick={() => handleSend(chip)}
-                  className="px-3.5 py-1.5 rounded-full text-[12px] font-medium text-gray-500 bg-white/60 border border-gray-100/40 hover:text-gray-700 hover:bg-white/80 transition-all duration-200"
-                >
-                  {chip}
-                </button>
-              ))}
-            </div>
-          )}
+          {/* Quick chips */}
+          <div className="flex flex-wrap gap-2 mt-3 justify-center">
+            {['I need housing help', 'Mental health support', 'Food assistance', 'Legal aid', 'Senior services'].map((chip, i) => (
+              <button
+                key={i}
+                onClick={() => handleSend(chip)}
+                disabled={isLoading}
+                className="px-3.5 py-1.5 rounded-full text-[12px] font-medium text-gray-500 bg-white/60 border border-gray-100/40 hover:text-gray-700 hover:bg-white/80 transition-all duration-200 disabled:opacity-40"
+              >
+                {chip}
+              </button>
+            ))}
+          </div>
 
           <p className="text-[10px] text-gray-300 text-center mt-2 font-medium">
             ClearPath AI · Verified Houston resources · Honest confidence
