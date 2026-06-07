@@ -94,10 +94,10 @@ const CRISIS_PATTERNS = [
 // ─── Descriptive Labels for BART-large-MNLI ───
 // Ultra-specific labels give BART maximum semantic signal for NLI matching.
 const CANDIDATE_LABELS = [
-  'rent, mortgage, eviction, being evicted, losing my home, homelessness, shelter, emergency housing, section 8, housing assistance, no money for rent, need financial help, utility assistance, about to lose my apartment',
+  'rent, mortgage, eviction, being evicted, losing my home, homelessness, shelter, emergency housing, section 8, housing assistance, no money for rent, need financial help, utility assistance, about to lose my apartment, can\'t afford rent, broke, no money',
   'needing food, getting free food, food pantry, free groceries, meals, food stamps, SNAP, food bank, hungry, starving, no money for food, where to get food, feeding family, no food at home',
-  'therapy, counseling, psychiatrist, depression, feeling depressed, anxiety, feeling anxious, mental health treatment, emotional support, PTSD, stressed, overwhelmed, feeling alone, lonely, isolated, no one to talk to, alone, loneliness',
-  'job search, resume help, career training, unemployment benefits, employment, looking for work, fired, laid off, need money, no money, unemployed, need income, financial stability, workforce development',
+  'feeling alone, lonely, isolated, no one to talk to, I am alone, social isolation, therapy, counseling, psychiatrist, depression, feeling depressed, anxiety, feeling anxious, mental health treatment, emotional support, PTSD, stressed, overwhelmed, loneliness, need someone to talk to',
+  'job search, resume help, career training, unemployment benefits, employment, looking for work, fired, laid off, need money, no money, unemployed, need income, financial stability, workforce development, broke, can\'t afford, need cash',
   'free lawyer, legal aid, immigration attorney, court representation, legal help, deportation, custody, divorce',
   'doctor, medical clinic, health insurance, prescription, healthcare, medical care, sick, cancer treatment, dying of illness, hospital, clinic, health center',
   'suicidal thoughts, wanting to kill myself, self-harm, or immediate danger to life',
@@ -106,10 +106,10 @@ const CANDIDATE_LABELS = [
 
 // Map descriptive labels back to short display names
 const LABEL_TO_CATEGORY: Record<string, string> = {
-  'rent, mortgage, eviction, being evicted, losing my home, homelessness, shelter, emergency housing, section 8, housing assistance, no money for rent, need financial help, utility assistance, about to lose my apartment': 'Housing Assistance',
+  'rent, mortgage, eviction, being evicted, losing my home, homelessness, shelter, emergency housing, section 8, housing assistance, no money for rent, need financial help, utility assistance, about to lose my apartment, can\'t afford rent, broke, no money': 'Housing Assistance',
   'needing food, getting free food, food pantry, free groceries, meals, food stamps, SNAP, food bank, hungry, starving, no money for food, where to get food, feeding family, no food at home': 'Food Assistance',
-  'therapy, counseling, psychiatrist, depression, feeling depressed, anxiety, feeling anxious, mental health treatment, emotional support, PTSD, stressed, overwhelmed, feeling alone, lonely, isolated, no one to talk to, alone, loneliness': 'Mental Health',
-  'job search, resume help, career training, unemployment benefits, employment, looking for work, fired, laid off, need money, no money, unemployed, need income, financial stability, workforce development': 'Employment Services',
+  'feeling alone, lonely, isolated, no one to talk to, I am alone, social isolation, therapy, counseling, psychiatrist, depression, feeling depressed, anxiety, feeling anxious, mental health treatment, emotional support, PTSD, stressed, overwhelmed, loneliness, need someone to talk to': 'Mental Health',
+  'job search, resume help, career training, unemployment benefits, employment, looking for work, fired, laid off, need money, no money, unemployed, need income, financial stability, workforce development, broke, can\'t afford, need cash': 'Employment Services',
   'free lawyer, legal aid, immigration attorney, court representation, legal help, deportation, custody, divorce': 'Legal Aid',
   'doctor, medical clinic, health insurance, prescription, healthcare, medical care, sick, cancer treatment, dying of illness, hospital, clinic, health center': 'Healthcare',
   'suicidal thoughts, wanting to kill myself, self-harm, or immediate danger to life': 'Crisis Support',
@@ -162,6 +162,48 @@ function isOutsideServiceArea(userLat: number, userLng: number): boolean {
 // ─── Crisis Detection ──────────────────────────────────────
 function detectCrisis(text: string): boolean {
   return CRISIS_PATTERNS.some(pattern => pattern.test(text));
+}
+
+// ─── Crisis Type Detection ────────────────────────────────
+type CrisisType = 'self-harm' | 'violence-others' | 'domestic' | 'medical' | 'general';
+
+function detectCrisisType(text: string): CrisisType {
+  // Check violence toward others FIRST (most urgent for safety)
+  const violencePatterns = [
+    /\b(kill|murder|hurt|harm|shoot|stab)\s+(someone|my|a|him|her|them|people|friend|family|partner|spouse|boss|child|kids?)\b/i,
+    /i\s+(wanna|want\s+to|will|am\s+going\s+to)\s+(kill|murder|hurt|harm|shoot|stab)\b/i,
+    /gonna\s+(kill|murder|hurt|harm|shoot|stab)\b/i,
+  ];
+  if (violencePatterns.some(p => p.test(text))) return 'violence-others';
+
+  // Domestic violence
+  const domesticPatterns = [
+    /domestic\s+violen/i, /domestic\s+abuse/i,
+    /(husband|wife|partner|boyfriend|girlfriend|spouse)\s+(hits?|beats?|hurts?|chokes?|strangles?)/i,
+    /being\s+beaten/i, /beaten\s+by/i, /being\s+abused/i, /abused\s+by\s+my\s+partner/i,
+    /choking\s+me/i, /strangling\s+me/i, /threatening\s+to\s+kill/i,
+  ];
+  if (domesticPatterns.some(p => p.test(text))) return 'domestic';
+
+  // Medical emergency
+  const medicalPatterns = [
+    /i'?m\s+dying\b(?!\s+(for|to|of|from|laughing|laugh))/i,
+    /i\s+am\s+dying\b(?!\s+(for|to|of|from|laughing|laugh))/i,
+    /i'?m\s+going\s+to\s+die\b(?!\s+(from|of|for))/i,
+    /i\s+can'?t\s+breathe/i,
+  ];
+  if (medicalPatterns.some(p => p.test(text))) return 'medical';
+
+  // Self-harm / suicidal
+  const selfHarmPatterns = [
+    /suicid/i, /kill\s+myself/i, /end\s+it\s+all/i, /end\s+my\s+life/i,
+    /want\s+to\s+die/i, /self[- ]?harm/i, /harm\s+myself/i, /hurt\s+myself/i,
+    /overdose/i, /hang\s+myself/i, /slit\s+my\s+wrists/i,
+    /better\s+off\s+dead/i, /not\s+worth\s+living/i,
+  ];
+  if (selfHarmPatterns.some(p => p.test(text))) return 'self-harm';
+
+  return 'general';
 }
 
 // ─── Classification result with source tracking ────────────
@@ -443,24 +485,71 @@ export async function POST(request: NextRequest) {
     const isCrisis = detectCrisis(text);
 
     if (isCrisis) {
-      const crisisLines = [
-        { name: "988 Suicide & Crisis Lifeline", action: "Free. Confidential. 24/7.", call: "988" },
-        { name: "Crisis Text Line", action: "Text HOME to 741741", call: "Text" },
-        { name: "National Domestic Violence Hotline", action: "1-800-799-7233", call: "1-800-799-7233" },
-        { name: "911", action: "Immediate danger — call now", call: "911" },
-      ];
+      const crisisType = detectCrisisType(text);
+
+      // Crisis lines tailored to the type of crisis
+      const crisisLines = (() => {
+        const base = [
+          { name: "988 Suicide & Crisis Lifeline", action: "Free. Confidential. 24/7.", call: "988" },
+          { name: "Crisis Text Line", action: "Text HOME to 741741", call: "Text" },
+          { name: "911", action: "Immediate danger — call now", call: "911" },
+        ];
+
+        if (crisisType === 'violence-others') {
+          return [
+            { name: "988 Suicide & Crisis Lifeline", action: "If you're having thoughts of harming others, support is available. Free. Confidential. 24/7.", call: "988" },
+            { name: "Crisis Text Line", action: "Text HOME to 741741", call: "Text" },
+            { name: "911", action: "If someone is in immediate danger — call now", call: "911" },
+          ];
+        }
+
+        if (crisisType === 'domestic') {
+          return [
+            { name: "National Domestic Violence Hotline", action: "1-800-799-7233 — Confidential, 24/7", call: "1-800-799-7233" },
+            { name: "988 Suicide & Crisis Lifeline", action: "Free. Confidential. 24/7.", call: "988" },
+            { name: "Crisis Text Line", action: "Text HOME to 741741", call: "Text" },
+            { name: "911", action: "If you are in immediate danger — call now", call: "911" },
+          ];
+        }
+
+        if (crisisType === 'medical') {
+          return [
+            { name: "911", action: "Medical emergency — call now", call: "911" },
+            { name: "988 Suicide & Crisis Lifeline", action: "Free. Confidential. 24/7.", call: "988" },
+            { name: "Crisis Text Line", action: "Text HOME to 741741", call: "Text" },
+          ];
+        }
+
+        return base;
+      })();
+
+      // Crisis message tailored to type
+      const crisisWhy = (() => {
+        switch (crisisType) {
+          case 'violence-others': return "If you're having thoughts of harming others, support is available. You don't have to face this alone.";
+          case 'domestic': return "Your safety is the top priority right now. Help is available.";
+          case 'medical': return "This sounds like a medical emergency. Please get help immediately.";
+          case 'self-harm': return "You are not alone. Help is available right now.";
+          default: return "Your safety is the top priority right now.";
+        }
+      })();
+
+      const crisisWarning = crisisType === 'violence-others'
+        ? "If someone is in immediate danger, call 911."
+        : "If you are in immediate physical danger, call 911.";
 
       const crisisResources = getResourcesForCategory("Crisis Support", userLat, userLng);
 
       return NextResponse.json({
         isCrisis: true,
+        crisisType,
         crisisLines,
         categories: [{
           label: "Crisis Support",
           confidence: 99,
           resources: crisisResources,
-          why: "Your safety is the top priority right now.",
-          warning: "If you are in immediate physical danger, call 911.",
+          why: crisisWhy,
+          warning: crisisWarning,
         }],
         hasLocation: userLat !== undefined,
         outsideServiceArea: userLat !== undefined && isOutsideServiceArea(userLat, userLng!),
