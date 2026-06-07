@@ -6,6 +6,12 @@ const HF_API_KEY = process.env.HUGGINGFACE_API_KEY;
 const HF_MODEL = "facebook/bart-large-mnli";
 const HF_API_URL = `https://api-inference.huggingface.co/models/${HF_MODEL}`;
 
+// ─── Boot-time diagnostic (runs once when serverless function cold-starts) ───
+console.log(`[classify:boot] HF_API_KEY present: ${!!HF_API_KEY}`);
+console.log(`[classify:boot] HF_API_KEY length: ${HF_API_KEY?.length ?? 'N/A'}`);
+console.log(`[classify:boot] HF_API_KEY prefix: ${HF_API_KEY ? HF_API_KEY.substring(0, 6) + '...' : 'NONE'}`);
+console.log(`[classify:boot] HF_API_URL: ${HF_API_URL}`);
+
 // ─── Crisis Detection (regex-based, deterministic, AI NEVER trusted for crisis) ───
 const CRISIS_PATTERNS = [
   // ─── Suicidal ideation ───
@@ -172,6 +178,22 @@ async function classifyWithBART(text: string): Promise<ClassificationResult[]> {
     return keywordClassify(text);
   }
 
+  // ── CALLING HF API — with full diagnostic logging ──
+  console.log(`[classify] Calling HF API at ${HF_API_URL}`);
+  console.log(`[classify] Key prefix: ${HF_API_KEY.substring(0, 6)}...`);
+  console.log(`[classify] Input text: "${text.substring(0, 80)}${text.length > 80 ? '...' : ''}"`);
+  console.log(`[classify] Candidate labels count: ${CANDIDATE_LABELS.length}`);
+
+  const requestBody = {
+    inputs: text,
+    parameters: {
+      candidate_labels: CANDIDATE_LABELS,
+      multi_label: true,
+    },
+  };
+
+  const startTime = Date.now();
+
   try {
     const response = await fetch(HF_API_URL, {
       method: "POST",
@@ -179,14 +201,11 @@ async function classifyWithBART(text: string): Promise<ClassificationResult[]> {
         Authorization: `Bearer ${HF_API_KEY}`,
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({
-        inputs: text,
-        parameters: {
-          candidate_labels: CANDIDATE_LABELS,
-          multi_label: true,
-        },
-      }),
+      body: JSON.stringify(requestBody),
     });
+
+    const elapsed = Date.now() - startTime;
+    console.log(`[classify] HF API responded in ${elapsed}ms with status ${response.status}`);
 
     if (!response.ok) {
       const errBody = await response.text();
@@ -196,9 +215,17 @@ async function classifyWithBART(text: string): Promise<ClassificationResult[]> {
     }
 
     const result = await response.json();
+    console.log(`[classify] HF API response keys: ${Object.keys(result).join(', ')}`);
+    console.log(`[classify] HF API returned ${result.labels?.length ?? 0} labels, ${result.scores?.length ?? 0} scores`);
 
     // BART-large-MNLI zero-shot returns { labels: string[], scores: number[] }
     if (result.labels && result.scores) {
+      // Log top 3 results
+      const top3 = result.labels.slice(0, 3).map((l: string, i: number) =>
+        `${LABEL_TO_CATEGORY[l] || l}: ${(result.scores[i] * 100).toFixed(1)}%`
+      );
+      console.log(`[classify] Top 3: ${top3.join(' | ')}`);
+
       return result.labels.map((label: string, i: number) => ({
         label: LABEL_TO_CATEGORY[label] || label,
         score: result.scores[i],
@@ -208,15 +235,18 @@ async function classifyWithBART(text: string): Promise<ClassificationResult[]> {
 
     // Unexpected response format — fall back honestly
     console.warn("[classify] Unexpected HF response format — falling back to keyword matching");
+    console.warn(`[classify] Response was: ${JSON.stringify(result).substring(0, 200)}`);
     return keywordClassify(text);
   } catch (error) {
-    console.error("[classify] HF API call failed:", error);
+    const elapsed = Date.now() - startTime;
+    console.error(`[classify] HF API call FAILED after ${elapsed}ms:`, error);
     return keywordClassify(text);
   }
 }
 
 // ─── Keyword Classification (HONEST fallback — never pretends to be BART) ───
 function keywordClassify(text: string): ClassificationResult[] {
+  console.log("[classify] Using KEYWORD matching (BART unavailable or failed)");
   const lower = text.toLowerCase();
   const results: ClassificationResult[] = [];
 
@@ -248,7 +278,7 @@ function keywordClassify(text: string): ClassificationResult[] {
         score *= 0.7;
       }
     } else {
-      score = 0.05 + Math.random() * 0.1; // Low baseline noise
+      score = 0.05 + Math.random() * 0.1;
     }
 
     results.push({ label, score: Math.round(score * 100) / 100, source: 'keyword' });
@@ -262,7 +292,6 @@ function keywordClassify(text: string): ClassificationResult[] {
 function getResourcesForCategory(category: string, userLat?: number, userLng?: number) {
   const dbResources = RESOURCES_BY_CATEGORY[category] || [];
   return dbResources.map(r => {
-    // Smart distance display
     let distance: string | null = null;
     if (userLat !== undefined && userLng !== undefined) {
       const miles = haversineMi(userLat, userLng, HOUSTON_LAT, HOUSTON_LNG);
@@ -296,7 +325,6 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { text, lat, lng } = body;
 
-    // Validate optional geolocation
     const userLat = typeof lat === 'number' && lat >= -90 && lat <= 90 ? lat : undefined;
     const userLng = typeof lng === 'number' && lng >= -180 && lng <= 180 ? lng : undefined;
 
@@ -339,7 +367,6 @@ export async function POST(request: NextRequest) {
     // Layer 2: AI Classification (BART if available, keyword if not — ALWAYS HONEST)
     const classifications = await classifyWithBART(text);
 
-    // Determine classification source for honest reporting
     const classificationSource = classifications.length > 0 ? classifications[0].source : 'keyword';
 
     // Layer 3: Confidence-gated response
@@ -349,14 +376,12 @@ export async function POST(request: NextRequest) {
       .filter(c => c.score >= MULTI_NEED_THRESHOLD)
       .slice(0, MAX_CATEGORIES);
 
-    // ── NEVER return empty categories ──
     if (significantCategories.length === 0 && classifications.length > 0) {
       significantCategories = [classifications[0]];
     }
 
     const needsClarification = significantCategories.length > 0 && significantCategories[0].score < 0.5;
 
-    // Build categories with resources attached
     const categoriesWithResources = significantCategories.map(c => ({
       label: c.label,
       confidence: Math.round(c.score * 100),
@@ -374,8 +399,6 @@ export async function POST(request: NextRequest) {
 
     const noResults = categoriesWithResources.length === 0;
 
-    // ── HONEST model reporting ──
-    // If using keyword matching, say so explicitly
     const modelLabel = classificationSource === 'bart'
       ? "BART-large-MNLI (live)"
       : "Keyword matching (BART API key not configured)";
@@ -390,7 +413,7 @@ export async function POST(request: NextRequest) {
         ? "Your request scored below 50% — try providing more detail for better matches"
         : null,
       model: modelLabel,
-      classificationSource, // Expose source so frontend can display honestly
+      classificationSource,
       hasLocation: userLat !== undefined,
       outsideServiceArea: userLat !== undefined && isOutsideServiceArea(userLat, userLng!),
       serviceArea: 'Houston, TX metro area',
@@ -404,15 +427,17 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// ─── GET Handler (health check) ────────────────────────────
+// ─── GET Handler (health check with HONEST diagnostics) ────
 export async function GET() {
   const hasApiKey = !!(HF_API_KEY && HF_API_KEY !== "hf_xxxxx");
   return NextResponse.json({
     status: "ok",
     service: "ClearPath AI Classification API",
-    version: "3.0.0",
+    version: "3.1.0",
     model: "facebook/bart-large-mnli",
     bartAvailable: hasApiKey,
+    apiKeyPrefix: HF_API_KEY ? HF_API_KEY.substring(0, 6) + '...' : 'NONE',
+    apiKeyLength: HF_API_KEY?.length ?? 0,
     classificationMode: hasApiKey ? "BART-large-MNLI (live)" : "Keyword matching (fallback — set HUGGINGFACE_API_KEY)",
     crisisDetection: "regex-based (deterministic)",
     labels: LABELS,
