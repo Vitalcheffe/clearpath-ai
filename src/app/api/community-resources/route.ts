@@ -20,17 +20,25 @@ export async function GET(request: NextRequest) {
       ];
     }
 
-    const resources = await db.resource.findMany({
-      where,
-      orderBy: { name: "asc" },
-    });
+    let resources: Array<Record<string, unknown>> = [];
+    let categories: Array<{ category: string }> = [];
 
-    // Get unique categories for filtering
-    const categories = await db.resource.findMany({
-      select: { category: true },
-      distinct: ["category"],
-      orderBy: { category: "asc" },
-    });
+    try {
+      resources = await db.resource.findMany({
+        where,
+        orderBy: { name: "asc" },
+      });
+
+      // Get unique categories for filtering
+      categories = await db.resource.findMany({
+        select: { category: true },
+        distinct: ["category"],
+        orderBy: { category: "asc" },
+      });
+    } catch (dbError) {
+      console.error("DB query failed (community-resources):", dbError);
+      // Return empty results — never crash the app for a DB issue
+    }
 
     return NextResponse.json({
       resources,
@@ -38,9 +46,9 @@ export async function GET(request: NextRequest) {
     });
   } catch (error) {
     console.error("Error fetching community resources:", error);
-    return NextResponse.json(
-      { error: "Failed to fetch resources" },
-      { status: 500 }
-    );
+    return NextResponse.json({
+      resources: [],
+      categories: [],
+    });
   }
 }

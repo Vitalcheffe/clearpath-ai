@@ -36,36 +36,43 @@ export async function GET(request: NextRequest) {
       ];
     }
 
-    const conversations = await db.conversation.findMany({
-      where,
-      orderBy: { createdAt: "desc" },
-      skip: skip > 0 ? skip : undefined,
-      take: take > 0 ? take : undefined,
-      include: {
-        messages: {
-          orderBy: { createdAt: "asc" },
-          take: 1,
+    let conversations: Array<Record<string, unknown>> = [];
+    let total = 0;
+
+    try {
+      conversations = await db.conversation.findMany({
+        where,
+        orderBy: { createdAt: "desc" },
+        skip: skip > 0 ? skip : undefined,
+        take: take > 0 ? take : undefined,
+        include: {
+          messages: {
+            orderBy: { createdAt: "asc" },
+            take: 1,
+          },
         },
-      },
-    });
+      });
 
-    // Also get total count for pagination
-    const total = await db.conversation.count({ where });
+      // Also get total count for pagination
+      total = await db.conversation.count({ where });
+    } catch (dbError) {
+      console.error("DB query failed (conversations):", dbError);
+      // Return empty — never crash the app for a DB issue
+    }
 
-    const mapped = conversations.map((c) => {
-      // Try to extract top resource from the first AI message's resources field
+    const mapped = conversations.map((c: Record<string, unknown>) => {
       let topResource: string | null = null;
-      for (const msg of c.messages) {
+      const messages = (c.messages as Array<Record<string, unknown>>) || [];
+      for (const msg of messages) {
         if (msg.role === "ai" && msg.resources) {
           try {
-            const resources = JSON.parse(msg.resources);
+            const resources = JSON.parse(msg.resources as string);
             if (Array.isArray(resources) && resources.length > 0) {
               topResource = typeof resources[0] === "string" ? resources[0] : resources[0]?.title || resources[0]?.name || null;
             }
           } catch {
-            // not JSON, try as plain string
-            if (msg.resources.trim()) {
-              topResource = msg.resources.split("\n")[0] || null;
+            if ((msg.resources as string).trim()) {
+              topResource = (msg.resources as string).split("\n")[0] || null;
             }
           }
           break;
@@ -81,8 +88,8 @@ export async function GET(request: NextRequest) {
         confidence: c.confidence,
         isCrisis: c.isCrisis,
         topResource,
-        createdAt: c.createdAt.toISOString(),
-        updatedAt: c.updatedAt.toISOString(),
+        createdAt: (c.createdAt as Date).toISOString(),
+        updatedAt: (c.updatedAt as Date).toISOString(),
       };
     });
 
@@ -92,10 +99,10 @@ export async function GET(request: NextRequest) {
     });
   } catch (error) {
     console.error("Error fetching conversations:", error);
-    return NextResponse.json(
-      { error: "Failed to fetch conversations" },
-      { status: 500 }
-    );
+    return NextResponse.json({
+      conversations: [],
+      total: 0,
+    });
   }
 }
 
@@ -117,28 +124,43 @@ export async function POST(request: NextRequest) {
     // If authenticated, always use session userId (ignore the one from body)
     const effectiveUserId = sessionUserId || userId || null;
 
-    const conversation = await db.conversation.create({
-      data: {
+    let conversation: Record<string, unknown> | null = null;
+    try {
+      conversation = await db.conversation.create({
+        data: {
+          title,
+          preview: preview || title,
+          category: category || null,
+          categoryColor: categoryColor || null,
+          confidence: confidence || 0,
+          isCrisis: isCrisis || false,
+          isGuest: !effectiveUserId,
+          userId: effectiveUserId,
+        },
+      });
+    } catch (dbError) {
+      console.error("DB create failed (conversations):", dbError);
+      return NextResponse.json({
+        id: null,
         title,
         preview: preview || title,
-        category: category || null,
-        categoryColor: categoryColor || null,
+        category,
+        categoryColor,
         confidence: confidence || 0,
         isCrisis: isCrisis || false,
-        isGuest: !effectiveUserId,
-        userId: effectiveUserId,
-      },
-    });
+        createdAt: new Date().toISOString(),
+      });
+    }
 
     return NextResponse.json({
-      id: conversation.id,
-      title: conversation.title,
-      preview: conversation.preview,
-      category: conversation.category,
-      categoryColor: conversation.categoryColor,
-      confidence: conversation.confidence,
-      isCrisis: conversation.isCrisis,
-      createdAt: conversation.createdAt.toISOString(),
+      id: (conversation as Record<string, unknown>).id,
+      title: (conversation as Record<string, unknown>).title,
+      preview: (conversation as Record<string, unknown>).preview,
+      category: (conversation as Record<string, unknown>).category,
+      categoryColor: (conversation as Record<string, unknown>).categoryColor,
+      confidence: (conversation as Record<string, unknown>).confidence,
+      isCrisis: (conversation as Record<string, unknown>).isCrisis,
+      createdAt: ((conversation as Record<string, unknown>).createdAt as Date).toISOString(),
     });
   } catch (error) {
     console.error("Error creating conversation:", error);

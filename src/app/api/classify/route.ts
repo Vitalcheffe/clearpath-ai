@@ -312,49 +312,56 @@ export async function POST(request: NextRequest) {
         { name: "Local Crisis Center", action: "Talk to a real person now", call: "211" },
       ];
 
-      // Save conversation to database
-      const conversation = await db.conversation.create({
-        data: {
-          userId: userId || null,
-          title: "Crisis: Immediate Support Needed",
-          preview: text.substring(0, 100),
-          category: "Crisis",
-          categoryColor: CATEGORY_COLORS["Crisis"],
-          confidence: 99,
-          isCrisis: true,
-          isGuest: !userId,
-        },
-      });
+      // Save conversation to database (non-blocking — DB may be unavailable on Vercel)
+      let conversationId: string | null = null;
+      try {
+        const conversation = await db.conversation.create({
+          data: {
+            userId: userId || null,
+            title: "Crisis: Immediate Support Needed",
+            preview: text.substring(0, 100),
+            category: "Crisis",
+            categoryColor: CATEGORY_COLORS["Crisis"],
+            confidence: 99,
+            isCrisis: true,
+            isGuest: !userId,
+          },
+        });
+        conversationId = conversation.id;
 
-      // Save user message
-      await db.message.create({
-        data: {
-          conversationId: conversation.id,
-          role: "user",
-          text,
-          isCrisis: true,
-        },
-      });
+        // Save user message
+        await db.message.create({
+          data: {
+            conversationId: conversation.id,
+            role: "user",
+            text,
+            isCrisis: true,
+          },
+        });
 
-      // Save AI response
-      const aiResponseText = "🚨 **Your safety is the top priority right now.**\n\nIf you are in immediate danger, please call **911**.\n\nHere are crisis resources available 24/7:\n\n📞 **988 Suicide & Crisis Lifeline** — Call or text 988\n📞 **Crisis Text Line** — Text HOME to 741741\n📞 **National Domestic Violence Hotline** — 1-800-799-7233\n📞 **211** — Local crisis center connections";
-      await db.message.create({
-        data: {
-          conversationId: conversation.id,
-          role: "ai",
-          text: aiResponseText,
-          category: "Crisis",
-          confidence: 99,
-          isCrisis: true,
-          resources: JSON.stringify(crisisLines.map(l => ({ title: l.name, action: l.action, call: l.call }))),
-          why: "Crisis keyword detected — immediate safety resources provided.",
-          warning: "If you are in immediate physical danger, call 911.",
-        },
-      });
+        // Save AI response
+        const aiResponseText = "🚨 **Your safety is the top priority right now.**\n\nIf you are in immediate danger, please call **911**.\n\nHere are crisis resources available 24/7:\n\n📞 **988 Suicide & Crisis Lifeline** — Call or text 988\n📞 **Crisis Text Line** — Text HOME to 741741\n📞 **National Domestic Violence Hotline** — 1-800-799-7233\n📞 **211** — Local crisis center connections";
+        await db.message.create({
+          data: {
+            conversationId: conversation.id,
+            role: "ai",
+            text: aiResponseText,
+            category: "Crisis",
+            confidence: 99,
+            isCrisis: true,
+            resources: JSON.stringify(crisisLines.map(l => ({ title: l.name, action: l.action, call: l.call }))),
+            why: "Crisis keyword detected — immediate safety resources provided.",
+            warning: "If you are in immediate physical danger, call 911.",
+          },
+        });
+      } catch (dbError) {
+        console.error("DB save failed (crisis):", dbError);
+        // Continue — crisis response must NEVER be blocked by a DB error
+      }
 
       return NextResponse.json({
         isCrisis: true,
-        conversationId: conversation.id,
+        conversationId: conversationId,
         crisisLines,
         categories: [],
         note: "Crisis keyword detected — AI classification bypassed entirely",
@@ -401,51 +408,58 @@ export async function POST(request: NextRequest) {
       warningText = "The confidence score is below 70% — consider providing more details for a better match.";
     }
 
-    // Save conversation to database
-    const conversation = await db.conversation.create({
-      data: {
-        userId: userId || null,
-        title: text.substring(0, 60) + (text.length > 60 ? "..." : ""),
-        preview: text.substring(0, 100),
-        category: topCategory,
-        categoryColor: CATEGORY_COLORS[topCategory] || "#6b7280",
-        confidence: topConfidence,
-        isCrisis: false,
-        isGuest: !userId,
-      },
-    });
+    // Save conversation to database (non-blocking — DB may be unavailable on Vercel)
+    let conversationId: string | null = null;
+    try {
+      const conversation = await db.conversation.create({
+        data: {
+          userId: userId || null,
+          title: text.substring(0, 60) + (text.length > 60 ? "..." : ""),
+          preview: text.substring(0, 100),
+          category: topCategory,
+          categoryColor: CATEGORY_COLORS[topCategory] || "#6b7280",
+          confidence: topConfidence,
+          isCrisis: false,
+          isGuest: !userId,
+        },
+      });
+      conversationId = conversation.id;
 
-    // Save user message
-    await db.message.create({
-      data: {
-        conversationId: conversation.id,
-        role: "user",
-        text,
-      },
-    });
+      // Save user message
+      await db.message.create({
+        data: {
+          conversationId: conversation.id,
+          role: "user",
+          text,
+        },
+      });
 
-    // Save AI response
-    await db.message.create({
-      data: {
-        conversationId: conversation.id,
-        role: "ai",
-        text: aiText,
-        category: topCategory,
-        confidence: topConfidence,
-        isCrisis: false,
-        resources: resources.length > 0 ? JSON.stringify(resources) : null,
-        alternatives: classifications.length > 1
-          ? JSON.stringify(classifications.slice(1).map(c => ({ label: c.label, confidence: Math.round(c.score * 100) })))
-          : null,
-        why: whyText,
-        also: alsoText || null,
-        warning: warningText,
-      },
-    });
+      // Save AI response
+      await db.message.create({
+        data: {
+          conversationId: conversation.id,
+          role: "ai",
+          text: aiText,
+          category: topCategory,
+          confidence: topConfidence,
+          isCrisis: false,
+          resources: resources.length > 0 ? JSON.stringify(resources) : null,
+          alternatives: classifications.length > 1
+            ? JSON.stringify(classifications.slice(1).map(c => ({ label: c.label, confidence: Math.round(c.score * 100) })))
+            : null,
+          why: whyText,
+          also: alsoText || null,
+          warning: warningText,
+        },
+      });
+    } catch (dbError) {
+      console.error("DB save failed (classify):", dbError);
+      // Continue — classification response must NEVER be blocked by a DB error
+    }
 
     return NextResponse.json({
       isCrisis: false,
-      conversationId: conversation.id,
+      conversationId: conversationId,
       categories: classifications.map((c) => ({
         label: c.label,
         confidence: Math.round(c.score * 100),
