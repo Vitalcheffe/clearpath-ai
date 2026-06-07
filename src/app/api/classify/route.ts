@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { HfInference } from "@huggingface/inference";
 import { HOUSTON_RESOURCES, RESOURCES_BY_CATEGORY } from "@/data/resources";
 
 // ─── Configuration ─────────────────────────────────────────
@@ -225,8 +226,8 @@ async function classifyWithBART(text: string): Promise<{ results: Classification
     },
   };
 
-  const startTime = Date.now();
-
+  // ── ATTEMPT 1: Raw fetch ──
+  const fetchStart = Date.now();
   try {
     const response = await fetch(HF_API_URL, {
       method: "POST",
@@ -237,59 +238,114 @@ async function classifyWithBART(text: string): Promise<{ results: Classification
       body: JSON.stringify(requestBody),
     });
 
-    const elapsed = Date.now() - startTime;
+    const elapsed = Date.now() - fetchStart;
     debug.fetchStatus = response.status;
     debug.fetchElapsedMs = elapsed;
-    console.log(`[classify] HF API responded in ${elapsed}ms with status ${response.status}`);
+    console.log(`[classify] HF raw fetch responded in ${elapsed}ms with status ${response.status}`);
 
-    if (!response.ok) {
+    if (response.ok) {
+      const result = await response.json();
+      debug.hfResponseBody = JSON.stringify(result).substring(0, 500);
+
+      // BART-large-MNLI zero-shot returns { labels: string[], scores: number[] }
+      if (result.labels && result.scores) {
+        const top3 = result.labels.slice(0, 3).map((l: string, i: number) =>
+          `${LABEL_TO_CATEGORY[l] || l}: ${(result.scores[i] * 100).toFixed(1)}%`
+        );
+        console.log(`[classify] Top 3: ${top3.join(' | ')}`);
+
+        return {
+          results: result.labels.map((label: string, i: number) => ({
+            label: LABEL_TO_CATEGORY[label] || label,
+            score: result.scores[i],
+            source: 'bart' as const,
+          })),
+          debug,
+        };
+      }
+
+      // Unexpected format
+      debug.fallbackUsed = true;
+      debug.fallbackReason = `Unexpected HF response format: keys=${Object.keys(result).join(',')}`;
+      console.warn("[classify] Unexpected HF response format:", debug.fallbackReason);
+    } else {
       const errBody = await response.text();
       debug.hfResponseBody = errBody.substring(0, 500);
-      console.error(`[classify] HF API error ${response.status}: ${errBody}`);
-      // HF failed — fall back to keyword, but mark it honestly
       debug.fallbackUsed = true;
       debug.fallbackReason = `HF API returned ${response.status}: ${errBody.substring(0, 100)}`;
-      return { results: keywordClassify(text), debug };
+      console.error(`[classify] HF API error ${response.status}: ${errBody}`);
     }
+  } catch (fetchErr) {
+    const elapsed = Date.now() - fetchStart;
+    debug.fetchElapsedMs = elapsed;
+    const cause = (fetchErr as any)?.cause;
+    debug.fetchError = fetchErr instanceof Error ? fetchErr.message : String(fetchErr);
+    const causeInfo = cause ? ` (cause: ${cause.code || cause.message || cause.name || 'unknown'}${cause.hostname ? ` hostname=${cause.hostname}` : ''}${cause.address ? ` address=${cause.address}` : ''})` : '';
+    console.error(`[classify] HF raw fetch FAILED after ${elapsed}ms: ${debug.fetchError}${causeInfo}`);
+  }
 
-    const result = await response.json();
-    debug.hfResponseBody = JSON.stringify(result).substring(0, 500);
-    console.log(`[classify] HF API response keys: ${Object.keys(result).join(', ')}`);
-    console.log(`[classify] HF API returned ${result.labels?.length ?? 0} labels, ${result.scores?.length ?? 0} scores`);
+  // ── ATTEMPT 2: HfInference SDK (different HTTP stack) ──
+  console.log("[classify] Raw fetch failed or returned bad format — trying HfInference SDK");
+  const sdkStart = Date.now();
+  try {
+    const hf = new HfInference(HF_API_KEY);
+    const result = await hf.zeroShotClassification({
+      model: HF_MODEL,
+      inputs: text,
+      parameters: {
+        candidate_labels: CANDIDATE_LABELS,
+        multi_label: true,
+      },
+    });
 
-    // BART-large-MNLI zero-shot returns { labels: string[], scores: number[] }
-    if (result.labels && result.scores) {
-      // Log top 3 results
-      const top3 = result.labels.slice(0, 3).map((l: string, i: number) =>
-        `${LABEL_TO_CATEGORY[l] || l}: ${(result.scores[i] * 100).toFixed(1)}%`
+    const elapsed = Date.now() - sdkStart;
+    console.log(`[classify] HfInference SDK succeeded in ${elapsed}ms`);
+
+    // SDK returns ZeroShotClassificationOutput — array of { label, score }
+    if (result && Array.isArray(result)) {
+      const top3 = result.slice(0, 3).map((r: any) =>
+        `${LABEL_TO_CATEGORY[r.label] || r.label}: ${(r.score * 100).toFixed(1)}%`
       );
-      console.log(`[classify] Top 3: ${top3.join(' | ')}`);
+      console.log(`[classify] SDK Top 3: ${top3.join(' | ')}`);
+
+      // Update debug to show SDK was used
+      if (!debug.fetchStatus) {
+        debug.fetchStatus = 200; // SDK succeeded
+      }
+      debug.fetchElapsedMs = elapsed;
+      debug.fallbackUsed = false;
+      debug.fallbackReason = null;
 
       return {
-        results: result.labels.map((label: string, i: number) => ({
-          label: LABEL_TO_CATEGORY[label] || label,
-          score: result.scores[i],
+        results: result.map((r: any) => ({
+          label: LABEL_TO_CATEGORY[r.label] || r.label,
+          score: r.score,
           source: 'bart' as const,
         })),
         debug,
       };
     }
 
-    // Unexpected response format — fall back honestly
-    console.warn("[classify] Unexpected HF response format — falling back to keyword matching");
-    console.warn(`[classify] Response was: ${JSON.stringify(result).substring(0, 200)}`);
     debug.fallbackUsed = true;
-    debug.fallbackReason = `Unexpected HF response format: keys=${Object.keys(result).join(',')}`;
-    return { results: keywordClassify(text), debug };
-  } catch (error) {
-    const elapsed = Date.now() - startTime;
-    debug.fetchElapsedMs = elapsed;
-    debug.fetchError = error instanceof Error ? error.message : String(error);
-    console.error(`[classify] HF API call FAILED after ${elapsed}ms:`, error);
+    debug.fallbackReason = `SDK returned unexpected format: ${typeof result}`;
+    console.warn("[classify] SDK returned unexpected format:", typeof result);
+  } catch (sdkErr) {
+    const elapsed = Date.now() - sdkStart;
+    const cause = (sdkErr as any)?.cause;
+    const sdkMsg = sdkErr instanceof Error ? sdkErr.message : String(sdkErr);
+    const causeInfo = cause ? ` (cause: ${cause.code || cause.message || 'unknown'})` : '';
+    console.error(`[classify] HfInference SDK also FAILED after ${elapsed}ms: ${sdkMsg}${causeInfo}`);
+
     debug.fallbackUsed = true;
-    debug.fallbackReason = `Fetch error: ${debug.fetchError}`;
-    return { results: keywordClassify(text), debug };
+    if (!debug.fallbackReason) {
+      debug.fallbackReason = `Both raw fetch and SDK failed. Raw: ${debug.fetchError || 'N/A'}. SDK: ${sdkMsg}${causeInfo}`;
+    } else {
+      debug.fallbackReason += ` | SDK also failed: ${sdkMsg}${causeInfo}`;
+    }
   }
+
+  // ── FINAL FALLBACK: Keyword matching (honest) ──
+  return { results: keywordClassify(text), debug };
 }
 
 // ─── Keyword Classification (HONEST fallback — never pretends to be BART) ───
