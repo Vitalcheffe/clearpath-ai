@@ -209,7 +209,7 @@ const layers = [
   {
     step: 6,
     title: 'Human Escalation',
-    desc: '"Talk to a Navigator" is always one click away. 211.org, real people.',
+    desc: 'Call 211 to speak with a real person. Available 24/7, free and confidential.',
     icon: Navigation,
     color: 'blue',
     colorHex: '#3b82f6',
@@ -689,7 +689,7 @@ const deepDives = [
     color: '#f59e0b',
     bgColor: 'rgba(245,158,11,0.06)',
     accentBg: 'rgba(245,158,11,0.1)',
-    detail: 'Our "Talk to a Navigator" button isn\'t a fallback — it\'s a first-class feature. Real human navigators from the 211 network are available around the clock. Because some conversations need a person, not a prompt.',
+    detail: 'Calling 211 connects you to a real human navigator from the United Way network, available around the clock. Because some conversations need a person, not a prompt.',
   },
 ]
 
@@ -2293,10 +2293,8 @@ export default function LandingPage() {
               <h4 className="text-[12px] font-bold uppercase tracking-wider text-gray-400">Product</h4>
               <nav className="space-y-3">
                 <Link href="/#how-it-works" className="block text-[14px] text-gray-400 hover:text-white transition-colors">How It Works</Link>
-                <Link href="/app" className="block text-[14px] text-gray-400 hover:text-white transition-colors">Demo</Link>
+                <Link href="/app" className="block text-[14px] text-gray-400 hover:text-white transition-colors">Try the Demo</Link>
                 <Link href="/#scenarios" className="block text-[14px] text-gray-400 hover:text-white transition-colors">Scenarios</Link>
-                <Link href="/pricing" className="block text-[14px] text-gray-400 hover:text-white transition-colors">Pricing</Link>
-                <Link href="/dashboard" className="block text-[14px] text-gray-400 hover:text-white transition-colors">Dashboard</Link>
               </nav>
             </div>
 

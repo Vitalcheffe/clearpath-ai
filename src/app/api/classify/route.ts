@@ -43,9 +43,9 @@ const CRISIS_PATTERNS = [
   /want\s+to\s+fall\s+asleep\s+(and\s+)?never/i,
   /no\s+point\s+in\s+living/i,
 
-  // ─── Medical emergency — "I'm dying" only standalone, NOT "I'm dying for a coffee" ───
-  /i'?m\s+dying\b(?!\s+(for|to|of|from))/i,
-  /i\s+am\s+dying\b(?!\s+(for|to|of|from))/i,
+  // ─── Medical emergency — "I'm dying" only standalone, NOT "I'm dying for a coffee" or "I'm dying laughing" ───
+  /i'?m\s+dying\b(?!\s+(for|to|of|from|laughing|laugh))/i,
+  /i\s+am\s+dying\b(?!\s+(for|to|of|from|laughing|laugh))/i,
   /i'?m\s+going\s+to\s+die\b(?!\s+(from|of|for))/i,
   /i\s+am\s+going\s+to\s+die\b(?!\s+(from|of|for))/i,
   /help\s+me\s+i'?m\s+dying/i,
