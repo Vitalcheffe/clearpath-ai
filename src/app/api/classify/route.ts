@@ -12,6 +12,7 @@ const CRISIS_PATTERNS = [
   /suicid/i,
   /kill\s+myself/i,
   /end\s+it\s+all/i,
+  /end\s+it\b/i,
   /end\s+my\s+life/i,
   /want\s+to\s+die/i,
   /take\s+my\s+life/i,
@@ -326,9 +327,17 @@ export async function POST(request: NextRequest) {
     // Multi-need: show all categories ≥ 15%, max 5
     const MULTI_NEED_THRESHOLD = 0.15;
     const MAX_CATEGORIES = 5;
-    const significantCategories = classifications
+    let significantCategories = classifications
       .filter(c => c.score >= MULTI_NEED_THRESHOLD)
       .slice(0, MAX_CATEGORIES);
+
+    // ── NEVER return empty categories ──
+    // If BART returns 0 categories above threshold, broaden to top result
+    // so the user always sees SOMETHING — even if confidence is low.
+    if (significantCategories.length === 0 && classifications.length > 0) {
+      // Take the top-scoring category regardless of threshold
+      significantCategories = [classifications[0]];
+    }
 
     const needsClarification = significantCategories.length > 0 && significantCategories[0].score < 0.5;
 
@@ -346,11 +355,16 @@ export async function POST(request: NextRequest) {
         : undefined,
     }));
 
+    // If even the broadened result is extremely low confidence, show clarification
+    const noResults = categoriesWithResources.length === 0;
+
     return NextResponse.json({
       isCrisis: false,
       categories: categoriesWithResources,
-      needsClarification,
-      clarificationMessage: needsClarification
+      needsClarification: needsClarification || noResults,
+      clarificationMessage: noResults
+        ? "We couldn't match your description to a specific category. Could you tell us more about what you need help with?"
+        : needsClarification
         ? "Your request scored below 50% — try providing more detail for better matches"
         : null,
       model: HF_API_KEY && HF_API_KEY !== "hf_xxxxx" ? "BART-large-MNLI (live)" : "BART-large-MNLI (simulated)",
