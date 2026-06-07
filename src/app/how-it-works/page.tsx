@@ -1678,7 +1678,7 @@ export default function HowItWorksPage() {
                 How BART-large-MNLI Powers ClearPath AI
               </h2>
               <p className="text-[15px] text-gray-500 mt-4 max-w-3xl mx-auto leading-relaxed">
-                A deep dive into the NLI-based zero-shot classification model that makes calibrated transparency possible —
+                A deep dive into the NLI-based zero-shot classification model that makes honest confidence possible —
                 and why it fundamentally cannot hallucinate.
               </p>
             </motion.div>
@@ -2081,7 +2081,7 @@ export default function HowItWorksPage() {
                 </h2>
 
                 <p className="text-[16px] text-gray-500 max-w-xl mx-auto leading-relaxed">
-                  Try the ClearPath AI demo and experience calibrated transparency firsthand. Basic classification works without an account. Create a free account to save your history.
+                  Try the ClearPath AI demo and experience honest confidence firsthand. Basic classification works without an account. Create a free account to save your history.
                   Free forever. Type a real need and see how the 6-layer pipeline responds.
                 </p>
 

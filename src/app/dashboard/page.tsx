@@ -227,7 +227,7 @@ const upcomingEvents = [
     title: 'USAII Hackathon Demo Session',
     date: 'July 5, 2026',
     time: '3:00 PM EST',
-    description: 'See ClearPath AI in action! Live demo of calibrated transparency and crisis detection features.',
+    description: 'See ClearPath AI in action! Live demo of honest confidence and crisis detection features.',
     type: 'Demo',
     typeColorHex: '#8b5cf6',
     typeBgColor: 'rgba(139,92,246,0.08)',
@@ -1898,7 +1898,7 @@ export default function DashboardPage() {
                   </div>
                   <div>
                     <h2 className="text-[16px] font-bold tracking-tight text-gray-900">6-Layer Architecture</h2>
-                    <p className="text-[13px] text-gray-500 mt-0.5">Calibrated transparency at every step</p>
+                    <p className="text-[13px] text-gray-500 mt-0.5">Honest confidence at every step</p>
                   </div>
                 </div>
 
@@ -1956,7 +1956,7 @@ export default function DashboardPage() {
 
                       <div className="mt-6 pt-5 border-t border-gray-100/60 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                         <p className="text-[13px] text-gray-500 leading-relaxed">
-                          Each layer adds safety, transparency, and calibrated confidence — from free-text input to human escalation.
+                          Each layer adds safety, transparency, and honest confidence — from free-text input to human escalation.
                         </p>
                         <Link
                           href="/about"
@@ -2170,7 +2170,7 @@ export default function DashboardPage() {
                   </div>
                   <span className="text-[15px] font-bold text-white">ClearPath AI</span>
                 </div>
-                <p className="text-[13px] text-gray-400 leading-relaxed">Calibrated transparency for community resource navigation. Built with responsibility at the core.</p>
+                <p className="text-[13px] text-gray-400 leading-relaxed">Honest confidence for community resource navigation. Built with responsibility at the core.</p>
               </div>
 
               {/* Product */}

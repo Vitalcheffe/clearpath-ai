@@ -256,7 +256,7 @@ const architectureLayers = [
     layer: 5,
     name: 'Result Display',
     icon: BookOpen,
-    responsibleFunction: 'Calibrated transparency to user',
+    responsibleFunction: 'Honest confidence to user',
     description:
       'Every result shows three components: "Why This Result" (plain-language explanation of the match), "What Else" (top-3 alternatives with their confidence scores), and "How Confident" (calibrated percentage with caveats). This is the opposite of the prevailing AI design philosophy that optimizes for appearing competent — we optimize for being honest.',
     color: '#10b981',

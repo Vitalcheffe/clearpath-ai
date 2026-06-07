@@ -94,7 +94,7 @@ export default function LoginPage() {
 
   const benefits = [
     { icon: Shield, text: 'Crisis detection always active', color: 'bg-red-400/20' },
-    { icon: Eye, text: 'Calibrated confidence scores', color: 'bg-blue-400/20' },
+    { icon: Eye, text: 'Honest confidence scores', color: 'bg-blue-400/20' },
     { icon: Navigation, text: 'Human escalation at <70%', color: 'bg-amber-400/20' },
     { icon: Lock, text: 'Privacy by design', color: 'bg-emerald-400/20' },
     { icon: Heart, text: 'Community impact tracking', color: 'bg-pink-400/20' },

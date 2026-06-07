@@ -127,7 +127,7 @@ const leadership = [
   {
     name: 'Amine Harch El Korane',
     role: 'Founder & Lead Developer',
-    bio: 'Amine is the founder and driving force behind ClearPath AI. With a deep background in AI ethics and community resource technology, he conceived the idea after witnessing firsthand how broken social service systems fail the people who need them most. His experience in Morocco and the broader MENA region showed him that the gap between available resources and the people who need them is not just a technology problem — it is a trust problem. His vision for calibrated transparency became the founding principle of ClearPath AI, and he built the first working prototype in under two weeks.',
+    bio: 'Amine is the founder and driving force behind ClearPath AI. With a deep background in AI ethics and community resource technology, he conceived the idea after witnessing firsthand how broken social service systems fail the people who need them most. His experience in Morocco and the broader MENA region showed him that the gap between available resources and the people who need them is not just a technology problem — it is a trust problem. His vision for honest confidence became the founding principle of ClearPath AI, and he built the first working prototype in under two weeks.',
     expertise: ['AI Ethics & Safety', 'Zero-Shot Classification', 'Community Resource Technology', 'NLP & BART Models', 'Next.js & TypeScript'],
     initials: 'AH',
     colorHex: '#3b82f6',
@@ -358,7 +358,7 @@ const advisoryBoard = [
 const values = [
   {
     title: 'Transparency First',
-    description: 'We believe every AI system should show its work. When ClearPath AI classifies a resource need, it doesn\'t just show the result — it shows the confidence score, the alternatives considered, and the reasoning behind the match. Calibrated transparency is not a feature we added; it\'s the foundation we built on.',
+    description: 'We believe every AI system should show its work. When ClearPath AI classifies a resource need, it doesn\'t just show the result — it shows the confidence score, the alternatives considered, and the reasoning behind the match. Honest confidence is not a feature we added; it\'s the foundation we built on.',
     icon: Eye,
     color: '#3b82f6',
     bgColor: 'rgba(59,130,246,0.06)',
@@ -477,7 +477,7 @@ const timeline = [
   {
     month: 'February 2026',
     title: 'First Prototype',
-    desc: 'With the vision of calibrated transparency defined, Amine built the first working prototype in two weeks. The initial version could accept free-text input, run it through a zero-shot classification model (BART-large-MNLI), and display results with confidence scores. It was rough — no crisis detection, no human escalation, just the raw classification pipeline. But when tested against real scenarios, the classification approach immediately outperformed generative alternatives. Zero hallucinated resources. Zero phantom phone numbers. The proof of concept worked.',
+    desc: 'With the vision of honest confidence defined, Amine built the first working prototype in two weeks. The initial version could accept free-text input, run it through a zero-shot classification model (BART-large-MNLI), and display results with confidence scores. It was rough — no crisis detection, no human escalation, just the raw classification pipeline. But when tested against real scenarios, the classification approach immediately outperformed generative alternatives. Zero hallucinated resources. Zero phantom phone numbers. The proof of concept worked.',
     icon: Code2,
     color: '#3b82f6',
     dotColor: 'bg-blue-400',
@@ -652,7 +652,7 @@ export default function TeamPage() {
               >
                 We&apos;re a team of engineers, researchers, designers, and community advocates
                 united by a single belief: <span className="font-semibold text-gray-700">when AI serves people in crisis, honesty isn&apos;t optional — it&apos;s the architecture.</span>{' '}
-                Every line of code, every design decision, and every partnership is built around calibrated transparency.
+                Every line of code, every design decision, and every partnership is built around honest confidence.
               </motion.p>
 
               {/* Team Stats */}
@@ -1485,7 +1485,7 @@ export default function TeamPage() {
               className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5"
             >
               {[
-                { name: 'BART-large-MNLI', category: 'ML Model', desc: 'Zero-shot classification with calibrated confidence scores. Chosen for its transparency over generative alternatives.', icon: Brain, color: '#3b82f6' },
+                { name: 'BART-large-MNLI', category: 'ML Model', desc: 'Zero-shot classification with honest confidence scores. Chosen for its transparency over generative alternatives.', icon: Brain, color: '#3b82f6' },
                 { name: 'Next.js 16', category: 'Frontend Framework', desc: 'Server-rendered React with App Router. Optimized for performance and accessibility out of the box.', icon: Code2, color: '#10b981' },
                 { name: 'Hugging Face', category: 'ML Platform', desc: 'Model hosting and inference API. Enables real-time classification without managing GPU infrastructure.', icon: Cpu, color: '#8b5cf6' },
                 { name: 'TypeScript', category: 'Language', desc: 'Type-safe development across the entire stack. Catches errors before they reach users.', icon: FileCheck, color: '#f59e0b' },
@@ -2104,7 +2104,7 @@ export default function TeamPage() {
                   a: 'Yes — it\'s an architectural guarantee, not just a policy. Our infrastructure is designed so that guest data is processed in real-time and never written to persistent storage. For authenticated users, data is encrypted at rest with full user control — delete anytime. No session logs for guests, no third-party tracking, no advertising cookies. Privacy was a founding principle, not an afterthought.',
                 },
                 {
-                  q: 'What does "calibrated transparency" mean?',
+                  q: 'What does "honest confidence" mean?',
                   a: 'It means our AI always shows its confidence level. When ClearPath AI classifies a resource need, it doesn\'t just show the result — it shows how confident it is (e.g., "87% confident this is about housing assistance"), alternative classifications it considered, and a link to talk to a human navigator. The AI tells you what it knows, what it doesn\'t know, and how sure it is.',
                 },
                 {

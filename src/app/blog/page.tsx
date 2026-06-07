@@ -235,7 +235,7 @@ const articles: BlogArticle[] = [
     category: 'AI Safety',
     categoryColor: '#ef4444',
     categoryBg: 'bg-red-50 text-red-700 border-red-100/60',
-    title: 'Calibrated Confidence Scores: A Deep Dive into Honest AI',
+    title: 'Honest Confidence Scores: A Deep Dive into Honest AI',
     excerpt: 'Why we chose calibrated confidence over raw model outputs, how our scoring system works, and why showing uncertainty is the most responsible thing an AI system can do.',
     fullPreview: 'Most AI systems present their outputs with unwavering certainty. A chatbot gives you an answer, and you have no way of knowing whether the model is 99% confident or 51% confident. In social services, this is dangerous. Our calibrated confidence scoring system uses isotonic regression to transform raw model logits into well-calibrated probability estimates. When ClearPath AI shows a 94% confidence score, it means that across thousands of similar classifications, the model was correct 94% of the time. When it shows 62%, it means the model genuinely does not know — and that information is displayed prominently in the UI alongside a recommendation to consult a human navigator. This radical honesty about uncertainty is not a weakness; it is the most responsible thing an AI system can do when people are seeking help with critical needs like housing, healthcare, and food access.',
     author: 'Dr. Sarah Chen',
@@ -428,11 +428,11 @@ const researchPapers = [
     authors: 'ClearPath AI Team',
     venue: 'USAII Global AI Hackathon 2026 — Project Documentation',
     date: '2026',
-    abstract: 'Technical documentation for the ClearPath AI project, developed for the USAII Global AI Hackathon 2026. We present a 6-layer transparency architecture that enforces calibrated confidence display, automatic human escalation, and crisis-locked safety protocols. The architecture processes queries through input normalization, crisis detection, zero-shot classification, confidence calibration, explanation generation, and human escalation layers, each independently monitored and logged for full auditability.',
+    abstract: 'Technical documentation for the ClearPath AI project, developed for the USAII Global AI Hackathon 2026. We present a 6-layer transparency architecture that enforces honest confidence display, automatic human escalation, and crisis-locked safety protocols. The architecture processes queries through input normalization, crisis detection, zero-shot classification, confidence calibration, explanation generation, and human escalation layers, each independently monitored and logged for full auditability.',
     citations: 0,
     doi: '',
     gradient: 'from-violet-600 to-indigo-600',
-    keyFindings: ['6-layer transparent architecture', 'Zero-shot classification approach', 'Hardcoded crisis detection', 'Calibrated confidence display'],
+    keyFindings: ['6-layer transparent architecture', 'Zero-shot classification approach', 'Hardcoded crisis detection', 'Honest confidence display'],
   },
   {
     title: 'Classification vs. Generation for Community Resource Navigation',
@@ -508,7 +508,7 @@ const popularTags = [
   { name: 'Zero-Shot Classification', count: 12 },
   { name: 'Crisis Detection', count: 9 },
   { name: 'BART-large-MNLI', count: 8 },
-  { name: 'Calibrated Confidence', count: 7 },
+  { name: 'Honest Confidence', count: 7 },
   { name: 'Hallucination Prevention', count: 6 },
   { name: 'Community Resources', count: 11 },
   { name: '211 Navigation', count: 5 },
@@ -562,7 +562,7 @@ const topicsWeCover = [
   {
     icon: Microscope,
     title: 'Research',
-    description: 'Peer-reviewed papers on zero-shot classification, calibrated transparency, and novel evaluation methodologies for social AI.',
+    description: 'Peer-reviewed papers on zero-shot classification, honest confidence, and novel evaluation methodologies for social AI.',
     color: '#8b5cf6',
     bgColor: 'bg-violet-50',
     articleCount: 3,
@@ -1929,7 +1929,7 @@ export default function BlogPage() {
                   hot: false,
                 },
                 {
-                  question: 'Is calibrated confidence actually useful for non-technical users seeking help?',
+                  question: 'Is honest confidence actually useful for non-technical users seeking help?',
                   author: 'Lisa Park',
                   authorInitials: 'LP',
                   authorGradient: 'from-amber-400 to-orange-600',
@@ -2224,7 +2224,7 @@ export default function BlogPage() {
                   role: 'Head of AI Research',
                   initials: 'SC',
                   gradient: 'from-violet-400 to-purple-600',
-                  bio: 'Leading researcher in zero-shot classification and calibrated transparency. Technical lead for the USAII Global AI Hackathon 2026 project.',
+                  bio: 'Leading researcher in zero-shot classification and honest confidence. Technical lead for the USAII Global AI Hackathon 2026 project.',
                   articleCount: 4,
                   focus: 'Research & Safety',
                 },
@@ -2358,8 +2358,8 @@ export default function BlogPage() {
                 {
                   step: 4,
                   title: 'Learn About Honest AI',
-                  description: 'Read "Calibrated Confidence Scores" to see how we make AI uncertainty visible and actionable for users.',
-                  article: 'Calibrated Confidence Scores: A Deep Dive into Honest AI',
+                  description: 'Read "Honest Confidence Scores" to see how we make AI uncertainty visible and actionable for users.',
+                  article: 'Honest Confidence Scores: A Deep Dive into Honest AI',
                   readTime: '11 min read',
                   color: '#10b981',
                   icon: Gauge,
@@ -2462,7 +2462,7 @@ export default function BlogPage() {
 
               {/* Title */}
               <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-gray-900 leading-tight mb-4">
-                See Calibrated Transparency{' '}
+                See Honest Confidence{' '}
                 <span className="bg-gradient-to-r from-blue-600 via-emerald-500 to-teal-500 bg-clip-text text-transparent gradient-text-animate">
                   in Action
                 </span>
@@ -2536,7 +2536,7 @@ export default function BlogPage() {
                 <span className="text-[14px] font-bold tracking-tight text-gray-900">ClearPath AI</span>
               </div>
               <p className="text-[12px] text-gray-400 leading-relaxed max-w-xs">
-                Verified community resources with calibrated transparency. Classified, not generated.
+                Verified community resources with honest confidence. Classified, not generated.
               </p>
               <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[9px] font-bold tracking-wider uppercase bg-emerald-50 text-emerald-600 border border-emerald-100/60 mt-3">
                 USAII Hackathon 2026

@@ -441,7 +441,7 @@ export default function AboutPage() {
           </div>
         </section>
 
-        {/* ═══ 3. OUR PHILOSOPHY: CALIBRATED TRANSPARENCY ═══ */}
+        {/* ═══ 3. OUR PHILOSOPHY: HONEST CONFIDENCE ═══ */}
         <section className="py-20">
           <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
             <motion.div
@@ -455,7 +455,7 @@ export default function AboutPage() {
                 <Brain className="w-3.5 h-3.5" />
                 Our Philosophy
               </div>
-              <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-gray-900">Calibrated Transparency</h2>
+              <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-gray-900">Honest Confidence</h2>
               <p className="text-[15px] text-gray-500 mt-4 max-w-2xl mx-auto leading-relaxed">
                 Not all AI uncertainty is the same. Our 6-layer architecture ensures that confidence is always visible, escalation is always available, and safety is never optional.
               </p>
@@ -575,7 +575,7 @@ export default function AboutPage() {
                 resources that don&apos;t exist. And the people who need help the most can&apos;t wait 72 hours for a callback.
               </p>
               <p className="text-[15px] text-gray-500 leading-relaxed">
-                ClearPath AI addresses this with a 6-layer architecture designed around calibrated transparency.
+                ClearPath AI addresses this with a 6-layer architecture designed around honest confidence.
                 Instead of hiding uncertainty behind confident-sounding answers, we show you exactly what we know,
                 what we don&apos;t, and how confident we are. And when we&apos;re not sure, we ask — we never guess.
               </p>
@@ -1081,9 +1081,9 @@ export default function AboutPage() {
                   initials: 'AK',
                   role: 'Project Founder & Product Design',
                   location: 'Morocco',
-                  bio: 'Amine is a high school student from Morocco who witnessed firsthand how broken the community resource navigation system is. After seeing neighbors struggle for weeks to find basic social services, he founded ClearPath AI with a conviction: AI that interacts with vulnerable people must be honest about what it knows and doesn\'t know. He leads product strategy and design, focusing on making calibrated transparency intuitive and accessible for everyone.',
+                  bio: 'Amine is a high school student from Morocco who witnessed firsthand how broken the community resource navigation system is. After seeing neighbors struggle for weeks to find basic social services, he founded ClearPath AI with a conviction: AI that interacts with vulnerable people must be honest about what it knows and doesn\'t know. He leads product strategy and design, focusing on making honest confidence intuitive and accessible for everyone.',
                   motivation: 'I built ClearPath AI because I watched a woman in my neighborhood spend three weeks searching for food assistance — only to discover she\'d missed the deadline while navigating broken links and outdated websites. No one should have to fight that hard to find help.',
-                  skills: ['Product Strategy', 'UX Design', 'User Research', 'Calibrated Transparency', 'Community Engagement'],
+                  skills: ['Product Strategy', 'UX Design', 'User Research', 'Honest Confidence', 'Community Engagement'],
                   gradient: 'from-emerald-500 to-teal-600',
                   icon: Palette,
                   socials: { github: '#', linkedin: '#' },
@@ -1184,7 +1184,7 @@ export default function AboutPage() {
                   initials: 'FE',
                   role: 'AI Ethics Advisor',
                   org: 'Mohammed VI Polytechnic University',
-                  bio: 'Expert in responsible AI deployment in underserved communities. Advises on calibrated transparency methodology and NIST AI RMF alignment.',
+                  bio: 'Expert in responsible AI deployment in underserved communities. Advises on honest confidence methodology and NIST AI RMF alignment.',
                   gradient: 'from-violet-500 to-purple-600',
                 },
                 {
@@ -1584,7 +1584,7 @@ export default function AboutPage() {
                   items: [
                     { text: 'ClearPath AI Foundation — nonprofit governance model', done: false },
                     { text: 'Cross-jurisdictional resource sharing network', done: false },
-                    { text: 'Academic research partnerships for calibrated transparency methodology', done: false },
+                    { text: 'Academic research partnerships for honest confidence methodology', done: false },
                     { text: 'Government adoption toolkit with compliance frameworks', done: false },
                     { text: 'Global resource taxonomy standard for community services', done: false },
                     { text: 'Federated learning for bias detection without data sharing', done: false },
@@ -1659,7 +1659,7 @@ export default function AboutPage() {
               {[
                 {
                   outlet: 'AI Ethics Quarterly',
-                  title: 'Calibrated Transparency: A New Paradigm for AI in Social Services',
+                  title: 'Honest Confidence: A New Paradigm for AI in Social Services',
                   date: 'June 2026',
                   excerpt: 'ClearPath AI\'s 6-layer architecture offers a blueprint for responsible AI deployment in community resource navigation. Their approach of classification over generation could prevent thousands of harmful hallucinations annually.',
                   color: '#3b82f6',
@@ -1921,7 +1921,7 @@ export default function AboutPage() {
                 <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-gray-900">Ready to try honest AI?</h2>
                 <p className="text-[15px] text-gray-500 mt-4 max-w-lg mx-auto leading-relaxed">
                   Experience AI that shows its work, admits uncertainty, and always puts your safety first.
-                  No hallucinations. No hidden confidence. Just calibrated transparency.
+                  No hallucinations. No hidden confidence. Just honest confidence.
                 </p>
                 <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mt-8">
                   <Link

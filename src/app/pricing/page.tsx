@@ -67,7 +67,7 @@ const tiersBase = [
     features: [
       { text: 'Unlimited resource searches', included: true, desc: 'Search as many times as you need — no daily or monthly caps' },
       { text: 'Crisis detection (always active)', included: true, desc: 'Hardcoded safety layer that bypasses AI entirely when crisis keywords are detected' },
-      { text: 'Confidence scores on every result', included: true, desc: 'Calibrated transparency showing how certain the AI is about each classification' },
+      { text: 'Confidence scores on every result', included: true, desc: 'Honest confidence showing how certain the AI is about each classification' },
       { text: '211 human navigator access', included: true, desc: 'Connect with a real human navigator via the 211 network anytime' },
       { text: 'Community support', included: true, desc: 'Access our community forums and help documentation' },
       { text: 'Priority classification speed', included: false, desc: '' },
@@ -97,7 +97,7 @@ const tiersBase = [
     features: [
       { text: 'Unlimited resource searches', included: true, desc: 'Search as many times as you need — no daily or monthly caps' },
       { text: 'Crisis detection (always active)', included: true, desc: 'Hardcoded safety layer that bypasses AI entirely when crisis keywords are detected' },
-      { text: 'Confidence scores on every result', included: true, desc: 'Calibrated transparency showing how certain the AI is about each classification' },
+      { text: 'Confidence scores on every result', included: true, desc: 'Honest confidence showing how certain the AI is about each classification' },
       { text: '211 human navigator access', included: true, desc: 'Connect with a real human navigator via the 211 network anytime' },
       { text: 'Community support', included: true, desc: 'Access our community forums and help documentation' },
       { text: 'Priority classification speed', included: true, desc: 'Jump the queue for 2x faster classifications — critical when every second counts' },
@@ -153,7 +153,7 @@ const faqs = [
   {
     question: 'What makes ClearPath different from ChatGPT?',
     answer:
-      'Unlike generic AI chatbots, ClearPath AI never hallucinates resources. We classify against a verified 211 database using BART-large-MNLI, show calibrated confidence scores on every result, and bypass AI entirely when crisis keywords are detected. Every result shows WHY it was recommended, WHAT ELSE was considered, and HOW CONFIDENT we are.',
+      'Unlike generic AI chatbots, ClearPath AI never hallucinates resources. We classify against a verified 211 database using BART-large-MNLI, show honest confidence scores on every result, and bypass AI entirely when crisis keywords are detected. Every result shows WHY it was recommended, WHAT ELSE was considered, and HOW CONFIDENT we are.',
   },
   {
     question: 'How does crisis detection work?',
@@ -1884,7 +1884,7 @@ export default function PricingPage() {
                       Try the Demo
                     </h3>
                     <p className="text-[13px] text-gray-500 mt-1 leading-relaxed">
-                      Experience ClearPath AI free with no sign-up required. See how calibrated transparency works.
+                      Experience ClearPath AI free with no sign-up required. See how honest confidence works.
                     </p>
                     <span className="inline-flex items-center gap-1 text-[13px] font-semibold text-emerald-600 mt-2">
                       Launch demo <ArrowUpRight className="w-3.5 h-3.5" />

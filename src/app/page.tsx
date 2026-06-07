@@ -300,7 +300,7 @@ function getLayerBg(color: string) {
 // ─── COMPARISON DATA ─────────────────────────────────────
 const comparisons = [
   { negative: 'Hallucinates resources that don\'t exist', positive: 'Only verified resources from 211 database' },
-  { negative: 'Shows every answer with same confidence', positive: 'Calibrated confidence scores on every result' },
+  { negative: 'Shows every answer with same confidence', positive: 'Honest confidence scores on every result' },
   { negative: 'No crisis detection protocol', positive: 'Hardcoded crisis layer bypasses AI entirely' },
   { negative: 'Can\'t connect you to a real person', positive: 'One-click escalation to 211 human navigators' },
   { negative: 'Stores your conversations', positive: 'Guest mode needs no account; data stays yours' },
@@ -358,8 +358,8 @@ const faqs = [
     answer: 'Before any AI model runs, we check your input against a hardcoded list of crisis keywords and patterns. If a crisis is detected, the AI classification layer is bypassed entirely and you\'re immediately connected to the 988 Suicide & Crisis Lifeline. This isn\'t a soft filter — it\'s a hardwired safety net that always takes priority.',
   },
   {
-    question: 'What does "calibrated transparency" mean?',
-    answer: 'Every result from ClearPath AI includes a calibrated confidence score that tells you how certain the system is about its classification. Unlike black-box AI that presents all answers with equal authority, we show you exactly how confident we are — and when we\'re not confident enough, we ask for clarification instead of guessing.',
+    question: 'What does "honest confidence" mean?',
+    answer: 'Every result from ClearPath AI includes an honest confidence score that tells you how certain the system is about its classification. Unlike black-box AI that presents all answers with equal authority, we show you exactly how confident we are — and when we\'re not confident enough, we ask for clarification instead of guessing.',
   },
   {
     question: 'Is ClearPath AI free?',
@@ -639,7 +639,7 @@ const awards = [
   {
     icon: Award,
     title: 'INFORMS Responsible AI Recognition',
-    desc: 'Recognized for calibrated transparency architecture meeting NIST AI Risk Management Framework standards.',
+    desc: 'Recognized for honest confidence architecture meeting NIST AI Risk Management Framework standards.',
     colorHex: '#3b82f6',
     bgColor: 'rgba(59,130,246,0.06)',
     badge: 'Submitted',
@@ -655,7 +655,7 @@ const awards = [
   {
     icon: BookOpen,
     title: 'AI Ethics Publication',
-    desc: 'Our approach to calibrated transparency has been submitted for publication in the AI Ethics journal.',
+    desc: 'Our approach to honest confidence has been submitted for publication in the AI Ethics journal.',
     colorHex: '#8b5cf6',
     bgColor: 'rgba(139,92,246,0.06)',
     badge: 'Submitted',
@@ -675,12 +675,12 @@ const deepDives = [
   },
   {
     title: 'Confidence You Can See',
-    desc: 'Every result comes with a calibrated confidence score. No black boxes. No pretending.',
+    desc: 'Every result comes with an honest confidence score. No black boxes. No pretending.',
     icon: TrendingUp,
     color: '#10b981',
     bgColor: 'rgba(16,185,129,0.06)',
     accentBg: 'rgba(16,185,129,0.1)',
-    detail: 'When our model is 92% confident, we show you 92%. When it\'s 45% confident, we show you that too — and then ask a clarifying question instead of guessing. Calibrated transparency means you never have to blindly trust the machine.',
+    detail: 'When our model is 92% confident, we show you 92%. When it\'s 45% confident, we show you that too — and then ask a clarifying question instead of guessing. Honest confidence means you never have to blindly trust the machine.',
   },
   {
     title: 'Human Always Available',
@@ -796,7 +796,7 @@ export default function LandingPage() {
                 transition={{ duration: 0.6, delay: 0.35 }}
                 className="text-lg sm:text-xl text-gray-500 leading-relaxed max-w-2xl"
               >
-                ClearPath AI connects you with verified community resources — showing calibrated confidence instead of hiding uncertainty.{' '}
+                ClearPath AI connects you with verified community resources — showing honest confidence instead of hiding uncertainty.{' '}
                 <span className="font-semibold text-gray-700">Classified, not generated.</span>
               </motion.p>
 
@@ -1062,7 +1062,7 @@ export default function LandingPage() {
             />
             <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-6">
               <div className="text-center md:text-left">
-                <h3 className="text-[20px] md:text-[22px] font-bold text-white tracking-tight">Experience calibrated transparency firsthand</h3>
+                <h3 className="text-[20px] md:text-[22px] font-bold text-white tracking-tight">Experience honest confidence firsthand</h3>
                 <p className="text-[14px] text-blue-200 mt-1">Type anything. See the confidence scores. No sign-up required.</p>
               </div>
               <Link
@@ -1173,7 +1173,7 @@ export default function LandingPage() {
           className="text-center mb-16"
         >
           <motion.h2 variants={staggerItem} className="text-3xl sm:text-4xl font-extrabold tracking-tight text-gray-900">
-            6 Layers of Calibrated Transparency
+            6 Layers of Honest Confidence
           </motion.h2>
           <motion.p variants={staggerItem} className="text-lg text-gray-500 mt-4 max-w-2xl mx-auto">
             Every step is designed to be honest about what it knows and what it doesn&apos;t.
@@ -2173,7 +2173,7 @@ export default function LandingPage() {
             Frequently asked questions
           </motion.h2>
           <motion.p variants={staggerItem} className="text-lg text-gray-500 mt-4 max-w-2xl mx-auto">
-            Everything you need to know about ClearPath AI and calibrated transparency.
+            Everything you need to know about ClearPath AI and honest confidence.
           </motion.p>
         </motion.div>
 
@@ -2267,7 +2267,7 @@ export default function LandingPage() {
                 <span className="text-[15px] font-bold tracking-tight text-white">ClearPath AI</span>
               </div>
               <p className="text-[13px] text-gray-400 leading-relaxed max-w-xs">
-                When it matters most, honesty is the safest answer. Connecting people with verified community resources through calibrated transparency.
+                When it matters most, honesty is the safest answer. Connecting people with verified community resources through honest confidence.
               </p>
               <p className="text-[11px] text-gray-500 font-medium">
                 Built for USAII Global AI Hackathon 2026
@@ -2331,7 +2331,7 @@ export default function LandingPage() {
           <div className="mt-16 pt-8 border-t border-white/5">
             <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
               <p className="text-[12px] text-gray-500">
-                &copy; 2026 ClearPath AI. All rights reserved. Built with calibrated transparency.
+                &copy; 2026 ClearPath AI. All rights reserved. Built with honest confidence.
               </p>
               <div className="flex items-center gap-4">
                 <a href="#" className="text-gray-500 hover:text-white transition-colors" aria-label="GitHub">

@@ -1,6 +1,6 @@
 ▲ Next.js 16.1.3 (Turbopack)
 - Local:         http://localhost:3000
-- Network:       http://21.0.15.77:3000
+- Network:       http://21.0.15.185:3000
 - Environments: .env
 
 ✓ Starting...
@@ -9,7 +9,67 @@ This information is used to shape Next.js' roadmap and prioritize features.
 You can learn more, including how to opt-out if you'd not like to participate in this anonymous program, by visiting the following URL:
 https://nextjs.org/telemetry
 
-✓ Ready in 689ms
+✓ Ready in 662ms
 ○ Compiling / ...
- GET / 200 in 67ms (compile: 3ms, render: 63ms)
- GET / 200 in 62ms (compile: 3ms, render: 59ms)
+ GET / 200 in 4.3s (compile: 3.9s, render: 380ms)
+ GET / 200 in 555ms (compile: 122ms, render: 433ms)
+ GET / 200 in 105ms (compile: 5ms, render: 100ms)
+[next-auth][warn][NEXTAUTH_URL] 
+https://next-auth.js.org/warnings#nextauth_url
+[next-auth][warn][NO_SECRET] 
+https://next-auth.js.org/warnings#no_secret
+ GET /api/auth/session 200 in 1062ms (compile: 1041ms, render: 22ms)
+ GET / 200 in 140ms (compile: 5ms, render: 136ms)
+ GET / 200 in 135ms (compile: 4ms, render: 131ms)
+ GET /api/auth/session 200 in 30ms (compile: 22ms, render: 8ms)
+✓ Compiled in 174ms
+✓ Compiled in 83ms
+✓ Compiled in 92ms
+✓ Compiled in 197ms
+⨯ ./src/app/page.tsx:362:273
+Parsing ecmascript source code failed
+[0m [90m 360 |[39m   {
+ [90m 361 |[39m     question[33m:[39m [32m'What does "honest confidence" mean?'[39m[33m,[39m
+[31m[1m>[22m[39m[90m 362 |[39m     answer[33m:[39m [32m'Every result from ClearPath AI includes an honest confidence score that tells you how certain the system is about its classification. Unlike black-box AI that presents all answers with equal authority, we show you exactly how confident we are — and when we'[39mre not confident enough[33m,[39m we ask [36mfor[39m clarification instead [36mof[39m guessing[33m.[39m[32m',[39m
+ [90m     |[39m                                                                                                                                                                                                                                                                                 [31m[1m^[22m[39m[31m[1m^[22m[39m
+ [90m 363 |[39m   }[33m,[39m
+ [90m 364 |[39m   {
+ [90m 365 |[39m     question[33m:[39m [32m'Is ClearPath AI free?'[39m[33m,[39m[0m
+
+Expected ',', got 're'
+
+Import traces:
+  Client Component Browser:
+    ./src/app/page.tsx [Client Component Browser]
+    ./src/app/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/app/page.tsx [Client Component SSR]
+    ./src/app/page.tsx [Server Component]
+
+
+ GET / 500 in 878ms (compile: 787ms, render: 91ms)
+⨯ ./src/app/page.tsx:362:273
+Parsing ecmascript source code failed
+[0m [90m 360 |[39m   {
+ [90m 361 |[39m     question[33m:[39m [32m'What does "honest confidence" mean?'[39m[33m,[39m
+[31m[1m>[22m[39m[90m 362 |[39m     answer[33m:[39m [32m'Every result from ClearPath AI includes an honest confidence score that tells you how certain the system is about its classification. Unlike black-box AI that presents all answers with equal authority, we show you exactly how confident we are — and when we'[39mre not confident enough[33m,[39m we ask [36mfor[39m clarification instead [36mof[39m guessing[33m.[39m[32m',[39m
+ [90m     |[39m                                                                                                                                                                                                                                                                                 [31m[1m^[22m[39m[31m[1m^[22m[39m
+ [90m 363 |[39m   }[33m,[39m
+ [90m 364 |[39m   {
+ [90m 365 |[39m     question[33m:[39m [32m'Is ClearPath AI free?'[39m[33m,[39m[0m
+
+Expected ',', got 're'
+
+Import traces:
+  Client Component Browser:
+    ./src/app/page.tsx [Client Component Browser]
+    ./src/app/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/app/page.tsx [Client Component SSR]
+    ./src/app/page.tsx [Server Component]
+
+
+ GET / 500 in 83ms (compile: 74ms, render: 9ms)
+✓ Compiled in 144ms

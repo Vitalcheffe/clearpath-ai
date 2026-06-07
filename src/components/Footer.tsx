@@ -402,7 +402,7 @@ export default function Footer() {
                     </div>
                   </Link>
                   <p className="text-[13px] text-gray-400 leading-relaxed max-w-xs">
-                    Connecting people with verified community resources through calibrated transparency and responsible AI. Every result shows confidence, reasoning, and alternatives.
+                    Connecting people with verified community resources through honest confidence and responsible AI. Every result shows confidence, reasoning, and alternatives.
                   </p>
                 </div>
 

@@ -8,28 +8,118 @@ const HF_API_KEY = process.env.HUGGINGFACE_API_KEY;
 const HF_MODEL = "facebook/bart-large-mnli";
 const HF_API_URL = `https://api-inference.huggingface.co/models/${HF_MODEL}`;
 
-// ─── Crisis Keywords (hardcoded, deterministic) ────────────
-const CRISIS_KEYWORDS = [
-  "suicide", "kill myself", "end my life", "want to die", "can't take this anymore",
-  "want it all to end", "no reason to live", "better off dead", "hurt myself",
-  "self-harm", "overdose", "jump off", "slit my", "hang myself",
-  "end it all", "give up on life", "not worth living", "suicidal",
-  "thinking about death", "don't want to be alive", "take my own life",
-  "domestic violence", "being abused", "raped", "sexual assault",
-  "child abuse", "human trafficking", "help me escape",
-  "hits me", "beats me", "husband hits", "wife hits", "partner hits",
+// ─── Crisis Detection (regex-based, deterministic, AI NEVER trusted for crisis) ───
+// Uses regex patterns for robust matching — handles case, spacing, punctuation.
+// Crisis check runs BEFORE any HuggingFace API call.
+const CRISIS_PATTERNS = [
+  // ─── Suicidal ideation ───
+  /suicid/i,
+  /kill\s+myself/i,
+  /end\s+it\s+all/i,
+  /end\s+my\s+life/i,
+  /end\s+it\b/i,
+  /want\s+to\s+die/i,
+  /take\s+my\s+life/i,
+  /can'?t\s+take\s+(this|it)/i,
+  /want\s+it\s+all\s+to\s+end/i,
+  /ending\s+it/i,
+  /harm\s+myself/i,
+  /self[- ]?harm/i,
+  /hurt\s+myself/i,
+  /want\s+to\s+hurt\s+myself/i,
+  /no\s+(reason|point)\s+to\s+live/i,
+  /better\s+off\s+dead/i,
+  /don'?t\s+want\s+to\s+live/i,
+  /don'?t\s+want\s+to\s+be\s+here/i,
+  /overdose/i,
+  /take\s+pills/i,
+  /jump\s+off/i,
+  /hang\s+myself/i,
+  /slit\s+my\s+wrists/i,
+  /not\s+worth\s+living/i,
+  /world\s+without\s+me/i,
+  /give\s+up\s+on\s+life/i,
+  /can'?t\s+go\s+on/i,
+  /life\s+(means|has)\s+nothing/i,
+  /nothing\s+(to\s+)?live\s+for/i,
+  /don'?t\s+want\s+to\s+exist/i,
+  /want\s+to\s+disappear/i,
+  /want\s+to\s+fall\s+asleep\s+(and\s+)?never/i,
+  /no\s+point\s+in\s+living/i,
+
+  // ─── Medical emergency — "I'm dying" only when standalone, NOT "I'm dying for a coffee" ───
+  /i'?m\s+dying\b(?!\s+(for|to|of|from))/i,
+  /i\s+am\s+dying\b(?!\s+(for|to|of|from))/i,
+  /i'?m\s+going\s+to\s+die\b(?!\s+(from|of|for))/i,
+  /i\s+am\s+going\s+to\s+die\b(?!\s+(from|of|for))/i,
+  /help\s+me\s+i'?m\s+dying/i,
+  /i\s+can'?t\s+breathe/i,
+
+  // ─── Domestic violence / abuse ───
+  /domestic\s+violen/i,
+  /domestic\s+abuse/i,
+  /(husband|wife|partner|boyfriend|girlfriend|spouse)\s+(hits?|beats?|hurts?|chokes?|strangles?)/i,
+  /being\s+beaten/i,
+  /beaten\s+by/i,
+  /physical\s+abuse/i,
+  /emotional\s+abuse/i,
+  /threaten(ing)?\s+me/i,
+  /controlling\s+me/i,
+  /won'?t\s+let\s+me\s+leave/i,
+  /trapped\s+in\s+my\s+relationship/i,
+  /afraid\s+of\s+my\s+partner/i,
+  /being\s+abused/i,
+  /abused\s+by\s+my\s+partner/i,
+  /choking\s+me/i,
+  /strangling\s+me/i,
+  /stalking\s+me/i,
+  /threatening\s+to\s+kill/i,
+
+  // ─── Sexual assault / trafficking ───
+  /sexual\s+assault/i,
+  /\braped?\b/i,
+  /human\s+trafficking/i,
+  /forced\s+to\s+work/i,
+  /held\s+against\s+my\s+will/i,
 ];
 
-// ─── Classification Labels ─────────────────────────────────
+// ─── Descriptive Labels for BART-large-MNLI ───
+// Ultra-specific labels give BART maximum semantic signal for NLI matching.
+// Each label includes the most common user-facing terms so the model can
+// directly match "hungry" → "food bank", "lawyer" → "legal aid", etc.
+const CANDIDATE_LABELS = [
+  'paying rent, mortgage, eviction prevention, or emergency shelter and housing',
+  'needing food, getting free food, food pantry, free groceries, meals, food stamps, SNAP, food bank, hungry, starving, no money for food, where to get food, feeding family, no food at home',
+  'therapy, counseling, psychiatrist, depression, anxiety, or mental health treatment',
+  'job search, resume help, career training, unemployment benefits, or employment',
+  'free lawyer, legal aid, immigration attorney, court representation, or legal help',
+  'doctor, medical clinic, health insurance, prescription, or healthcare access',
+  'suicidal thoughts, wanting to kill myself, self-harm, or immediate danger to life',
+  'elderly care, senior meals, home delivery, transportation for older adults',
+];
+
+// Map descriptive labels back to short display names for the UI
+const LABEL_TO_CATEGORY: Record<string, string> = {
+  'paying rent, mortgage, eviction prevention, or emergency shelter and housing': 'Housing Assistance',
+  'needing food, getting free food, food pantry, free groceries, meals, food stamps, SNAP, food bank, hungry, starving, no money for food, where to get food, feeding family, no food at home': 'Food Assistance',
+  'therapy, counseling, psychiatrist, depression, anxiety, or mental health treatment': 'Mental Health',
+  'job search, resume help, career training, unemployment benefits, or employment': 'Employment Services',
+  'free lawyer, legal aid, immigration attorney, court representation, or legal help': 'Legal Aid',
+  'doctor, medical clinic, health insurance, prescription, or healthcare access': 'Healthcare',
+  'suicidal thoughts, wanting to kill myself, self-harm, or immediate danger to life': 'Crisis Support',
+  'elderly care, senior meals, home delivery, transportation for older adults': 'Senior Services',
+};
+
+// Short labels for display/color mapping
 const LABELS = [
-  "Housing Assistance",
-  "Food Assistance",
-  "Mental Health",
-  "Employment Services",
-  "Legal Aid",
-  "Healthcare",
-  "Substance Abuse",
-  "Senior Services",
+  'Housing Assistance',
+  'Food Assistance',
+  'Mental Health',
+  'Employment Services',
+  'Legal Aid',
+  'Healthcare',
+  'Crisis Support',
+  'Senior Services',
 ];
 
 // ─── Category Colors ───────────────────────────────────────
@@ -40,15 +130,14 @@ const CATEGORY_COLORS: Record<string, string> = {
   "Employment Services": "#3b82f6",
   "Legal Aid": "#06b6d4",
   "Healthcare": "#ef4444",
-  "Substance Abuse": "#f97316",
   "Senior Services": "#6366f1",
   "Crisis": "#dc2626",
+  "Crisis Support": "#dc2626",
 };
 
 // ─── Crisis Detection ──────────────────────────────────────
 function detectCrisis(text: string): boolean {
-  const lower = text.toLowerCase().trim();
-  return CRISIS_KEYWORDS.some((keyword) => lower.includes(keyword));
+  return CRISIS_PATTERNS.some(pattern => pattern.test(text));
 }
 
 // ─── Classification via HuggingFace ────────────────────────
@@ -68,7 +157,7 @@ async function classifyWithHF(text: string): Promise<Array<{ label: string; scor
       body: JSON.stringify({
         inputs: text,
         parameters: {
-          candidate_labels: LABELS,
+          candidate_labels: CANDIDATE_LABELS,
           multi_label: true,
         },
       }),
@@ -84,7 +173,7 @@ async function classifyWithHF(text: string): Promise<Array<{ label: string; scor
     // BART-large-MNLI zero-shot returns { labels: string[], scores: number[] }
     if (result.labels && result.scores) {
       return result.labels.map((label: string, i: number) => ({
-        label,
+        label: LABEL_TO_CATEGORY[label] || label,  // Map back to short name
         score: result.scores[i],
       }));
     }
@@ -108,7 +197,7 @@ function simulateClassification(text: string): Array<{ label: string; score: num
     "Employment Services": ["job", "employment", "work", "unemployed", "training", "career", "fired", "laid off", "resume", "workforce"],
     "Legal Aid": ["legal", "lawyer", "immigration", "court", "custody", "divorce", "deportation", "rights"],
     "Healthcare": ["medical", "health", "doctor", "insurance", "prescription", "hospital", "clinic", "sick", "pain", "medication", "insulin"],
-    "Substance Abuse": ["addiction", "drugs", "alcohol", "rehab", "detox", "sober", "overdose", "substance"],
+    "Crisis Support": ["suicidal", "crisis", "self-harm", "kill myself", "emergency", "danger", "overdose", "distress"],
     "Senior Services": ["senior", "elderly", "aging", "medicare", "social security", "retirement", "old age", "grandparent"],
   };
 
@@ -139,11 +228,60 @@ function simulateClassification(text: string): Array<{ label: string; score: num
   return results.filter((r) => r.score > 0.3);
 }
 
+// ─── HAVERSINE DISTANCE + SMART DISPLAY ───
+// Houston, TX city center coordinates (service area reference point)
+const HOUSTON_LAT = 29.7604;
+const HOUSTON_LNG = -95.3698;
+const HOUSTON_METRO_RADIUS_MI = 25;  // Approximate Houston metro radius
+
+const EARTH_RADIUS_MI = 3958.8;
+
+function haversineMi(lat1: number, lng1: number, lat2: number, lng2: number): number {
+  const toRad = (deg: number) => deg * (Math.PI / 180);
+  const dLat = toRad(lat2 - lat1);
+  const dLng = toRad(lng2 - lng1);
+  const a = Math.sin(dLat / 2) ** 2 + Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLng / 2) ** 2;
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return EARTH_RADIUS_MI * c;
+}
+
+/**
+ * Returns a smart distance display string.
+ * - < 25 mi: "X.X mi" (local Houston)
+ * - 25-100 mi: "X mi (outside Houston metro)" (regional)
+ * - > 100 mi: "📍 Houston, TX" (far away, show city only)
+ * - No location: null (don't show distance at all)
+ */
+function formatSmartDistance(userLat: number, userLng: number, resourceLat: number | null, resourceLng: number | null): string | null {
+  if (resourceLat === null || resourceLng === null) return null;  // Phone/text-only service
+
+  const miles = haversineMi(userLat, userLng, resourceLat, resourceLng);
+
+  if (miles <= HOUSTON_METRO_RADIUS_MI) {
+    return `${miles.toFixed(1)} mi`;
+  } else if (miles <= 100) {
+    return `${Math.round(miles)} mi (outside Houston metro)`;
+  } else {
+    return '📍 Houston, TX';
+  }
+}
+
+/**
+ * Check if user is outside the Houston service area (> 100 mi from city center)
+ */
+function isOutsideServiceArea(userLat: number, userLng: number): boolean {
+  return haversineMi(userLat, userLng, HOUSTON_LAT, HOUSTON_LNG) > 100;
+}
+
 // ─── POST Handler ──────────────────────────────────────────
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { text } = body;
+    const { text, lat, lng } = body;
+
+    // Validate optional geolocation
+    const userLat = typeof lat === 'number' && lat >= -90 && lat <= 90 ? lat : undefined;
+    const userLng = typeof lng === 'number' && lng >= -180 && lng <= 180 ? lng : undefined;
 
     if (!text || typeof text !== "string" || text.trim().length === 0) {
       return NextResponse.json(
@@ -249,7 +387,7 @@ export async function POST(request: NextRequest) {
 
     for (let i = 0; i < Math.min(classifications.length, 3); i++) {
       const c = classifications[i];
-      const emoji = ["🏠", "🍎", "🧠", "💼", "⚖️", "🏥", "🚭", "👴"][LABELS.indexOf(c.label)] || "📋";
+      const emoji = ["🏠", "🍎", "🧠", "💼", "⚖️", "🏥", "🚨", "👴"][LABELS.indexOf(c.label)] || "📋";
       const confPct = Math.round(c.score * 100);
       aiText += `${emoji} **${c.label}** (${confPct}% confidence)\n`;
     }
@@ -317,6 +455,9 @@ export async function POST(request: NextRequest) {
         ? "Your request scored below 50% across all categories — too ambiguous for reliable matching"
         : null,
       model: HF_API_KEY && HF_API_KEY !== "hf_xxxxx" ? "BART-large-MNLI (live)" : "BART-large-MNLI (simulated)",
+      hasLocation: userLat !== undefined,
+      outsideServiceArea: userLat !== undefined && isOutsideServiceArea(userLat, userLng!),
+      serviceArea: 'Houston, TX metro area',
     });
   } catch (error) {
     console.error("Classification API error:", error);
@@ -334,7 +475,7 @@ export async function GET() {
     service: "ClearPath AI Classification API",
     version: "1.0.0",
     model: "facebook/bart-large-mnli",
-    crisisDetection: "hardcoded (deterministic)",
+    crisisDetection: "regex-based (deterministic)",
     labels: LABELS,
   });
 }

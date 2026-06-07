@@ -82,6 +82,9 @@ interface ClassifyResponse {
   note?: string
   conversationId?: string
   model: string
+  hasLocation?: boolean
+  outsideServiceArea?: boolean
+  serviceArea?: string
 }
 
 interface ConversationHistory {
@@ -876,7 +879,7 @@ function HowItWorksModal({ onClose }: { onClose: () => void }) {
           {/* Header */}
           <div className="mb-8">
             <h2 className="text-[24px] font-bold text-gray-900 tracking-tight leading-tight">How ClearPath AI Works</h2>
-            <p className="text-[14px] text-gray-400 mt-1.5 font-medium">6-Layer Architecture for Calibrated Transparency</p>
+            <p className="text-[14px] text-gray-400 mt-1.5 font-medium">6-Layer Architecture for Honest Confidence</p>
           </div>
 
           {/* Layers Timeline */}
@@ -928,7 +931,7 @@ function DemoScenariosModal({ onClose, onSelectScenario }: {
       id: 'job',
       label: "I lost my job and can't pay rent. My kids need food.",
       title: 'Multi-Need Classification',
-      description: 'Shows multi-label classification with calibrated confidence scores',
+      description: 'Shows multi-label classification with honest confidence scores',
       color: '#3b82f6',
       bg: 'rgba(59,130,246,0.06)',
       icon: <Layers className="w-5 h-5" />,
@@ -1416,6 +1419,8 @@ export default function Home() {
     clarifyReason?: string
     transparencyItems?: string[]
     model?: string
+    outsideServiceArea?: boolean
+    serviceArea?: string
   }>>([])
   const [suggestions, setSuggestions] = useState<Array<{ id: string; label: string; description?: string; icon?: string }>>(starters)
   const [isTyping, setIsTyping] = useState(false)
@@ -1431,6 +1436,29 @@ export default function Home() {
   const [inputText, setInputText] = useState('')
   const [expandedTransparency, setExpandedTransparency] = useState<Set<number>>(new Set())
   const textareaRef = useRef<HTMLTextAreaElement>(null)
+
+  // ─── Geolocation: real distances, no fake data ───
+  const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null)
+  const [locationStatus, setLocationStatus] = useState<'idle' | 'requesting' | 'granted' | 'denied'>('idle')
+
+  const requestLocation = useCallback(() => {
+    if (!navigator.geolocation) {
+      setLocationStatus('denied')
+      return
+    }
+    setLocationStatus('requesting')
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        setUserLocation({ lat: position.coords.latitude, lng: position.coords.longitude })
+        setLocationStatus('granted')
+      },
+      () => {
+        // User denied or error — fall back to showing addresses only
+        setLocationStatus('denied')
+      },
+      { enableHighAccuracy: false, timeout: 10000, maximumAge: 300000 } // Cache for 5 min
+    )
+  }, [])
 
   // Conversation history from API
   const [conversations, setConversations] = useState<ConversationHistory[]>([])
@@ -1453,16 +1481,17 @@ export default function Home() {
     fetch('/api/community-resources')
       .then(res => res.json())
       .then(data => {
-        if (Array.isArray(data)) {
+        if (data.resources && Array.isArray(data.resources)) {
           const grouped: Record<string, Resource[]> = {}
-          for (const r of data) {
+          for (const r of data.resources) {
             const cat = r.category
             if (!grouped[cat]) grouped[cat] = []
+            // Smart distance: show "📍 Houston, TX" by default, real distance if geolocation is available
             grouped[cat].push({
               name: r.name,
               detail: r.description + (r.phone ? ` Call ${r.phone}` : '') + (r.hours ? ` Hours: ${r.hours}` : ''),
               verified: r.lastVerified || undefined,
-              distance: r.address || undefined,
+              distance: '📍 Houston, TX',  // Default — replaced with real distance if user shares location
             })
           }
           setDbResources(grouped)
@@ -1521,10 +1550,14 @@ export default function Home() {
     setIsTyping(true)
 
     try {
-      // Build request body — include conversationId if we have one
-      const requestBody: Record<string, string> = { text: userText }
+      // Build request body — include conversationId and location if available
+      const requestBody: Record<string, string | number> = { text: userText }
       if (currentConvIdRef.current) {
         requestBody.conversationId = currentConvIdRef.current
+      }
+      if (userLocation) {
+        requestBody.lat = userLocation.lat
+        requestBody.lng = userLocation.lng
       }
 
       const res = await fetch('/api/classify', {
@@ -1542,6 +1575,8 @@ export default function Home() {
           isClarify: true,
           clarifyConfidence: 0,
           transparencyItems: ['An error occurred while processing your request. Please try again.'],
+          outsideServiceArea: false,
+          serviceArea: undefined,
         }])
         return
       }
@@ -1611,7 +1646,7 @@ export default function Home() {
       })
 
       setIsTyping(false)
-      setMessages(prev => [...prev, {
+      const aiMsg: typeof messages[number] = {
         role: 'ai',
         text: '',
         isCrisis,
@@ -1621,10 +1656,13 @@ export default function Home() {
         upgradeInfo,
         isClarify,
         clarifyConfidence,
-        clarifyReason,
+        clarifyReason: clarifyReason ?? undefined,
         transparencyItems,
         model: data.model,
-      }])
+        outsideServiceArea: data.outsideServiceArea,
+        serviceArea: data.serviceArea,
+      }
+      setMessages(prev => [...prev, aiMsg])
 
       // Set follow-up suggestions
       if (!isCrisis && !isClarify && enrichedCategories.length > 0) {
@@ -1648,6 +1686,8 @@ export default function Home() {
         isClarify: true,
         clarifyConfidence: 0,
         transparencyItems: ['A network error occurred. Please check your connection and try again.'],
+        outsideServiceArea: false,
+        serviceArea: undefined,
       }])
     }
   }, [isTyping, fetchConversations])
@@ -2032,6 +2072,32 @@ export default function Home() {
       <div ref={chatRef} className="flex-1 overflow-y-auto scroll-smooth relative">
         <div className="max-w-[820px] mx-auto px-6 relative">
 
+          {/* ─── Service Area Banner ─── */}
+          <div className="pt-3">
+            <div className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-blue-50/60 border border-blue-100/40 backdrop-blur-sm">
+              <MapPin className="w-3.5 h-3.5 text-blue-500 shrink-0" />
+              <span className="text-[12px] text-blue-700 font-medium">ClearPath AI currently serves the <span className="font-bold">Houston, TX metro area</span></span>
+              <span className="text-[11px] text-blue-400 font-medium ml-1">— Expanding soon</span>
+              {locationStatus === 'idle' && (
+                <button
+                  onClick={requestLocation}
+                  className="ml-2 inline-flex items-center gap-1 px-2.5 py-1 text-[10px] font-bold text-blue-600 bg-blue-100/60 rounded-md hover:bg-blue-100 transition-colors"
+                >
+                  📍 Use my location
+                </button>
+              )}
+              {locationStatus === 'requesting' && (
+                <span className="ml-2 text-[10px] text-blue-400 animate-pulse">Locating...</span>
+              )}
+              {locationStatus === 'granted' && (
+                <span className="ml-2 text-[10px] text-emerald-500 font-semibold">✓ Location shared</span>
+              )}
+              {locationStatus === 'denied' && (
+                <span className="ml-2 text-[10px] text-gray-400">Location unavailable</span>
+              )}
+            </div>
+          </div>
+
           {/* Empty state — Premium Welcome */}
           <AnimatePresence mode="wait">
             {!hasMessages && !isTyping && (
@@ -2098,7 +2164,7 @@ export default function Home() {
                 >
                   I connect you with verified community resources.
                   <br />
-                  <span className="text-gray-500">Calibrated confidence, not guesswork.</span>
+                  <span className="text-gray-500">Honest confidence, not guesswork.</span>
                 </motion.p>
 
                 {/* Feature badges — glass morphism */}
@@ -2210,6 +2276,17 @@ export default function Home() {
                               'This is active learning — the model uses your answer to refine its classification'
                             ]} />
                           </>
+                        )}
+
+                        {/* Outside service area warning */}
+                        {msg.outsideServiceArea && !msg.isCrisis && (
+                          <div className="flex items-start gap-2.5 px-4 py-3 rounded-xl bg-amber-50/60 border border-amber-100/40 mb-3">
+                            <MapPin className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" />
+                            <div>
+                              <p className="text-[12px] text-amber-800 font-semibold leading-snug">You appear to be outside our service area ({msg.serviceArea || 'Houston, TX'}).</p>
+                              <p className="text-[11px] text-amber-600 mt-1 leading-relaxed">These resources are located in Houston but may still be helpful as reference. We&apos;re expanding to more areas soon.</p>
+                            </div>
+                          </div>
                         )}
 
                         {/* Categories */}
@@ -2391,7 +2468,7 @@ export default function Home() {
 
           <p className="text-[11px] text-gray-300 text-center mt-2.5 flex items-center justify-center gap-2 font-medium">
             <span className="inline-block w-1.5 h-1.5 rounded-full bg-emerald-400 shadow-sm shadow-emerald-400/30" />
-            ClearPath AI · Live Mode — Verified resources · Calibrated confidence · BART-large-MNLI
+            ClearPath AI · Live Mode — Verified resources · Honest confidence · BART-large-MNLI
           </p>
         </div>
       </div>
