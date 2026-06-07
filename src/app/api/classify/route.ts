@@ -82,26 +82,26 @@ const CRISIS_PATTERNS = [
 // ─── Descriptive Labels for BART-large-MNLI ───
 // Ultra-specific labels give BART maximum semantic signal for NLI matching.
 const CANDIDATE_LABELS = [
-  'paying rent, mortgage, eviction prevention, or emergency shelter and housing',
+  'rent, mortgage, eviction, being evicted, losing my home, homelessness, shelter, emergency housing, section 8, housing assistance',
   'needing food, getting free food, food pantry, free groceries, meals, food stamps, SNAP, food bank, hungry, starving, no money for food, where to get food, feeding family, no food at home',
-  'therapy, counseling, psychiatrist, depression, anxiety, or mental health treatment, feeling depressed, feeling anxious, emotional support',
-  'job search, resume help, career training, unemployment benefits, or employment',
-  'free lawyer, legal aid, immigration attorney, court representation, or legal help',
-  'doctor, medical clinic, health insurance, prescription, or healthcare access',
+  'therapy, counseling, psychiatrist, depression, feeling depressed, anxiety, feeling anxious, mental health treatment, emotional support, PTSD, stressed, overwhelmed',
+  'job search, resume help, career training, unemployment benefits, employment, looking for work, fired, laid off',
+  'free lawyer, legal aid, immigration attorney, court representation, legal help, deportation, custody, divorce',
+  'doctor, medical clinic, health insurance, prescription, healthcare, medical care, sick, cancer treatment, dying of illness, hospital, clinic, health center',
   'suicidal thoughts, wanting to kill myself, self-harm, or immediate danger to life',
-  'elderly care, senior meals, home delivery, transportation for older adults, aging parent, elderly mother, senior citizen services',
+  'elderly care, senior meals, home delivery, transportation for older adults, aging parent, elderly mother, senior citizen services, senior, older adult, Medicare',
 ];
 
 // Map descriptive labels back to short display names
 const LABEL_TO_CATEGORY: Record<string, string> = {
-  'paying rent, mortgage, eviction prevention, or emergency shelter and housing': 'Housing Assistance',
+  'rent, mortgage, eviction, being evicted, losing my home, homelessness, shelter, emergency housing, section 8, housing assistance': 'Housing Assistance',
   'needing food, getting free food, food pantry, free groceries, meals, food stamps, SNAP, food bank, hungry, starving, no money for food, where to get food, feeding family, no food at home': 'Food Assistance',
-  'therapy, counseling, psychiatrist, depression, anxiety, or mental health treatment, feeling depressed, feeling anxious, emotional support': 'Mental Health',
-  'job search, resume help, career training, unemployment benefits, or employment': 'Employment Services',
-  'free lawyer, legal aid, immigration attorney, court representation, or legal help': 'Legal Aid',
-  'doctor, medical clinic, health insurance, prescription, or healthcare access': 'Healthcare',
+  'therapy, counseling, psychiatrist, depression, feeling depressed, anxiety, feeling anxious, mental health treatment, emotional support, PTSD, stressed, overwhelmed': 'Mental Health',
+  'job search, resume help, career training, unemployment benefits, employment, looking for work, fired, laid off': 'Employment Services',
+  'free lawyer, legal aid, immigration attorney, court representation, legal help, deportation, custody, divorce': 'Legal Aid',
+  'doctor, medical clinic, health insurance, prescription, healthcare, medical care, sick, cancer treatment, dying of illness, hospital, clinic, health center': 'Healthcare',
   'suicidal thoughts, wanting to kill myself, self-harm, or immediate danger to life': 'Crisis Support',
-  'elderly care, senior meals, home delivery, transportation for older adults, aging parent, elderly mother, senior citizen services': 'Senior Services',
+  'elderly care, senior meals, home delivery, transportation for older adults, aging parent, elderly mother, senior citizen services, senior, older adult, Medicare': 'Senior Services',
 };
 
 const LABELS = [
@@ -202,14 +202,14 @@ function simulateClassification(text: string): Array<{ label: string; score: num
   const results: Array<{ label: string; score: number }> = [];
 
   const labelKeywords: Record<string, string[]> = {
-    "Housing Assistance": ["housing", "rent", "shelter", "homeless", "eviction", "apartment", "mortgage", "section 8"],
+    "Housing Assistance": ["housing", "rent", "shelter", "homeless", "eviction", "evicted", "apartment", "mortgage", "section 8", "losing my home"],
     "Food Assistance": ["food", "hungry", "groceries", "snap", "meals", "eat", "feeding", "food bank", "ebt", "starving"],
-    "Mental Health": ["mental", "depression", "anxiety", "therapy", "counseling", "ptsd", "stress", "emotional", "depressed", "anxious", "feelings"],
+    "Mental Health": ["mental", "depression", "depressed", "anxiety", "anxious", "therapy", "counseling", "ptsd", "stress", "stressed", "emotional", "overwhelmed", "feelings"],
     "Employment Services": ["job", "employment", "work", "unemployed", "training", "career", "fired", "laid off", "resume"],
     "Legal Aid": ["legal", "lawyer", "immigration", "court", "custody", "divorce", "deportation", "rights"],
-    "Healthcare": ["medical", "health", "doctor", "insurance", "prescription", "hospital", "clinic", "sick", "pain", "medication", "insulin"],
+    "Healthcare": ["medical", "health", "doctor", "insurance", "prescription", "hospital", "clinic", "sick", "pain", "medication", "insulin", "cancer", "dying of", "illness"],
     "Crisis Support": ["suicidal", "crisis", "self-harm", "kill myself", "emergency", "danger", "overdose", "distress"],
-    "Senior Services": ["senior", "elderly", "aging", "medicare", "social security", "retirement", "old age", "grandparent", "elder"],
+    "Senior Services": ["senior", "elderly", "aging", "medicare", "social security", "retirement", "old age", "grandparent", "elder", "older adult"],
   };
 
   for (const [label, keywords] of Object.entries(labelKeywords)) {
@@ -324,8 +324,8 @@ export async function POST(request: NextRequest) {
     const classifications = await classifyWithHF(text);
 
     // Layer 3: Confidence-gated response
-    // Multi-need: show all categories ≥ 15%, max 5
-    const MULTI_NEED_THRESHOLD = 0.15;
+    // Multi-need: show all categories ≥ 10%, max 5
+    const MULTI_NEED_THRESHOLD = 0.10;
     const MAX_CATEGORIES = 5;
     let significantCategories = classifications
       .filter(c => c.score >= MULTI_NEED_THRESHOLD)
