@@ -77,15 +77,20 @@ const CRISIS_PATTERNS = [
   /human\s+trafficking/i,
   /forced\s+to\s+work/i,
   /held\s+against\s+my\s+will/i,
+
+  // ─── Homicidal ideation / violence towards others ───
+  /\b(kill|murder|hurt|harm|shoot|stab)\s+(someone|my|a|him|her|them|people|friend|family|partner|spouse|boss|child|kids?)\b/i,
+  /i\s+(wanna|want\s+to|will|am\s+going\s+to)\s+(kill|murder|hurt|harm|shoot|stab)\b/i,
+  /gonna\s+(kill|murder|hurt|harm|shoot|stab)\b/i,
 ];
 
 // ─── Descriptive Labels for BART-large-MNLI ───
 // Ultra-specific labels give BART maximum semantic signal for NLI matching.
 const CANDIDATE_LABELS = [
-  'rent, mortgage, eviction, being evicted, losing my home, homelessness, shelter, emergency housing, section 8, housing assistance',
+  'rent, mortgage, eviction, being evicted, losing my home, homelessness, shelter, emergency housing, section 8, housing assistance, no money for rent, need financial help, utility assistance, about to lose my apartment',
   'needing food, getting free food, food pantry, free groceries, meals, food stamps, SNAP, food bank, hungry, starving, no money for food, where to get food, feeding family, no food at home',
-  'therapy, counseling, psychiatrist, depression, feeling depressed, anxiety, feeling anxious, mental health treatment, emotional support, PTSD, stressed, overwhelmed',
-  'job search, resume help, career training, unemployment benefits, employment, looking for work, fired, laid off',
+  'therapy, counseling, psychiatrist, depression, feeling depressed, anxiety, feeling anxious, mental health treatment, emotional support, PTSD, stressed, overwhelmed, feeling alone, lonely, isolated, no one to talk to, alone, loneliness',
+  'job search, resume help, career training, unemployment benefits, employment, looking for work, fired, laid off, need money, no money, unemployed, need income, financial stability, workforce development',
   'free lawyer, legal aid, immigration attorney, court representation, legal help, deportation, custody, divorce',
   'doctor, medical clinic, health insurance, prescription, healthcare, medical care, sick, cancer treatment, dying of illness, hospital, clinic, health center',
   'suicidal thoughts, wanting to kill myself, self-harm, or immediate danger to life',
@@ -94,10 +99,10 @@ const CANDIDATE_LABELS = [
 
 // Map descriptive labels back to short display names
 const LABEL_TO_CATEGORY: Record<string, string> = {
-  'rent, mortgage, eviction, being evicted, losing my home, homelessness, shelter, emergency housing, section 8, housing assistance': 'Housing Assistance',
+  'rent, mortgage, eviction, being evicted, losing my home, homelessness, shelter, emergency housing, section 8, housing assistance, no money for rent, need financial help, utility assistance, about to lose my apartment': 'Housing Assistance',
   'needing food, getting free food, food pantry, free groceries, meals, food stamps, SNAP, food bank, hungry, starving, no money for food, where to get food, feeding family, no food at home': 'Food Assistance',
-  'therapy, counseling, psychiatrist, depression, feeling depressed, anxiety, feeling anxious, mental health treatment, emotional support, PTSD, stressed, overwhelmed': 'Mental Health',
-  'job search, resume help, career training, unemployment benefits, employment, looking for work, fired, laid off': 'Employment Services',
+  'therapy, counseling, psychiatrist, depression, feeling depressed, anxiety, feeling anxious, mental health treatment, emotional support, PTSD, stressed, overwhelmed, feeling alone, lonely, isolated, no one to talk to, alone, loneliness': 'Mental Health',
+  'job search, resume help, career training, unemployment benefits, employment, looking for work, fired, laid off, need money, no money, unemployed, need income, financial stability, workforce development': 'Employment Services',
   'free lawyer, legal aid, immigration attorney, court representation, legal help, deportation, custody, divorce': 'Legal Aid',
   'doctor, medical clinic, health insurance, prescription, healthcare, medical care, sick, cancer treatment, dying of illness, hospital, clinic, health center': 'Healthcare',
   'suicidal thoughts, wanting to kill myself, self-harm, or immediate danger to life': 'Crisis Support',
@@ -202,10 +207,10 @@ function simulateClassification(text: string): Array<{ label: string; score: num
   const results: Array<{ label: string; score: number }> = [];
 
   const labelKeywords: Record<string, string[]> = {
-    "Housing Assistance": ["housing", "rent", "shelter", "homeless", "eviction", "evicted", "apartment", "mortgage", "section 8", "losing my home"],
+    "Housing Assistance": ["housing", "rent", "shelter", "homeless", "eviction", "evicted", "apartment", "mortgage", "section 8", "losing my home", "no money for rent", "financial help", "utility"],
     "Food Assistance": ["food", "hungry", "groceries", "snap", "meals", "eat", "feeding", "food bank", "ebt", "starving"],
-    "Mental Health": ["mental", "depression", "depressed", "anxiety", "anxious", "therapy", "counseling", "ptsd", "stress", "stressed", "emotional", "overwhelmed", "feelings"],
-    "Employment Services": ["job", "employment", "work", "unemployed", "training", "career", "fired", "laid off", "resume"],
+    "Mental Health": ["mental", "depression", "depressed", "anxiety", "anxious", "therapy", "counseling", "ptsd", "stress", "stressed", "emotional", "overwhelmed", "feelings", "alone", "lonely", "isolated", "no one to talk to", "loneliness"],
+    "Employment Services": ["job", "employment", "work", "unemployed", "training", "career", "fired", "laid off", "resume", "need money", "no money", "income"],
     "Legal Aid": ["legal", "lawyer", "immigration", "court", "custody", "divorce", "deportation", "rights"],
     "Healthcare": ["medical", "health", "doctor", "insurance", "prescription", "hospital", "clinic", "sick", "pain", "medication", "insulin", "cancer", "dying of", "illness"],
     "Crisis Support": ["suicidal", "crisis", "self-harm", "kill myself", "emergency", "danger", "overdose", "distress"],
