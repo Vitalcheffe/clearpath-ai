@@ -6,7 +6,6 @@ import { motion, AnimatePresence } from 'framer-motion'
 import {
   Home,
   MessageCircle,
-  LayoutDashboard,
   BookOpen,
   Search,
   ArrowRight,
@@ -46,15 +45,6 @@ const helpfulLinks = [
     borderColor: 'rgba(16, 185, 129, 0.12)',
   },
   {
-    title: 'Dashboard',
-    description: 'View your resource dashboard',
-    href: '/dashboard',
-    icon: LayoutDashboard,
-    color: '#8b5cf6',
-    bgColor: 'rgba(139, 92, 246, 0.06)',
-    borderColor: 'rgba(139, 92, 246, 0.12)',
-  },
-  {
     title: 'Resources',
     description: 'Browse verified community resources',
     href: '/#how-it-works',
@@ -62,6 +52,15 @@ const helpfulLinks = [
     color: '#f59e0b',
     bgColor: 'rgba(245, 158, 11, 0.06)',
     borderColor: 'rgba(245, 158, 11, 0.12)',
+  },
+  {
+    title: 'API Docs',
+    description: 'Explore our classification API',
+    href: '/api-docs',
+    icon: Layers,
+    color: '#8b5cf6',
+    bgColor: 'rgba(139, 92, 246, 0.06)',
+    borderColor: 'rgba(139, 92, 246, 0.12)',
   },
 ]
 

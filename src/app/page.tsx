@@ -2304,9 +2304,9 @@ export default function LandingPage() {
               <nav className="space-y-3">
                 <Link href="/about" className="block text-[14px] text-gray-400 hover:text-white transition-colors">About</Link>
                 <Link href="/responsible-ai" className="block text-[14px] text-gray-400 hover:text-white transition-colors">Responsible AI</Link>
-                <Link href="/history" className="block text-[14px] text-gray-400 hover:text-white transition-colors">Documentation</Link>
-                <Link href="/settings" className="block text-[14px] text-gray-400 hover:text-white transition-colors">API Reference</Link>
-                <Link href="/profile" className="block text-[14px] text-gray-400 hover:text-white transition-colors">Community</Link>
+                <Link href="/api-docs" className="block text-[14px] text-gray-400 hover:text-white transition-colors">API Documentation</Link>
+                <Link href="/how-it-works" className="block text-[14px] text-gray-400 hover:text-white transition-colors">How It Works</Link>
+                <Link href="/blog" className="block text-[14px] text-gray-400 hover:text-white transition-colors">Blog</Link>
               </nav>
             </div>
 

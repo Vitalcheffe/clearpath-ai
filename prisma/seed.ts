@@ -1,14 +1,11 @@
 import { PrismaClient } from "@prisma/client";
-import bcrypt from "bcryptjs";
 
 const prisma = new PrismaClient();
 
 async function main() {
   console.log("Seeding database...");
 
-  // ─── 1. Demo User ──────────────────────────────────────────────
-  const hashedPassword = await bcrypt.hash("demo1234", 12);
-
+  // ─── 1. Demo User (for conversation/saved resource features) ──────
   const demoUser = await prisma.user.upsert({
     where: { email: "alex@example.com" },
     update: {},
@@ -16,7 +13,6 @@ async function main() {
       name: "Alex Korane",
       email: "alex@example.com",
       username: "alexkorane",
-      password: hashedPassword,
       plan: "free",
       language: "en",
       location: "Austin, TX",

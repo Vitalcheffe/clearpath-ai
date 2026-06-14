@@ -5,7 +5,7 @@ export default function robots(): MetadataRoute.Robots {
     rules: {
       userAgent: '*',
       allow: '/',
-      disallow: ['/app', '/dashboard', '/settings', '/profile', '/history', '/api/'],
+      disallow: ['/api/'],
     },
     sitemap: 'https://clearpath-ai.org/sitemap.xml',
   }

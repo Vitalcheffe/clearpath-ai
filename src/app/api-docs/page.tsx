@@ -2028,7 +2028,7 @@ curl -X GET http://localhost:3000/api/conversations?userId=user_456 \\
 
                       <div className="flex flex-wrap items-center justify-center gap-4">
                         <Link
-                          href="/dashboard"
+                          href="/app"
                           className="inline-flex items-center gap-2 px-7 py-3.5 rounded-xl bg-gradient-to-b from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 text-white font-semibold text-[14px] shadow-md shadow-blue-500/20 hover:shadow-lg hover:shadow-blue-500/30 transition-all active:scale-[0.97]"
                         >
                           <Rocket className="w-4 h-4" />

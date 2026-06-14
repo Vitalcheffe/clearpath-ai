@@ -2039,9 +2039,9 @@ export default function PricingPage() {
               <h4 className="text-[12px] font-bold uppercase tracking-wider text-gray-400">Company</h4>
               <nav className="space-y-3">
                 <Link href="/about" className="block text-[14px] text-gray-400 hover:text-white transition-colors">About</Link>
-                <Link href="/dashboard" className="block text-[14px] text-gray-400 hover:text-white transition-colors">Dashboard</Link>
-                <Link href="/history" className="block text-[14px] text-gray-400 hover:text-white transition-colors">History</Link>
-                <Link href="/settings" className="block text-[14px] text-gray-400 hover:text-white transition-colors">Settings</Link>
+                <Link href="/api-docs" className="block text-[14px] text-gray-400 hover:text-white transition-colors">API Docs</Link>
+                <Link href="/how-it-works" className="block text-[14px] text-gray-400 hover:text-white transition-colors">How It Works</Link>
+                <Link href="/blog" className="block text-[14px] text-gray-400 hover:text-white transition-colors">Blog</Link>
               </nav>
             </div>
 
