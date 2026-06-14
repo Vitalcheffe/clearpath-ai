@@ -29,10 +29,10 @@ ClearPath AI is a 6-layer community resource navigator:
 
 ## Tech Stack
 
-- **Frontend**: React + TypeScript (Next.js)
-- **Backend**: Node.js + Express
-- **AI Pipeline**: Python + HuggingFace Transformers (BART-large-MNLI)
-- **Database**: MongoDB
+- **Frontend**: React + TypeScript (Next.js 16)
+- **Backend**: Next.js API Routes (App Router)
+- **AI Pipeline**: HuggingFace Inference API (BART-large-MNLI) with dual fallback (raw fetch → SDK → keyword)
+- **Database**: SQLite via Prisma ORM
 - **Deployment**: Vercel
 
 ## Quick Start

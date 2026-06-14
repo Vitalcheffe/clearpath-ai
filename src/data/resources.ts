@@ -227,6 +227,48 @@ export const HOUSTON_RESOURCES: HoustonResource[] = [
     eligibility: "Adults 60+ — free membership",
     verified: "April 2026",
   },
+
+  // ─── Veteran Services ───
+  {
+    name: "Michael E. DeBakey VA Medical Center",
+    category: "Veteran Services",
+    description: "Full-service VA hospital providing medical care, mental health services, PTSD treatment, and specialty care for eligible veterans.",
+    phone: "713-791-1414",
+    address: "2002 Holcombe Blvd, Houston, TX 77030",
+    hours: "24/7 emergency; clinics Mon-Fri 8am-5pm",
+    eligibility: "Veterans with honorable discharge",
+    verified: "May 2026",
+  },
+  {
+    name: "VA Texas Valley Coastal Bend Health Care System",
+    category: "Veteran Services",
+    description: "VA benefits assistance including disability claims, pension, education (GI Bill), and vocational rehabilitation for veterans.",
+    phone: "1-800-827-1000",
+    address: "Apply online at va.gov or visit Houston VA Regional Office",
+    hours: "Mon-Fri 8am-5pm",
+    eligibility: "Veterans and eligible dependents",
+    verified: "May 2026",
+  },
+  {
+    name: "Veterans Housing Program (VASH)",
+    category: "Veteran Services",
+    description: "HUD-VASH program combining Section 8 housing vouchers with VA case management for homeless veterans. Priority placement available.",
+    phone: "713-794-7878",
+    address: "2002 Holcombe Blvd, Houston, TX 77030",
+    hours: "Mon-Fri 8am-4pm",
+    eligibility: "Homeless veterans with VA eligibility",
+    verified: "April 2026",
+  },
+  {
+    name: "Goodwill Industries Veterans Program",
+    category: "Veteran Services",
+    description: "Job training, career coaching, and direct job placement specifically for veterans. Programs for transitioning service members and veterans with disabilities.",
+    phone: "713-692-6221",
+    address: "1140 W Loop North, Houston, TX 77055",
+    hours: "Mon-Fri 8am-5pm",
+    eligibility: "Veterans facing employment barriers",
+    verified: "April 2026",
+  },
 ]
 
 // Group resources by category for quick lookup

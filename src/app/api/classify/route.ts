@@ -102,6 +102,7 @@ const CANDIDATE_LABELS = [
   'medical care, health clinic, doctor, prescription help, health insurance, dying of illness',
   'suicide, self-harm, want to die, end my life, hurting myself, crisis intervention',
   'senior services, elderly care, aging, meals for seniors, caregiver support, adults 60+',
+  'veteran services, VA benefits, military veteran, PTSD veteran, veteran housing, GI bill, veteran healthcare',
 ];
 
 // Map descriptive labels back to short display names
@@ -114,6 +115,7 @@ const LABEL_TO_CATEGORY: Record<string, string> = {
   'medical care, health clinic, doctor, prescription help, health insurance, dying of illness': 'Healthcare',
   'suicide, self-harm, want to die, end my life, hurting myself, crisis intervention': 'Crisis Support',
   'senior services, elderly care, aging, meals for seniors, caregiver support, adults 60+': 'Senior Services',
+  'veteran services, VA benefits, military veteran, PTSD veteran, veteran housing, GI bill, veteran healthcare': 'Veteran Services',
 };
 
 const LABELS = [
@@ -125,6 +127,7 @@ const LABELS = [
   'Healthcare',
   'Crisis Support',
   'Senior Services',
+  'Veteran Services',
 ];
 
 // ─── Category Colors ───────────────────────────────────────
@@ -136,6 +139,7 @@ const CATEGORY_COLORS: Record<string, string> = {
   "Legal Aid": "#06b6d4",
   "Healthcare": "#ef4444",
   "Senior Services": "#6366f1",
+  "Veteran Services": "#15803d",
   "Crisis": "#dc2626",
   "Crisis Support": "#dc2626",
 };
@@ -405,6 +409,7 @@ function keywordClassify(text: string): ClassificationResult[] {
     "Healthcare": ["medical", "health", "doctor", "insurance", "prescription", "hospital", "clinic", "sick", "pain", "medication", "insulin", "cancer", "dying of", "illness"],
     "Crisis Support": ["suicidal", "crisis", "self-harm", "kill myself", "emergency", "danger", "overdose", "distress"],
     "Senior Services": ["senior", "elderly", "aging", "medicare", "social security", "retirement", "old age", "grandparent", "elder", "older adult"],
+    "Veteran Services": ["veteran", "va ", "military", "gi bill", "vfw", "ptsd veteran", "discharge", "service member", "armed forces", "navy", "army", "marines", "air force", "coast guard"],
   };
 
   for (const [label, keywords] of Object.entries(labelKeywords)) {
@@ -573,7 +578,41 @@ export async function POST(request: NextRequest) {
       significantCategories = [classifications[0]];
     }
 
-    const needsClarification = significantCategories.length > 0 && significantCategories[0].score < 0.5;
+    const CLARIFICATION_THRESHOLD = 0.70;
+    const needsClarification = significantCategories.length > 0 && significantCategories[0].score < CLARIFICATION_THRESHOLD;
+
+    // ─── Clarification Questions (Layer 4: When confidence < 70%, ask don't guess) ───
+    const CLARIFICATION_QUESTIONS: Record<string, { question: string; options: string[]; id: string }[]> = {
+      'Housing Assistance': [
+        { question: 'Are you currently facing eviction, or at risk of losing housing?', options: ['Facing eviction', 'At risk', 'Currently homeless', 'Need affordable housing'], id: 'housing_urgency' },
+      ],
+      'Food Assistance': [
+        { question: 'Do you need food for yourself, your family, or both?', options: ['Just myself', 'My family', 'Both', 'Need baby formula/food'], id: 'food_who' },
+      ],
+      'Mental Health': [
+        { question: 'What kind of support are you looking for?', options: ['Counseling/therapy', 'Crisis support now', 'Ongoing treatment', 'Support group'], id: 'mental_type' },
+      ],
+      'Employment Services': [
+        { question: 'What is your employment situation?', options: ['Recently laid off', 'Long-term unemployed', 'Need career change', 'Need training/education'], id: 'employment_status' },
+      ],
+      'Legal Aid': [
+        { question: 'What type of legal help do you need?', options: ['Housing/eviction', 'Immigration', 'Family/custody', 'Criminal defense'], id: 'legal_type' },
+      ],
+      'Healthcare': [
+        { question: 'Is this an urgent medical need or ongoing care?', options: ['Urgent — need care now', 'Ongoing prescription/treatment', 'Need insurance', 'Preventive care'], id: 'health_urgency' },
+      ],
+      'Veteran Services': [
+        { question: 'What kind of veteran support do you need?', options: ['Housing/homelessness', 'Healthcare/PTSD', 'Benefits/VA claims', 'Employment/training'], id: 'veteran_type' },
+      ],
+      'Senior Services': [
+        { question: 'What kind of senior support do you need?', options: ['Meals/food delivery', 'Caregiver support', 'Transportation', 'Benefits counseling'], id: 'senior_type' },
+      ],
+    };
+
+    // Generate clarification questions for the top category when below threshold
+    const clarificationQuestions = needsClarification && significantCategories.length > 0
+      ? CLARIFICATION_QUESTIONS[significantCategories[0].label] || null
+      : null;
 
     const categoriesWithResources = significantCategories.map(c => ({
       label: c.label,
@@ -585,7 +624,7 @@ export async function POST(request: NextRequest) {
       also: significantCategories.length > 1
         ? `You may also benefit from ${significantCategories.slice(1, 3).map(sc => sc.label).join(" and ")} services.`
         : undefined,
-      warning: c.score < 0.70
+      warning: c.score < CLARIFICATION_THRESHOLD
         ? `${Math.round(c.score * 100)}% confidence — consider providing more detail for a better match`
         : undefined,
     }));
@@ -605,8 +644,9 @@ export async function POST(request: NextRequest) {
       clarificationMessage: noResults
         ? "We couldn't match your description to a specific category. Could you tell us more about what you need help with?"
         : needsClarification
-        ? "Your request scored below 50% — try providing more detail for better matches"
+        ? `Your top match scored below 70% confidence — help us help you by answering a quick question`
         : null,
+      clarificationQuestions,
       model: modelLabel,
       classificationSource,
       hasLocation: userLat !== undefined,
