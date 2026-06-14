@@ -18,6 +18,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     '/api-docs',
     '/login',
     '/signup',
+    '/app',
   ]
 
   return routes.map((route) => ({

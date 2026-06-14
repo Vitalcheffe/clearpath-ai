@@ -418,7 +418,7 @@ const partnerships = [
     department: 'Fairness & Classification Research',
     description: 'We plan to partner with academic institutions for research on fairness-aware classification for social service navigation. Our goal is to develop novel evaluation metrics for zero-shot classifiers in high-stakes community resource contexts, where misclassification can directly impact vulnerable populations. Partnership details pending.',
     projects: ['Fairness-aware confidence calibration for zero-shot models', 'Cross-lingual crisis keyword detection using multilingual embeddings', 'User study on transparency features in AI-assisted social services'],
-    papers: [],
+    papers: [] as { title: string; abstract: string }[],
   },
 ]
 
