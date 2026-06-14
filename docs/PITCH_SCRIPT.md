@@ -118,7 +118,7 @@ honesty is the safest answer.
 
 ```
 Built by Amine Harch El Korane & Harshit Singh
-100% free and open source · Hugging Face · React · Node.js · Python
+100% free and open source · React · Next.js · HuggingFace
 ```
 
 ---

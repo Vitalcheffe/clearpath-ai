@@ -236,7 +236,7 @@ const flowSteps = [
     step: 3,
     title: 'Multi-Label Classification',
     subtitle: 'BART-large-MNLI zero-shot',
-    description: 'The text is sent to BART-large-MNLI via the Hugging Face Inference API for zero-shot classification against 8 curated categories: Housing Assistance, Food Assistance, Mental Health, Employment, Legal Aid, Healthcare, Crisis Support, and Senior Services. The model returns confidence scores for each category simultaneously — because real needs are rarely simple. Multi-label detection means a single query can match multiple categories.',
+    description: 'The text is sent to BART-large-MNLI via the Hugging Face Inference API for zero-shot classification against 9 curated categories: Housing Assistance, Food Assistance, Mental Health, Employment, Legal Aid, Healthcare, Crisis Support, Senior Services, and Veteran Services. The model returns confidence scores for each category simultaneously — because real needs are rarely simple. Multi-label detection means a single query can match multiple categories.',
     icon: Layers,
     color: '#6366f1',
     bgColor: 'rgba(99,102,241,0.06)',
@@ -539,14 +539,14 @@ const safetyGuardrails = [
   {
     title: 'Minimal Data Retention',
     subtitle: 'Privacy by default',
-    description: 'ClearPath AI processes guest queries in real-time without storing them. Guest session data exists only in volatile memory and is purged when the browser closes. Accounts are optional — users can create free accounts to save conversation history and access personalized features, with data stored securely and encrypted at rest. The only data that leaves our system is the classification API call to Hugging Face, which processes text through their API. We recommend reviewing their privacy policy for details on their data handling. Users seeking help for domestic violence or substance abuse often do so from shared devices — they deserve absolute privacy by default.',
+    description: 'ClearPath AI processes queries in real-time without storing them. Session data exists only in volatile memory and is purged when the browser closes. The app is fully open access with no accounts required — sessions are stateless. The only data that leaves our system is the classification API call to Hugging Face, which processes text through their API. We recommend reviewing their privacy policy for details on their data handling. Users seeking help for domestic violence or substance abuse often do so from shared devices — they deserve absolute privacy by default.',
     icon: Lock,
     color: '#8b5cf6',
     bgColor: 'rgba(139,92,246,0.06)',
     features: [
-      'Guest sessions are in-memory only; account data is encrypted at rest',
+      'All sessions are in-memory only; no user data is persistently stored',
       'Session-only data — purged when browser tab closes',
-      'Basic classification works without an account — create a free account to save your history',
+      'Basic classification works without an account — no account needed, sessions are stateless',
       'No third-party analytics — no Google Analytics, no Facebook Pixel, no tracking cookies',
     ],
   },
@@ -595,8 +595,8 @@ const faqs = [
     answer: 'Generative models create new text based on patterns in their training data. For creative writing, this is ideal. For resource matching, it is dangerous. GPT-4 might invent a shelter that sounds plausible but doesn\'t exist, cite a program that ended years ago, or provide a wrong phone number — all with the same confident tone as a correct answer. Classification models like BART-large-MNLI don\'t generate text; they categorize input against a verified database. The model may not always find the right category, but it will never invent one that doesn\'t exist. When lives are at stake, classified beats generated.',
   },
   {
-    question: 'What are the 8 classification categories?',
-    answer: 'ClearPath AI classifies against 8 core categories: Housing Assistance (emergency shelter, rental help, Section 8), Food Assistance (SNAP, food banks, meal programs), Mental Health (counseling, crisis lines, support groups), Employment (job training, career services, unemployment benefits), Legal Aid (immigration, tenant rights, public defender), Healthcare (community clinics, prescription assistance, Medicaid), Crisis Support (988, domestic violence, substance abuse), and Senior Services (Meals on Wheels, Medicare help, senior centers). These categories were designed with input from 211 community navigators and cover the most common resource needs.',
+    question: 'What are the 9 classification categories?',
+    answer: 'ClearPath AI classifies against 9 core categories: Housing Assistance (emergency shelter, rental help, Section 8), Food Assistance (SNAP, food banks, meal programs), Mental Health (counseling, crisis lines, support groups), Employment (job training, career services, unemployment benefits), Legal Aid (immigration, tenant rights, public defender), Healthcare (community clinics, prescription assistance, Medicaid), Crisis Support (988, domestic violence, substance abuse), Senior Services (Meals on Wheels, Medicare help, senior centers), and Veteran Services (VA benefits, veteran housing, military transition support). These categories were designed with input from 211 community navigators and cover the most common resource needs.',
   },
   {
     question: 'How are confidence scores calibrated?',

@@ -10,19 +10,21 @@
 **Status:** Decided  
 **Context:** We need to classify user-described situations into resource categories. We have two options: (A) Fine-tune a classification model on labeled resource data, or (B) Use a zero-shot classification model that works without labeled training data.
 
-**Decision:** We chose zero-shot classification (Hugging Face Transformers, specifically `facebook/bart-large-mnli` or similar).
+**Decision:** We chose zero-shot classification using the HuggingFace Inference API with `facebook/bart-large-mnli`.
 
 **Rationale:**
 - We have NO labeled training data. Collecting and labeling a dataset of real crisis situations would take weeks and raises serious privacy concerns.
-- Zero-shot classification works out of the box with custom category labels. We can define our categories ("Legal Aid", "Food Assistance", "Emergency Housing", etc.) and the model classifies against them immediately.
+- Zero-shot classification works out of the box with custom category labels. We can define our categories ("Legal Aid", "Food Assistance", "Housing Assistance", etc.) and the model classifies against them immediately.
 - The hackathon build period is 7 days. Fine-tuning is not feasible in that timeline.
 - Zero-shot confidence scores are naturally calibrated (they represent how well the premise matches the hypothesis), which aligns with our transparency requirement.
+- Using the HuggingFace Inference API means we don't need to run the model locally — no Python runtime, no GPU, no model downloads. The API call handles everything.
 - If we need better accuracy post-hackathon, we can fine-tune on collected data later. Zero-shot is our MVP foundation.
 
 **Consequences:**
 - Zero-shot accuracy will be lower than a fine-tuned model, especially for domain-specific language. We accept this and mitigate with the clarification mechanism.
 - Confidence scores may be systematically over- or under-confident. We apply temperature scaling for calibration.
-- We are dependent on Hugging Face's model quality. If the base model has biases, our classifications will reflect them.
+- We are dependent on HuggingFace's model quality and API availability. If the base model has biases, our classifications will reflect them.
+- API latency adds to classification time (typically 1-3 seconds per request).
 
 **Alternatives Considered:**
 - OpenAI GPT-4 API: Better accuracy, but paid, and violates our "free tools only" philosophy. Also a black box — we can't inspect or calibrate confidence scores.
@@ -31,29 +33,31 @@
 
 ---
 
-## ADR-002: Python for AI Pipeline, Node.js for Backend
+## ADR-002: Single Next.js Application with HuggingFace Inference API
 
 **Date:** June 2026  
 **Status:** Decided  
-**Context:** The AI pipeline needs Python (Hugging Face Transformers, scientific computing). The web application needs a fast, well-supported backend framework. We could use Python for everything (Flask/FastAPI) or split the stack.
+**Context:** We need to serve a web frontend, API routes, crisis detection, and AI classification. We could split these into separate services (e.g., a Python AI pipeline + a Node.js backend) or unify them in a single application.
 
-**Decision:** Python for AI pipeline (Flask or FastAPI), Node.js + Express for web backend. Separate services communicating via REST API.
+**Decision:** A single Next.js application (App Router) handles everything: frontend pages, API routes, crisis detection, and AI classification via the HuggingFace Inference API. No separate Python pipeline or Express backend.
 
 **Rationale:**
-- Python is the only serious choice for NLP/AI work. Hugging Face Transformers, temperature scaling, and scientific libraries are Python-native.
-- Harshit is strongest in Node.js/Express. The web backend (serving the frontend, handling sessions, routing to AI pipeline) benefits from his expertise.
-- Separation of concerns: The AI pipeline can be deployed independently (on a GPU-enabled server if needed) while the web backend runs on Vercel.
-- The REST API contract between the two services is clean and testable. Each service can be developed and deployed independently.
+- **Simplicity:** One codebase, one `package.json`, one deployment. No inter-service communication, no API contracts between microservices, no CORS issues.
+- **HuggingFace Inference API eliminates the need for Python.** We call `facebook/bart-large-mnli` via the hosted API (`@huggingface/inference` npm package) from our Next.js API route. No Python runtime, no model downloads, no GPU required.
+- **Crisis detection is regex-based** — it runs as synchronous JavaScript in the classify API route before the HuggingFace call. No separate service needed.
+- **Faster development:** One team member can work on frontend while the other works on API routes, all in the same repo. No need to coordinate deployments across services.
+- **Single deployment target:** Deploy everything to Vercel as one unit. No separate GPU server for the AI pipeline.
+- **Lower latency for crisis detection:** Crisis keywords are checked inline in the same request, with no inter-service HTTP call needed. Crisis detection fires in < 1ms.
 
 **Consequences:**
-- Two codebases to maintain instead of one.
-- Two deployment targets instead of one.
-- Latency from the HTTP call between backend and AI pipeline (typically 50-200ms added).
-- More complex local development setup (need to run both services).
+- We depend on the HuggingFace Inference API being available. If it goes down, classification won't work (though crisis detection still works — it's local regex).
+- The HuggingFace Inference API has rate limits on the free tier. For a hackathon demo, this is acceptable.
+- All classification logic lives in `src/app/api/classify/route.ts`. This file handles both crisis detection and BART classification. It's a larger module but keeps the request flow simple and linear.
 
 **Alternatives Considered:**
-- All Python (FastAPI for everything): Simpler stack, but Harshit is less productive in Python. The frontend would need a separate server anyway (Next.js/Vercel).
-- All Node.js (TensorFlow.js for AI): Possible but TF.js has fewer pre-trained models and zero-shot classification options than Hugging Face's Python ecosystem. Would limit our AI capability.
+- Python AI pipeline (Flask/FastAPI) + Node.js backend: More traditional separation, but adds complexity (two codebases, two deployments, inter-service latency). The HuggingFace Inference API makes the Python runtime unnecessary.
+- All Python (FastAPI for everything): Simpler for AI work, but Harshit is less productive in Python. We'd lose Next.js's excellent developer experience and Vercel's zero-config deployment.
+- All Node.js with TensorFlow.js: Possible but TF.js has fewer pre-trained zero-shot models than HuggingFace's ecosystem. Would limit our AI capability.
 
 ---
 
@@ -82,51 +86,56 @@
 
 ---
 
-## ADR-004: MongoDB for Resource Data
+## ADR-004: SQLite via Prisma for Resource Data
 
 **Date:** June 2026  
 **Status:** Decided  
 **Context:** We need to store resource listings (name, category, phone, address, eligibility, hours). The data is semi-structured — some resources have many fields, others have few.
 
-**Decision:** MongoDB (Atlas free tier) for resource data storage.
+**Decision:** SQLite via Prisma ORM for resource data storage.
 
 **Rationale:**
-- Resource data is document-like: each resource has varying fields. MongoDB's flexible schema accommodates this naturally.
-- Atlas free tier (512MB) is sufficient for a hackathon MVP with resources for one or two cities.
-- Harshit has MongoDB experience. Faster development.
-- JSON-native storage matches our API contract (resources returned as JSON objects).
+- **Zero setup:** SQLite is file-based. No database server to configure, no cloud account to create, no connection strings to manage. `DATABASE_URL=file:./dev.db` is all we need.
+- **Prisma ORM** gives us type-safe database access, schema migrations via `prisma db push`, and a seed script for initial data. Perfect for a hackathon where speed matters.
+- **Single deployment unit:** The SQLite file lives alongside the app. No external database service means one less thing to break during the demo.
+- **Prisma schema** defines our models (Resource, User, Conversation, Message, SavedResource, UserSettings) with proper relationships and types. TypeScript type generation is automatic.
+- **Adequate for hackathon scale:** We're serving resources for one city (Houston, TX). SQLite handles this easily.
 
 **Consequences:**
-- MongoDB is not ideal for complex queries or relationships between resources. If we need to implement resource recommendations based on user history, a relational database would be better. But we're not doing user history (privacy-first, no stored data).
-- Atlas free tier has limitations (no advanced security features, shared cluster). Not production-grade for a real deployment.
+- SQLite is not ideal for concurrent writes. For a hackathon demo, this is fine. For production with real users, we'd migrate to PostgreSQL.
+- No built-in full-text search. We use in-memory filtering in the API route instead.
+- The Prisma schema uses comma-separated strings for lists (e.g., `services`, `languages` fields on Resource). This is a denormalization trade-off for simplicity.
 
 **Alternatives Considered:**
-- PostgreSQL: More structured, better for relational data. But resource data is not heavily relational, and the flexible schema of MongoDB is a better fit for varying resource attributes.
-- Supabase: PostgreSQL-based with built-in API. Good option but adds another dependency and learning curve.
-- Static JSON files: Simplest possible approach. No database needed. But makes updates harder and doesn't scale beyond a demo.
+- MongoDB (Atlas free tier): Flexible schema for varying resource attributes, but adds an external dependency and cloud service. Overkill for our scale and adds setup complexity.
+- PostgreSQL: More robust for production, but requires a running database server. Prisma supports it, and we could migrate later if needed.
+- Static JSON files only (no database): Simplest possible approach. We partially do this with `src/data/resources.ts`, but Prisma gives us persistence for conversations, users, and saved resources.
 
 ---
 
-## ADR-005: React + TypeScript for Frontend
+## ADR-005: Next.js App Router for Frontend and API
 
 **Date:** June 2026  
 **Status:** Decided  
-**Context:** We need a fast, modern frontend that works well on mobile devices and can display dynamic confidence indicators, clarification questions, and crisis overlays.
+**Context:** We need a fast, modern frontend that works well on mobile devices and can display dynamic confidence indicators, clarification questions, and crisis overlays. We also need API routes for classification and data access.
 
-**Decision:** React + TypeScript, deployed on Vercel.
+**Decision:** Next.js 16 with App Router, TypeScript, and Tailwind CSS with shadcn/ui components. Deployed on Vercel.
 
 **Rationale:**
-- Harshit's strongest frontend framework. Maximum development velocity.
-- TypeScript catches bugs at compile time, which is critical for a 7-day build sprint where we can't afford runtime errors.
-- Vercel deployment is trivial for React apps. Zero-config CI/CD.
-- Component-based architecture maps well to our UI: ConfidenceBar, ClarificationQuestion, CrisisOverlay, ResourceCard are all independent components.
+- **Full-stack in one framework:** Next.js App Router gives us both frontend pages (`src/app/`) and API routes (`src/app/api/`) in a single application. No separate backend needed.
+- **Harshit's strongest framework.** Maximum development velocity.
+- **TypeScript throughout** catches bugs at compile time, which is critical for a 7-day build sprint where we can't afford runtime errors.
+- **Tailwind CSS + shadcn/ui** provides a professional, accessible component library with zero custom CSS overhead.
+- **Vercel deployment is trivial** for Next.js apps. Zero-config CI/CD.
+- **Server Components** for static pages (about, team, privacy) and Client Components for interactive features (navigator, classification results).
 
 **Consequences:**
-- React bundle size can be large. We need to be mindful of performance on slow connections. Code splitting and lazy loading are required.
+- Next.js bundle size can be large. We need to be mindful of performance on slow connections. Code splitting and lazy loading are required.
 - Vercel's free tier has bandwidth limits. Fine for a hackathon demo but not for real traffic.
+- Serverless functions (API routes) have cold-start latency. The first classification request may take an extra 1-2 seconds.
 
 **Alternatives Considered:**
-- Next.js: Server-side rendering would help with initial load time and SEO. But adds complexity we may not need for a single-page app. Can add later if needed.
+- Separate React frontend + Express backend: More traditional split, but adds complexity. Next.js API routes handle our needs perfectly.
 - Vue.js: Lighter bundle size, but Harshit has less experience. Not worth the learning curve for a 7-day sprint.
 - Plain HTML/JS: Smallest possible bundle, but harder to manage complex state (classification results, clarification flow, crisis overlay). Not practical.
 
@@ -138,13 +147,13 @@
 **Status:** Decided  
 **Context:** We need to detect when a user is in active crisis (suicidal ideation, domestic violence, substance overdose) and show crisis resources immediately.
 
-**Decision:** Crisis detection is implemented as a hardcoded keyword-matching module in Python, completely separate from the AI classification pipeline. The AI layer CANNOT override or bypass it.
+**Decision:** Crisis detection is implemented as a hardcoded regex-based keyword-matching module in TypeScript, built directly into the `/api/classify` route. It runs before the HuggingFace classification call. The AI layer CANNOT override or bypass it.
 
 **Rationale:**
 - AI-powered crisis detection can fail silently. A language model might not flag an indirect expression of crisis, or worse, classify it as something else entirely.
 - Hardcoded keyword matching is deterministic: same input always produces the same output. No model updates, no version changes, no unpredictable behavior.
-- The crisis module runs FIRST, before the AI pipeline. Even if the AI server is down, crisis detection still works.
-- This is our strongest argument for the Best Responsible AI award: crisis detection is architecturally separated from AI, making it impossible for the AI to interfere with safety-critical functionality.
+- The crisis check runs synchronously in the same request handler, before the async HuggingFace API call. Even if the HuggingFace API is down, crisis detection still works.
+- This is our strongest argument for the Best Responsible AI award: crisis detection is architecturally separated from AI classification, making it impossible for the AI to interfere with safety-critical functionality.
 
 **Consequences:**
 - Keyword matching has limited recall. Indirect expressions ("I don't want to be here anymore") may not trigger detection. We document this as a known limitation.
@@ -158,27 +167,27 @@
 
 ---
 
-## ADR-007: No User Accounts or Data Persistence
+## ADR-007: No User Accounts or Data Persistence (By Default)
 
 **Date:** June 2026  
 **Status:** Decided  
 **Context:** Users describe personal, often sensitive situations. Storing this data creates privacy risks, legal obligations, and security requirements.
 
-**Decision:** No user accounts. No data persistence. All user input is processed in-memory and discarded after the session ends.
+**Decision:** No user accounts required. Guest mode is the default. All user input is processed and discarded after the session. Optional accounts exist for saving resources and conversation history, but are not required for core functionality.
 
 **Rationale:**
-- Privacy by design: we can't leak data we don't store.
-- Simpler architecture: no authentication, no database of user inputs, no GDPR compliance complexity.
+- Privacy by design: we can't leak data we don't store (for guest users).
+- Simpler architecture for the core flow: no authentication required to use the navigator.
 - Aligns with our brand: "We forget what you tell us. That's a feature, not a bug."
-- Reduces attack surface: no user database to breach.
+- Optional accounts add value (saved resources, conversation history) without compromising the privacy-first default.
 
 **Consequences:**
-- No session continuity: if the user refreshes the page, their classification results are lost.
-- No personalization: the system can't learn from past interactions or improve over time based on user feedback.
-- No analytics: we can't measure how many people we helped or which resources were most useful.
+- Guest session continuity: if the user refreshes the page, their classification results are lost.
+- No personalization for guests: the system can't learn from past interactions or improve over time based on user feedback.
+- No analytics for guests: we can't measure how many people we helped or which resources were most useful.
 
 **Alternatives Considered:**
-- Optional accounts with consent: More features (save resources, revisit past results) but adds significant complexity (auth, consent management, data retention policies).
+- Mandatory accounts: More features (save resources, revisit past results) but adds significant friction and privacy concerns for vulnerable users.
 - Anonymous sessions with expiry: Session data stored temporarily (24h expiry). Adds some continuity without permanent storage. Could implement post-hackathon.
 
 ---

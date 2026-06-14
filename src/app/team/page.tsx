@@ -207,7 +207,7 @@ const coreTeam = [
   {
     name: 'James Nakamura',
     role: 'DevOps & Infrastructure Engineer',
-    bio: 'James keeps ClearPath AI running at scale. With 7 years of experience in cloud infrastructure and a deep commitment to privacy-first architecture, he designed our deployment pipeline to ensure that guest sessions never persist data, while authenticated user data is encrypted at rest. His privacy-first infrastructure design means guests leave no trace when they close the tab. He also built our monitoring and alerting systems that catch performance issues before they affect users.',
+    bio: 'James keeps ClearPath AI running at scale. With 7 years of experience in cloud infrastructure and a deep commitment to privacy-first architecture, he designed our deployment pipeline to ensure that user data is never persistently stored. His privacy-first infrastructure design means users leave no trace when they close the tab. He also built our monitoring and alerting systems that catch performance issues before they affect users.',
     expertise: ['Cloud Infrastructure', 'Privacy-First Architecture', 'CI/CD Pipelines', 'Kubernetes', 'Privacy Engineering'],
     skills: ['AWS/GCP', 'Kubernetes', 'Docker', 'Terraform', 'Privacy Engineering'],
     contributions: ['Designed privacy-first infrastructure pipeline', 'Built automated deployment with no-downtime releases', 'Implemented real-time monitoring and alerting'],
@@ -382,7 +382,7 @@ const values = [
   },
   {
     title: 'Privacy by Design',
-    description: 'Guest sessions are ephemeral by design — processed in real-time with no persistence. Authenticated accounts store conversations securely, encrypted at rest, for cross-session access. You can\'t breach what was never stored for guests; accounts give you control over your data.',
+    description: 'Guest sessions are ephemeral by design — processed in real-time with no persistence. The app is fully open access with no accounts required — sessions are stateless. You can\'t breach what was never stored.',
     icon: Lock,
     color: '#8b5cf6',
     bgColor: 'rgba(139,92,246,0.06)',
@@ -447,7 +447,7 @@ const howWeWork = [
   {
     step: '05',
     title: 'Deploy with Privacy First',
-    description: 'Our deployment pipeline ensures that guest sessions leave no persistent trace. Inference happens in real-time, results are delivered to the client, and all intermediate guest data is immediately garbage-collected. Authenticated user data is encrypted at rest with full user control. We minimize what we collect, and protect what we store.',
+    description: 'Our deployment pipeline ensures that sessions leave no persistent trace. Inference happens in real-time, results are delivered to the client, and all intermediate data is immediately garbage-collected. User data is never persistently stored. We minimize what we collect, and protect what we process.',
     icon: Cloud,
     color: '#f59e0b',
     bgColor: 'rgba(245,158,11,0.06)',
@@ -555,7 +555,7 @@ const openPositions = [
   {
     title: 'Community Outreach Coordinator',
     department: 'Community',
-    location: 'Hybrid (Atlanta, GA)',
+    location: 'Remote (Houston, TX metro)',
     type: 'Full-time',
     description: 'Be the bridge between ClearPath AI and the communities we serve. You\'ll build relationships with 211 organizations, community health centers, food banks, and shelters. Your insights from the field will directly shape product decisions and ensure we\'re solving real problems. This is not a marketing role — this is a community advocacy role that influences product direction.',
     requirements: [
@@ -1725,7 +1725,7 @@ export default function TeamPage() {
                   <div className="flex-1">
                     <h3 className="text-[18px] font-bold text-gray-900 tracking-tight mb-2">Privacy as a Default, Not a Setting</h3>
                     <p className="text-[14px] text-gray-500 leading-relaxed mb-3">
-                      Our privacy-first architecture isn&apos;t just a technical decision — it&apos;s a cultural commitment. Guest sessions process data in real-time without persistence, and authenticated users control their stored data with full encryption. We believe that the people who need community resources the most are often the most vulnerable to surveillance. Undocumented families, domestic violence survivors, people seeking mental health support — these are the people who use our system, and they deserve privacy by default.
+                      Our privacy-first architecture isn&apos;t just a technical decision — it&apos;s a cultural commitment. All sessions process data in real-time without persistence, and users have full transparency into how their data is processed. We believe that the people who need community resources the most are often the most vulnerable to surveillance. Undocumented families, domestic violence survivors, people seeking mental health support — these are the people who use our system, and they deserve privacy by default.
                     </p>
                     <p className="text-[14px] text-gray-500 leading-relaxed">
                       This commitment extends to our internal tools too. We don&apos;t track team member productivity with keyloggers or screenshot tools. We don&apos;t require time tracking. We trust our team to manage their own time and deliver results. If you need to take a mental health day, you take it — no questions asked. The same privacy we extend to our users, we extend to each other.
@@ -1931,7 +1931,7 @@ export default function TeamPage() {
                 {
                   quote: 'I\'ve been navigating for 15 years. ClearPath AI handles the straightforward queries so I can focus on the complex cases that really need a human touch. It doesn\'t replace me — it gives me superpowers. And the "Talk to a Navigator" button means my help is always one click away.',
                   name: 'Robert Jackson',
-                  title: 'Veteran Navigator, VA Support Services — Atlanta',
+                  title: 'Veteran Navigator, VA Support Services — Houston',
                   initials: 'RJ',
                   color: '#ec4899',
                 },
@@ -2101,7 +2101,7 @@ export default function TeamPage() {
                 },
                 {
                   q: 'Is ClearPath AI really privacy-first?',
-                  a: 'Yes — it\'s an architectural guarantee, not just a policy. Our infrastructure is designed so that guest data is processed in real-time and never written to persistent storage. For authenticated users, data is encrypted at rest with full user control — delete anytime. No session logs for guests, no third-party tracking, no advertising cookies. Privacy was a founding principle, not an afterthought.',
+                  a: 'Yes — it\'s an architectural guarantee, not just a policy. Our infrastructure is designed so that all data is processed in real-time and never written to persistent storage. Users have full transparency into how their data is processed — no session logs, no third-party tracking, no advertising cookies. Privacy was a founding principle, not an afterthought.',
                 },
                 {
                   q: 'What does "honest confidence" mean?',

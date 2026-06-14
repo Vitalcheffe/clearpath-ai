@@ -163,12 +163,12 @@ const faqs = [
   {
     question: 'Is my data stored?',
     answer:
-      'Guest sessions are processed in-memory and not stored. If you create an account, your conversations are stored securely on our servers so you can access them later. For authenticated users, conversation history is stored securely on our servers. Guest sessions are not persisted. We believe that people seeking community resources deserve strong privacy protections across all plans.',
+      'Guest sessions are processed in-memory and not stored. Your queries are processed in real-time with no persistent storage. Guest sessions are not persisted. We believe that people seeking community resources deserve strong privacy protections across all plans.',
   },
   {
     question: 'Can I switch between plans?',
     answer:
-      'Absolutely. You can upgrade or downgrade your plan at any time from your account settings. When upgrading, you\'ll get immediate access to Pro features and be charged a prorated amount for the remainder of your billing cycle. When downgrading, your Pro features remain active until the end of your current billing period. There are no cancellation fees.',
+      'Absolutely. You can switch plans at any time. When upgrading, you\'ll get immediate access to Pro features and be charged a prorated amount for the remainder of your billing cycle. When downgrading, your Pro features remain active until the end of your current billing period. There are no cancellation fees.',
   },
   {
     question: 'How does annual billing work?',
@@ -213,7 +213,7 @@ const faqs = [
   {
     question: 'Is ClearPath AI HIPAA compliant?',
     answer:
-      'ClearPath AI is designed with privacy principles aligned with HIPAA best practices. Formal compliance certification is pending. We do not store Protected Health Information (PHI) for guest sessions, and authenticated user data is encrypted at rest. We are working toward formal HIPAA BAA availability for Enterprise customers. Contact our sales team for the latest compliance status and timeline.',
+      'ClearPath AI is designed with privacy principles aligned with HIPAA best practices. Formal compliance certification is pending. We do not store Protected Health Information (PHI) — user data is never persistently stored. We are working toward formal HIPAA BAA availability for Enterprise customers. Contact our sales team for the latest compliance status and timeline.',
   },
 ]
 
@@ -1912,7 +1912,7 @@ export default function PricingPage() {
                 {
                   icon: Lock,
                   title: 'Privacy-first by design.',
-                  desc: 'Guest sessions process in real-time with no persistence. Accounts store conversations securely for cross-session access.',
+                  desc: 'All sessions process in real-time with no persistence. No user data is stored between visits.',
                   color: '#3b82f6',
                   bg: 'rgba(59,130,246,0.06)',
                 },

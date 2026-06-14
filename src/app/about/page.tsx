@@ -861,7 +861,7 @@ export default function AboutPage() {
                   title: "Sarah's Story — Finding Housing After Eviction",
                   avatar: 'S',
                   avatarGradient: 'from-rose-500 to-pink-600',
-                  story: 'Sarah, a 34-year-old single mother of two in Atlanta, received an eviction notice after her hours were cut at work. She spent three days Googling "rent assistance Atlanta" and found dozens of programs — most had expired deadlines, others had complex eligibility requirements buried in PDFs. She tried an AI chatbot, which recommended a shelter that had closed in 2024.',
+                  story: 'Sarah, a 34-year-old single mother of two in Houston, received an eviction notice after her hours were cut at work. She spent three days Googling "rent assistance Houston" and found dozens of programs — most had expired deadlines, others had complex eligibility requirements buried in PDFs. She tried an AI chatbot, which recommended a shelter that had closed in 2024.',
                   clearpath: 'When Sarah used ClearPath AI, she typed: "I need help with rent, I\'m about to be evicted." The system classified her need as Emergency Housing with 94% confidence and showed her three verified programs with active funding, including one specifically for families with children. The confidence score was front and center — she knew immediately this was a high-confidence result. She also saw the "What else we considered" section, which showed she might also qualify for food assistance and utility relief.',
                   outcome: 'Sarah connected with the Family Housing Initiative within 48 hours and received emergency rental assistance that covered two months of rent. She also enrolled in the food assistance program she discovered through ClearPath AI\'s multi-need classification.',
                   icon: Home,
@@ -1418,9 +1418,9 @@ export default function AboutPage() {
                 </div>
                 <div className="space-y-4">
                   {[
-                    { title: 'Privacy by Design', desc: 'Guest sessions process in real-time with no persistence. Accounts store conversations securely for cross-session access. Minimal data collection, encrypted storage, no tracking.', icon: Database, color: '#ef4444' },
+                    { title: 'Privacy by Design', desc: 'All sessions process in real-time with no persistence. No user data is stored between visits. Minimal data collection, no tracking.', icon: Database, color: '#ef4444' },
                     { title: 'HTTPS Encryption', desc: 'All data in transit is encrypted via TLS 1.3. No plaintext transmission at any point.', icon: Lock, color: '#3b82f6' },
-                    { title: 'Minimal PII', desc: 'Guest users share no PII at all. Account holders provide only email and optional name — we never ask for addresses, SSNs, or sensitive identifiers.', icon: Fingerprint, color: '#8b5cf6' },
+                    { title: 'Minimal PII', desc: 'Users share no PII at all. We never ask for addresses, SSNs, or sensitive identifiers.', icon: Fingerprint, color: '#8b5cf6' },
                     { title: 'No Model Training', desc: 'User queries are never used to train, fine-tune, or improve any model. Zero data retention.', icon: Cpu, color: '#10b981' },
                     { title: 'Crisis Data Isolation', desc: 'Crisis-related inputs are processed locally and never transmitted to external services.', icon: Shield, color: '#f59e0b' },
                   ].map((item) => {

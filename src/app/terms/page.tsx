@@ -661,10 +661,10 @@ export default function TermsPage() {
                 <div className="p-4 rounded-xl bg-gray-50/60 border border-gray-100 mt-2">
                   <p className="text-[13px] text-gray-500">
                     <span className="font-semibold text-gray-700">Governing Law:</span> These Terms and any disputes
-                    arising from them are governed by the laws of the State of Georgia, United States,
+                    arising from them are governed by the laws of the State of Texas, United States,
                     without regard to conflict of law principles. For any claims not subject to arbitration,
                     you consent to the exclusive jurisdiction of the state and federal courts located in
-                    Atlanta, Georgia.
+                    Houston, Texas.
                   </p>
                 </div>
               </div>

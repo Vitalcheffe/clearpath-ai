@@ -25,8 +25,6 @@ import {
   Building2,
   FileText,
   Scale,
-  Briefcase,
-  Newspaper,
   DollarSign,
   Cpu,
   Eye,
@@ -64,7 +62,7 @@ const productLinks = [
   { label: 'How It Works', href: '/#how-it-works', icon: Cpu, desc: 'Our 6-layer pipeline' },
   { label: 'API Docs', href: '/verification', icon: FileText, desc: 'Integration guide' },
   { label: 'Pricing', href: '/pricing', icon: DollarSign, desc: 'Free forever for individuals' },
-  { label: 'Blog', href: '/about', icon: BookOpen, desc: 'Responsible AI insights' },
+  { label: 'Blog', href: '/blog', icon: BookOpen, desc: 'Responsible AI insights' },
   { label: 'Verification', href: '/verification', icon: ShieldCheck, desc: 'How we verify resources' },
 ]
 
@@ -72,8 +70,6 @@ const companyLinks = [
   { label: 'About', href: '/about', icon: Building2, desc: 'Our mission & story' },
   { label: 'Team', href: '/team', icon: Users, desc: 'The people behind ClearPath' },
   { label: 'Contact', href: '/contact', icon: Mail, desc: 'Get in touch' },
-  { label: 'Careers', href: '/about', icon: Briefcase, desc: 'Join our team' },
-  { label: 'Press', href: '/about', icon: Newspaper, desc: 'Media resources' },
 ]
 
 const legalLinks = [
@@ -84,9 +80,9 @@ const legalLinks = [
 ]
 
 const socialLinks = [
-  { label: 'GitHub', href: 'https://github.com/clearpath-ai', icon: Github, handle: '@clearpath-ai' },
-  { label: 'Twitter / X', href: 'https://x.com/clearpath_ai', icon: Twitter, handle: '@clearpath_ai' },
-  { label: 'LinkedIn', href: 'https://linkedin.com/company/clearpath-ai', icon: Linkedin, handle: 'ClearPath AI' },
+  { label: 'GitHub', href: 'https://github.com/Vitalcheffe/clearpath-ai', icon: Github, handle: '@Vitalcheffe' },
+  { label: 'Twitter / X', href: '#', icon: Twitter, handle: 'Coming soon' },
+  { label: 'LinkedIn', href: '#', icon: Linkedin, handle: 'Coming soon' },
 ]
 
 const trustBadges = [
@@ -97,7 +93,7 @@ const trustBadges = [
     bgColor: 'rgba(16, 185, 129, 0.08)',
     borderColor: 'rgba(16, 185, 129, 0.15)',
     desc: 'Privacy-first architecture',
-    detail: 'Guest sessions process queries in real-time with no persistence. Accounts store conversations securely for cross-session access.'
+    detail: 'All sessions process queries in real-time with no persistent data storage. Your privacy is protected by design.'
   },
   {
     label: 'Crisis detection',
@@ -115,7 +111,7 @@ const trustBadges = [
     bgColor: 'rgba(59, 130, 246, 0.08)',
     borderColor: 'rgba(59, 130, 246, 0.15)',
     desc: 'Verified resources',
-    detail: '50,000+ verified community resources from United Way 211 database.',
+    detail: '23 verified community resources from United Way 211 database.',
   },
   {
     label: 'Open source',

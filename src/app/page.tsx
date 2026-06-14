@@ -185,7 +185,7 @@ const layers = [
   {
     step: 3,
     title: 'Multi-Label Classification',
-    desc: 'BART-large-MNLI classifies against 8 categories simultaneously. No hallucinated resources.',
+    desc: 'BART-large-MNLI classifies against 9 categories simultaneously. No hallucinated resources.',
     icon: Layers,
     color: 'indigo',
     colorHex: '#6366f1',
@@ -227,7 +227,7 @@ const layerDeepDives = [
     bgColor: 'rgba(59,130,246,0.06)',
     function: 'Every result is scored from 0-100% using calibrated probabilities from BART-large-MNLI. Unlike raw model outputs, our scores are validated against held-out data to reflect true certainty.',
     dataFlow: 'User input → BART-large-MNLI softmax → Calibrated probability → Displayed as confidence ring',
-    example: '"I need help paying my electricity bill" → 91% confidence → Energy Assistance category. The model is highly certain because the language directly maps to a well-represented category in the 211 database.',
+    example: '"I need help with VA benefits" → 91% confidence → Veteran Services category. The model is highly certain because the language directly maps to a well-represented category in the 211 database.',
   },
   {
     layer: 2,
@@ -247,7 +247,7 @@ const layerDeepDives = [
     icon: Scale,
     colorHex: '#8b5cf6',
     bgColor: 'rgba(139,92,246,0.06)',
-    function: 'We use zero-shot classification (BART-large-MNLI) without fine-tuning, which minimizes training data bias. Our 8 categories are broad and inclusive, designed with community navigator input.',
+    function: 'We use zero-shot classification (BART-large-MNLI) without fine-tuning, which minimizes training data bias. Our 9 categories are broad and inclusive, designed with community navigator input.',
     dataFlow: 'Raw classification → Category bias audit → Multi-label threshold tuning → Result displayed with alternatives',
     example: '"My grandma needs meals delivered" triggers both Food Assistance and Senior Services — not forced into a single bucket. Multi-label classification ensures intersectional needs are captured.',
   },
@@ -371,7 +371,7 @@ const faqs = [
   },
   {
     question: 'What categories can ClearPath AI classify?',
-    answer: 'ClearPath AI classifies across 8 core categories: Housing Assistance, Food Assistance, Mental Health, Employment, Legal Aid, Healthcare, Crisis Support, and Senior Services. Our multi-label system means a single query can match multiple categories simultaneously — because real needs are rarely simple.',
+    answer: 'ClearPath AI classifies across 9 core categories: Housing Assistance, Food Assistance, Mental Health, Employment, Legal Aid, Healthcare, Crisis Support, Senior Services, and Veteran Services. Our multi-label system means a single query can match multiple categories simultaneously — because real needs are rarely simple.',
   },
   {
     question: 'Can I use ClearPath AI in a language other than English?',
@@ -585,14 +585,14 @@ const securityFeatures = [
   {
     icon: Lock,
     title: 'Privacy by Design',
-    desc: 'Guest users need no account — conversations are processed without storing personal data. Registered users control what gets saved and can delete everything anytime.',
+    desc: 'Guest users need no account — conversations are processed without storing personal data. Your data stays in your browser session — nothing is persisted without your consent.',
     colorHex: '#3b82f6',
     bgColor: 'rgba(59,130,246,0.06)',
   },
   {
     icon: UserCheck,
     title: 'Optional Accounts',
-    desc: 'Use ClearPath AI instantly as a guest. No sign-up, no email, no profile required. Create an account only if you want to save conversations and resources.',
+    desc: 'Use ClearPath AI instantly as a guest. No sign-up, no email, no profile required. Fully open access — just describe your situation.',
     colorHex: '#10b981',
     bgColor: 'rgba(16,185,129,0.06)',
   },
@@ -1949,7 +1949,7 @@ export default function LandingPage() {
               <h3 className="text-[18px] font-bold text-gray-900 tracking-tight">Privacy by design, not by afterthought.</h3>
             </div>
             <p className="text-[14px] text-gray-500 leading-relaxed max-w-xl mx-auto">
-              ClearPath AI was designed from the ground up with privacy-first architecture. Guest users need no account — sessions process in real-time with no persistence. For authenticated users, data is encrypted and fully controlled. Delete everything anytime. This isn&apos;t a feature we added. It&apos;s how we built it from day one.
+              ClearPath AI was designed from the ground up with privacy-first architecture. Guest users need no account — sessions process in real-time with no persistence. Your session data is processed in real-time and never stored permanently. This isn&apos;t a feature we added. It&apos;s how we built it from day one.
             </p>
           </div>
         </motion.div>
@@ -2332,10 +2332,10 @@ export default function LandingPage() {
                 &copy; 2026 ClearPath AI. All rights reserved. Built with honest confidence.
               </p>
               <div className="flex items-center gap-4">
-                <a href="#" className="text-gray-500 hover:text-white transition-colors" aria-label="GitHub">
+                <a href="https://github.com/Vitalcheffe/clearpath-ai" className="text-gray-500 hover:text-white transition-colors" aria-label="GitHub">
                   <Code2 className="w-4 h-4" />
                 </a>
-                <a href="#" className="text-gray-500 hover:text-white transition-colors" aria-label="Twitter">
+                <a href="#" title="Coming soon" className="text-gray-500 hover:text-white transition-colors" aria-label="Twitter">
                   <Globe2 className="w-4 h-4" />
                 </a>
                 <a href="mailto:team@clearpath-ai.org" className="text-gray-500 hover:text-white transition-colors" aria-label="Email">

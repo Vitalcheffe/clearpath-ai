@@ -27,8 +27,8 @@ A 6-layer community resource navigator:
 
 ```
 1. Free-text input          → User describes situation in their own words
-2. Crisis detection         → Hardcoded keyword check, AI-proof
-3. Multi-label classification→ Zero-shot NLP with confidence scores
+2. Crisis detection         → Hardcoded regex keyword check, AI-proof
+3. Multi-label classification→ Zero-shot NLP (BART-large-MNLI) with confidence scores
 4. Clarification questions   → When confidence < 70%, ask don't guess
 5. Transparent display       → Why + What Else + How Confident
 6. Human escalation          → 211 navigator when AI can't help
@@ -49,43 +49,68 @@ clearpath-ai/
 ├── BRAND.md             ← Visual identity + voice
 ├── DECISIONS.md         ← Architecture Decision Records
 ├── CRISIS_KEYWORDS.md   ← Crisis keyword database
-├── API_CONTRACT.md      ← Backend ↔ AI pipeline interface
+├── API_CONTRACT.md      ← API interface documentation
 ├── .env.example         ← Environment variables template
 ├── .gitignore
+├── next.config.ts       ← Next.js configuration
+├── package.json         ← Single package.json for the whole app
+├── tailwind.config.ts   ← Tailwind CSS configuration
+├── tsconfig.json        ← TypeScript configuration
 │
-├── ai_pipeline/         ← Amine's domain
-│   ├── app.py           ← Flask/FastAPI server
-│   ├── crisis_detection.py  ← Hardcoded keyword module
-│   ├── classifier.py    ← Hugging Face zero-shot + calibration
-│   ├── clarification.py ← Question generation logic
-│   ├── requirements.txt
-│   └── tests/
-│       ├── test_crisis_detection.py  ← 100% coverage required
-│       └── test_classifier.py
+├── prisma/              ← Database schema and seed
+│   ├── schema.prisma    ← SQLite schema (Resource, User, Conversation, Message)
+│   └── seed.ts          ← Seed data script
 │
-├── backend/             ← Harshit's domain
-│   ├── src/
-│   │   ├── routes/      ← Express API routes
-│   │   ├── models/      ← MongoDB schemas
-│   │   ├── middleware/   ← Auth, rate limiting, error handling
-│   │   └── index.ts     ← Entry point
-│   ├── package.json
-│   └── tsconfig.json
-│
-├── frontend/            ← Harshit's domain
-│   ├── src/
-│   │   ├── components/  ← React components
-│   │   │   ├── ConfidenceBar.tsx
-│   │   │   ├── ClarificationQuestion.tsx
-│   │   │   ├── CrisisOverlay.tsx
-│   │   │   ├── ResourceCard.tsx
-│   │   │   └── NavigatorButton.tsx
-│   │   ├── pages/       ← Main pages
-│   │   │   ├── InputPage.tsx
-│   │   │   └── ResultsPage.tsx
-│   │   └── App.tsx
-│   ├── package.json
-│   └── tsconfig.json
+├── src/
+│   ├── app/             ← Next.js App Router pages
+│   │   ├── page.tsx     ← Landing / home page
+│   │   ├── layout.tsx   ← Root layout
+│   │   ├── app/         ← Main app page (navigator)
+│   │   ├── about/       ← About page
+│   │   ├── team/        ← Team page
+│   │   ├── privacy/     ← Privacy policy
+│   │   ├── terms/       ← Terms of service
+│   │   ├── how-it-works/← How it works page
+│   │   ├── contact/     ← Contact page
+│   │   ├── api-docs/    ← API documentation page
+│   │   ├── blog/        ← Blog page
+│   │   ├── pricing/     ← Pricing page
+│   │   ├── responsible-ai/ ← Responsible AI page
+│   │   ├── verification/← Verification page
+│   │   ├── not-found.tsx← 404 page
+│   │   ├── globals.css  ← Global styles
+│   │   ├── sitemap.ts   ← Sitemap generator
+│   │   ├── robots.ts    ← Robots.txt generator
+│   │   │
+│   │   └── api/         ← Next.js API routes
+│   │       ├── route.ts         ← API index
+│   │       ├── classify/        ← Crisis detection + BART classification
+│   │       │   └── route.ts     ← POST /api/classify (crisis check + zero-shot)
+│   │       │   └── test-bart/   ← BART model test endpoint
+│   │       ├── community-resources/ ← GET community resources
+│   │       │   └── route.ts
+│   │       └── contact/         ← POST contact form
+│   │           └── route.ts
+│   │
+│   ├── components/      ← React components
+│   │   ├── Navbar.tsx
+│   │   ├── Footer.tsx
+│   │   └── ui/          ← shadcn/ui component library
+│   │
+│   ├── data/            ← Static data
+│   │   └── resources.ts ← Houston community resource database
+│   │
+│   ├── hooks/           ← Custom React hooks
+│   │   ├── use-mobile.ts
+│   │   └── use-toast.ts
+│   │
+│   ├── lib/             ← Shared utilities
+│   │   ├── db.ts        ← Prisma client singleton
+│   │   ├── utils.ts     ← Utility functions
+│   │   └── animations.ts ← Framer Motion variants
+│   │
+│   └── types/           ← TypeScript type declarations
+│       └── framer-motion.d.ts
 │
 └── docs/                ← Shared documents
     ├── JUDGE_MAP.md
@@ -97,12 +122,11 @@ clearpath-ai/
 
 ---
 
-## SETUP (15 MINUTES)
+## SETUP (5 MINUTES)
 
 ### Prerequisites
 
 - Node.js 18+
-- Python 3.10+
 - Git
 - VS Code (recommended)
 
@@ -112,17 +136,8 @@ clearpath-ai/
 git clone https://github.com/[repo-url]/clearpath-ai.git
 cd clearpath-ai
 
-# Frontend
-cd frontend && npm install && cd ..
-
-# Backend
-cd backend && npm install && cd ..
-
-# AI Pipeline
-cd ai_pipeline && python -m venv venv
-source venv/bin/activate  # Windows: venv\Scripts\activate
-pip install -r requirements.txt
-cd ..
+# Single install for the entire app
+npm install
 ```
 
 ### Step 2: Environment Variables
@@ -130,40 +145,43 @@ cd ..
 ```bash
 cp .env.example .env
 # Edit .env with your local values:
+# DATABASE_URL=file:./dev.db
 # HUGGINGFACE_API_KEY=hf_xxxxx
-# MONGODB_URI=mongodb+srv://...
-# PORT=3000
-# AI_PIPELINE_URL=http://localhost:8000
 ```
 
-### Step 3: Run Locally
+### Step 3: Initialize Database
 
 ```bash
-# Terminal 1: AI Pipeline
-cd ai_pipeline && source venv/bin/activate
-python app.py  # Runs on http://localhost:8000
-
-# Terminal 2: Backend
-cd backend && npm run dev  # Runs on http://localhost:3000
-
-# Terminal 3: Frontend
-cd frontend && npm run dev  # Runs on http://localhost:5173
+npx prisma db push
+npx prisma db seed
 ```
 
-### Step 4: Verify
+### Step 4: Run Locally
 
 ```bash
-# Crisis detection
-curl -X POST http://localhost:8000/api/crisis-check \
+npm run dev  # Runs on http://localhost:3000
+```
+
+That's it. One terminal. One command. The entire app — frontend, API routes, crisis detection, classification — all runs on a single Next.js dev server on port 3000.
+
+### Step 5: Verify
+
+```bash
+# Crisis detection (built into the classify endpoint)
+curl -X POST http://localhost:3000/api/classify \
   -H "Content-Type: application/json" \
   -d '{"user_input": "I want to hurt myself"}'
-# Expected: crisis_detected: true
+# Expected: crisis_detected: true, crisis_resources shown
 
 # Classification
-curl -X POST http://localhost:8000/api/classify \
+curl -X POST http://localhost:3000/api/classify \
   -H "Content-Type: application/json" \
   -d '{"user_input": "I can not pay my rent anymore"}'
-# Expected: categories with confidence scores
+# Expected: categories with confidence scores (9 categories)
+
+# Community resources
+curl http://localhost:3000/api/community-resources
+# Expected: Houston resource listings grouped by category
 ```
 
 ---
@@ -195,7 +213,7 @@ curl -X POST http://localhost:8000/api/classify \
 | 1 | CHARTER.md | Team rules, disqualification risks, module ownership |
 | 2 | OBJECTIVES.md | Quality standards (Level 0-3), daily checklists |
 | 3 | BRAND.md | Visual identity, voice, tone, color system |
-| 4 | API_CONTRACT.md | How the AI pipeline and backend communicate |
+| 4 | API_CONTRACT.md | How the API routes work |
 | 5 | CRISIS_KEYWORDS.md | The crisis keyword list + testing protocol |
 | 6 | RESPONSIBLE_AI.md | Our ethical framework (also a hackathon deliverable) |
 | 7 | SCENARIOS.md | 7 user scenarios for development and demo |

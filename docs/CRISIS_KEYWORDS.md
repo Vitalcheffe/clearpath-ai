@@ -10,7 +10,7 @@
 2. **The crisis module runs BEFORE the AI classification pipeline.** Always. No exceptions.
 3. **The AI cannot override, skip, or bypass the crisis module.** These two systems are architecturally isolated.
 4. **False positives are acceptable. False negatives are not.** It's better to show the crisis overlay to someone who doesn't need it than to miss someone who does.
-5. **The crisis module works even if the AI server is down.** It runs independently.
+5. **The crisis module works even if the HuggingFace API is down.** It runs locally as regex matching, independent of any external service.
 
 ---
 
@@ -206,39 +206,53 @@
 
 ## IMPLEMENTATION SPECIFICATION
 
-### Python Module Structure
+### TypeScript Implementation (in `src/app/api/classify/route.ts`)
 
-```python
-# crisis_detection.py
+The crisis detection is implemented as a list of regex patterns in the Next.js API route handler. It runs synchronously before the HuggingFace classification call.
 
-CRISIS_CATEGORIES = {
-    "suicide_self_harm": {
-        "resources": [...],
-        "keywords": [...],
-        "phrases": [...]
-    },
-    "domestic_violence": {
-        "resources": [...],
-        "keywords": [...],
-        "phrases": [...]
-    },
-    # ... etc
+```typescript
+// src/app/api/classify/route.ts
+
+const CRISIS_PATTERNS = [
+  // ─── Suicidal ideation ───
+  /suicid/i,
+  /kill\s+myself/i,
+  /end\s+it\s+all/i,
+  /end\s+my\s+life/i,
+  /want\s+to\s+die/i,
+  /harm\s+myself/i,
+  /self[- ]?harm/i,
+  // ... (full list in route.ts)
+
+  // ─── Domestic violence / abuse ───
+  /domestic\s+violen/i,
+  /domestic\s+abuse/i,
+  /(husband|wife|partner)\s+(hits?|beats?|hurts?)/i,
+  // ...
+
+  // ─── Sexual assault / trafficking ───
+  /sexual\s+assault/i,
+  /\braped?\b/i,
+  /human\s+trafficking/i,
+  // ...
+
+  // ─── Homicidal ideation ───
+  /\b(kill|murder|hurt|harm)\s+(someone|my|him|her|them)\b/i,
+  // ...
+];
+
+// Crisis check runs FIRST, before any AI classification
+function detectCrisis(userInput: string): CrisisResult | null {
+  // Check each regex pattern against user input
+  // Returns crisis category + resources if detected, null otherwise
+  //
+  // This function:
+  // - Tests user input against all regex patterns
+  // - Returns FIRST match found (priority: suicide > DV > substance > child > assault > trafficking)
+  // - Is completely independent of the HuggingFace classification pipeline
+  // - Runs synchronously (no async, no network calls)
+  // - Completes in < 1ms (regex matching is instant)
 }
-
-def detect_crisis(user_input: str) -> dict | None:
-    """
-    Check user input against crisis keywords.
-    Returns crisis category + resources if detected, None otherwise.
-    
-    This function:
-    - Converts input to lowercase
-    - Checks exact keyword matches first
-    - Then checks substring phrase patterns
-    - Returns FIRST match found (priority order: suicide > DV > substance > child > assault > trafficking)
-    - Is completely independent of the AI classification pipeline
-    - Runs synchronously (no async, no network calls)
-    - Completes in < 200ms
-    """
 ```
 
 ### API Response Format
@@ -301,7 +315,7 @@ Every keyword and phrase must be tested before deployment. No exceptions.
 | False positive check | "This headache is killing me" | None (no crisis) | [ ] |
 | Combined crisis | "I want to kill myself and my husband hits me" | suicide_self_harm (first priority) | [ ] |
 | Non-English | "Je veux mourir" | None (known limitation) | [ ] |
-| AI server down | Any crisis keyword | Crisis detected (independent of AI) | [ ] |
+| HuggingFace API down | Any crisis keyword | Crisis detected (regex runs independently) | [ ] |
 
 ---
 

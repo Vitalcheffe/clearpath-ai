@@ -530,6 +530,7 @@ export default function ContactPage() {
   })
   const [formSubmitted, setFormSubmitted] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [submitError, setSubmitError] = useState<string | null>(null)
   const [attachedFile, setAttachedFile] = useState<string | null>(null)
   const [expandedFaq, setExpandedFaq] = useState<number | null>(null)
 
@@ -549,6 +550,7 @@ export default function ContactPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsSubmitting(true)
+    setSubmitError(null)
     try {
       const res = await fetch('/api/contact', {
         method: 'POST',
@@ -563,12 +565,13 @@ export default function ContactPage() {
       if (res.ok) {
         setFormSubmitted(true)
       } else {
-        console.error('Contact form submission failed')
-        setFormSubmitted(true) // Still show success for demo UX
+        const data = await res.json().catch(() => ({}))
+        console.error('Contact form submission failed:', data)
+        setSubmitError(data.error || 'Failed to send message. Please try again later.')
       }
     } catch (error) {
       console.error('Contact form error:', error)
-      setFormSubmitted(true) // Still show success for demo UX
+      setSubmitError('Network error. Please check your connection and try again.')
     } finally {
       setIsSubmitting(false)
     }
@@ -1255,6 +1258,12 @@ export default function ContactPage() {
                       </div>
 
                       {/* Submit */}
+                      {submitError && (
+                        <div className="flex items-center gap-2 p-3 rounded-xl bg-red-50 border border-red-200 text-[13px] text-red-700">
+                          <AlertTriangle className="w-4 h-4 shrink-0" />
+                          {submitError}
+                        </div>
+                      )}
                       <div className="flex flex-col sm:flex-row items-center gap-4">
                         <button
                           type="submit"

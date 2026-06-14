@@ -9,9 +9,6 @@ const HF_API_URL = `https://api-inference.huggingface.co/models/${HF_MODEL}`;
 
 // ─── Boot-time diagnostic (runs once when serverless function cold-starts) ───
 console.log(`[classify:boot] HF_API_KEY present: ${!!HF_API_KEY}`);
-console.log(`[classify:boot] HF_API_KEY length: ${HF_API_KEY?.length ?? 'N/A'}`);
-console.log(`[classify:boot] HF_API_KEY prefix: ${HF_API_KEY ? HF_API_KEY.substring(0, 6) + '...' : 'NONE'}`);
-console.log(`[classify:boot] HF_API_URL: ${HF_API_URL}`);
 
 // ─── Crisis Detection (regex-based, deterministic, AI NEVER trusted for crisis) ───
 const CRISIS_PATTERNS = [
@@ -259,8 +256,7 @@ async function classifyWithBART(text: string): Promise<{ results: Classification
 
   // ── CALLING HF API — with full diagnostic logging ──
   debug.fetchAttempted = true;
-  console.log(`[classify] Calling HF API at ${HF_API_URL}`);
-  console.log(`[classify] Key prefix: ${HF_API_KEY.substring(0, 6)}...`);
+  console.log(`[classify] Calling HF API`);
   console.log(`[classify] Input text: "${text.substring(0, 80)}${text.length > 80 ? '...' : ''}"`);
   console.log(`[classify] Candidate labels count: ${CANDIDATE_LABELS.length}`);
 
@@ -429,7 +425,7 @@ function keywordClassify(text: string): ClassificationResult[] {
         score *= 0.7;
       }
     } else {
-      score = 0.05 + Math.random() * 0.1;
+      score = 0.05;
     }
 
     results.push({ label, score: Math.round(score * 100) / 100, source: 'keyword' });
@@ -653,7 +649,7 @@ export async function POST(request: NextRequest) {
       outsideServiceArea: userLat !== undefined && isOutsideServiceArea(userLat, userLng!),
       serviceArea: 'Houston, TX metro area',
       // ── DEBUG: Full transparency into classification pipeline ──
-      debug: classificationDebug,
+      debug: process.env.NODE_ENV === 'development' ? classificationDebug : undefined,
     });
   } catch (error) {
     console.error("Classification API error:", error);
@@ -673,8 +669,6 @@ export async function GET() {
     version: "3.1.0",
     model: "facebook/bart-large-mnli",
     bartAvailable: hasApiKey,
-    apiKeyPrefix: HF_API_KEY ? HF_API_KEY.substring(0, 6) + '...' : 'NONE',
-    apiKeyLength: HF_API_KEY?.length ?? 0,
     classificationMode: hasApiKey ? "BART-large-MNLI (live)" : "Keyword matching (fallback — set HUGGINGFACE_API_KEY)",
     crisisDetection: "regex-based (deterministic)",
     labels: LABELS,

@@ -496,7 +496,7 @@ const communityStories = [
   },
   {
     name: 'Aisha Williams',
-    role: 'Domestic Violence Survivor, Atlanta GA',
+    role: 'Domestic Violence Survivor, Houston TX',
     story: 'Aisha needed to find a shelter but was afraid of leaving digital traces. ClearPath AI processed her query without storing any personal information and connected her with a confidential crisis counselor within seconds, giving her the confidence to reach out.',
     avatar: 'from-purple-400 to-indigo-500',
     initials: 'AW',

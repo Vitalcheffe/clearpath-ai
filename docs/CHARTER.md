@@ -43,26 +43,25 @@ These are non-negotiable. Violation = immediate revert + warning.
 
 Each team member OWNS their modules. The other person can review and suggest, but does NOT rewrite without permission.
 
-### Amine — AI Pipeline & Project Lead
-- `crisis_detection/` — Hardcoded keyword engine (Python)
-- `nlp_classifier/` — Hugging Face zero-shot + confidence calibration (Python)
-- `clarification_engine/` — Active learning / question generation (Python)
+### Amine — AI & Project Lead
+- `src/app/api/classify/` — Crisis detection (regex-based keyword engine) + BART-large-MNLI zero-shot classification with confidence calibration
+- `src/data/` — Resource database (Houston community resource data and category mappings)
 - `RESPONSIBLE_AI.md` — Ethical framework documentation
 - Qualifier responses (June 7–10)
 - Pitch video script
 
 ### Harshit — Full-Stack & DevOps
-- `frontend/` — React + TypeScript UI (all components)
-- `backend/` — Node.js + Express API routes
-- `database/` — MongoDB schemas and seed data
-- `deployment/` — Vercel/AWS configuration
+- `src/app/` — Next.js App Router pages and UI components (all frontend pages)
+- `src/components/` — React + TypeScript UI components (all components)
+- `prisma/` — SQLite schema and seed data
+- `deployment/` — Vercel configuration
 - GitHub Actions / CI pipeline
 - Devpost submission formatting
 
 ### Shared (both must approve)
 - `README.md`
 - Architecture decisions
-- API contract between AI pipeline and backend
+- API route contracts (classify, community-resources, contact)
 - Final demo flow
 - Any change to the 6-layer architecture
 
@@ -92,12 +91,12 @@ These are NOT optional. They are CORE to our project and our competitive advanta
 | 5.2 | **Maximum response time: 4 hours** during build week (June 14–21). If you're unavailable for longer, notify in advance. |
 | 5.3 | **No ghosting.** If you need to drop out, say it directly. Don't disappear. |
 | 5.4 | **Decisions are documented.** Any architecture or design decision goes in `DECISIONS.md` with date, context, and who decided. |
-| 5.5 | **Disagreements are resolved by the person who OWNS the module.** If it's the AI pipeline, Amine decides. If it's the frontend, Harshit decides. If it's shared, we discuss and both agree. |
+| 5.5 | **Disagreements are resolved by the person who OWNS the module.** If it's the AI/classification module, Amine decides. If it's the frontend, Harshit decides. If it's shared, we discuss and both agree. |
 | 5.6 | **Build week schedule:** |
-| | June 14: Architecture finalization + repo setup + API contract |
+| | June 14: Architecture finalization + repo setup + API contracts |
 | | June 15: Crisis detection + frontend skeleton |
-| | June 16: NLP classifier + backend routes |
-| | June 17: Clarification engine + frontend integration |
+| | June 16: BART-large-MNLI classifier + API routes |
+| | June 17: Clarification logic + frontend integration |
 | | June 18: Confidence display + human escalation flow |
 | | June 19: End-to-end testing + bug fixes |
 | | June 20: Polish + README + RESPONSIBLE_AI.md + Devpost |
@@ -109,8 +108,8 @@ These are NOT optional. They are CORE to our project and our competitive advanta
 
 | # | Rule |
 |---|------|
-| 6.1 | **TypeScript on frontend.** No `any` types unless explicitly justified in a comment. |
-| 6.2 | **Python type hints** on all AI pipeline functions. |
+| 6.1 | **TypeScript throughout.** No `any` types unless explicitly justified in a comment. |
+| 6.2 | **Strict typing on all API route handlers.** Request/response types must be defined. |
 | 6.3 | **Every API endpoint has error handling.** Never return a raw error to the user. |
 | 6.4 | **No `console.log` in production.** Use a proper logger or remove before merge. |
 | 6.5 | **Crisis detection has 100% test coverage.** This module cannot have a single untested path. People's safety depends on it. |
@@ -128,7 +127,7 @@ These are strategic anti-patterns. Not disqualifying, but they WILL lose us poin
 | 7.2 | Hiding AI uncertainty | Show confidence scores prominently. This IS our differentiator. |
 | 7.3 | Saying "AI might be biased" as our only risk | Name the SPECIFIC risk: "AI may classify a complex multi-need situation as a single category, causing the user to miss an urgent legal deadline" |
 | 7.4 | Saying "we'll test it" as mitigation | Describe the DESIGN CHOICE: "When confidence < 70%, we force clarification questions before showing results" |
-| 7.5 | Submitting a demo that only works on your machine | Deploy to Vercel/AWS. Judges must be able to access it. |
+| 7.5 | Submitting a demo that only works on your machine | Deploy to Vercel. Judges must be able to access it. |
 | 7.6 | A GitHub repo with 3 commits all on June 21 | Commit regularly. Judges check commit history. Active development = credibility. |
 | 7.7 | A pitch video longer than 3 minutes | Keep it under 3 min. Judges have hundreds to watch. |
 | 7.8 | Ignoring the INFORMS scoring rubric | Every deliverable must map to: Problem Understanding, AI Reasoning, Solution Coherence, Responsible AI, Human Oversight, Communication Clarity |

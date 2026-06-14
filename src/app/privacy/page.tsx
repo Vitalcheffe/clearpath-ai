@@ -208,7 +208,7 @@ export default function PrivacyPage() {
                       <p className="font-semibold text-gray-800 text-[14px]">What you type</p>
                       <p className="text-[13px] text-gray-400 mt-0.5">
                         Your search queries and conversation inputs are processed to classify
-                        your needs and find relevant resources. For guests, processing is in-memory only and nothing is written to disk. For authenticated users, conversations are stored for cross-session access.
+                        your needs and find relevant resources. Processing is in-memory only and nothing is written to disk. Sessions are stateless — no personal data is retained between visits.
                       </p>
                     </div>
                   </div>
@@ -323,7 +323,7 @@ export default function PrivacyPage() {
               <div className="space-y-4 text-[15px] text-gray-500 leading-relaxed pl-0 md:pl-14">
                 <div className="p-5 rounded-xl bg-emerald-50/50 border border-emerald-100">
                   <p className="text-2xl sm:text-3xl font-black text-emerald-700 tracking-tight">
-                    If you create an account, your conversation history and saved resources are stored securely in our database so you can access them across sessions. If you use the app as a guest, no data is persisted.
+                    Queries are processed in real-time and not persistently stored. No personal data is retained between visits.
                   </p>
                 </div>
                 <p>
@@ -332,10 +332,10 @@ export default function PrivacyPage() {
                 </p>
                 <ul className="space-y-2.5">
                   {[
-                    'Guest sessions are processed in-memory with no persistent storage. Authenticated user data is encrypted and stored securely for cross-session access',
-                    'For authenticated users, conversations are stored in an encrypted SQLite database to provide history and resource tracking',
-                    'Guest session data is gone when you close the browser tab or navigate away',
-                    'Account holders can access past conversations; guest sessions cannot be retrieved',
+                    'Guest sessions are processed in-memory with no persistent storage. Queries are processed in real-time and not persistently stored',
+                    'Queries are processed in real-time and not persistently stored — no personal data is retained between visits',
+                    'No session data can be retrieved after the browser tab is closed',
+                    'All sessions are stateless — no personal data persists beyond the current visit',
                   ].map((item, i) => (
                     <li key={i} className="flex items-start gap-3">
                       <CheckCircle2 className="w-4 h-4 text-emerald-500 mt-1 shrink-0" />
@@ -346,7 +346,7 @@ export default function PrivacyPage() {
                 <div className="flex items-center gap-2 px-4 py-3 rounded-xl bg-gray-50/60 border border-gray-100 mt-4">
                   <Lock className="w-4 h-4 text-gray-400" />
                   <span className="text-[13px] text-gray-400">
-                    Guest sessions leave no trace; authenticated data is encrypted at rest
+                    Guest sessions leave no trace; no user data is persistently stored
                   </span>
                 </div>
               </div>
@@ -594,13 +594,13 @@ export default function PrivacyPage() {
                     {
                       icon: Cpu,
                       title: 'In-Memory Guest Processing',
-                      desc: 'Guest data processed in RAM, never persisted to disk. Authenticated user data encrypted at rest',
+                      desc: 'Guest data processed in RAM, never persisted to disk. No user data is persistently stored',
                       color: '#10b981',
                     },
                     {
                       icon: Database,
                       title: 'Encrypted Storage',
-                      desc: 'Authenticated user data encrypted at rest; guest sessions never touch disk',
+                      desc: 'No user data is persistently stored; guest sessions never touch disk',
                       color: '#3b82f6',
                     },
                     {
@@ -624,7 +624,7 @@ export default function PrivacyPage() {
                 </div>
                 <p>
                   While no system is 100% secure, our approach minimizes data exposure. Guest sessions leave no trace,
-                  and authenticated user data is encrypted at rest. You can&apos;t breach what was never stored.
+                  and no user data is persistently stored. You can&apos;t breach what was never stored.
                 </p>
               </div>
             </motion.div>
@@ -1012,9 +1012,9 @@ export default function PrivacyPage() {
                   <div className="space-y-2.5">
                     {[
                       { decision: 'In-memory processing for guests', rationale: 'Guest sessions eliminate entire categories of data breach risk. You cannot exfiltrate data that was never stored.' },
-                      { decision: 'Optional user accounts', rationale: 'Accounts are optional — guests can use the service with no identifiers. Authenticated users get cross-session history, with data encrypted at rest and minimal information collected.' },
+                      { decision: 'Optional user accounts', rationale: 'Accounts are optional — guests can use the service with no identifiers. No personal data is retained between visits, and all processing is stateless.' },
                       { decision: 'Zero-shot classification', rationale: 'We use a pre-trained model without fine-tuning on user data. Your queries improve nothing about the model.' },
-                      { decision: 'Session-based guest architecture', rationale: 'Guest state is ephemeral. When you close the tab, every trace of your guest interaction is gone from our servers. Account data persists securely for cross-session access.' },
+                      { decision: 'Session-based architecture', rationale: 'All state is ephemeral. When you close the tab, every trace of your interaction is gone from our servers. No data persists beyond the current session.' },
                       { decision: 'Opt-in location sharing', rationale: 'Location is never requested automatically. If you choose to share a ZIP code for better results, it stays in your session only.' },
                     ].map((item, i) => (
                       <div key={i} className="flex items-start gap-3 p-3 rounded-xl bg-gray-50/60 border border-gray-100">
@@ -1052,7 +1052,7 @@ export default function PrivacyPage() {
                       { icon: Lock, title: 'TLS 1.3 Encryption', desc: 'All data in transit encrypted end-to-end', color: '#3b82f6' },
                       { icon: Cpu, title: 'In-Memory for Guests', desc: 'Guest sessions use RAM processing with no disk persistence', color: '#10b981' },
                       { icon: Shield, title: 'Input Sanitization', desc: 'All user inputs sanitized before processing', color: '#8b5cf6' },
-                      { icon: Database, title: 'Encrypted at Rest', desc: 'Authenticated data encrypted in SQLite; guest sessions never persisted', color: '#f59e0b' },
+                      { icon: Database, title: 'No Persistent Storage', desc: 'No user data is persistently stored; all sessions are ephemeral', color: '#f59e0b' },
                       { icon: Eye, title: 'No Tracking', desc: 'No analytics, pixels, or behavioral tracking', color: '#ef4444' },
                       { icon: UserCheck, title: 'Optional Accounts', desc: 'Guests need no identifiers; accounts are optional', color: '#06b6d4' },
                     ].map((safeguard) => {

@@ -49,7 +49,7 @@ This is what wins the whole thing. This is the level where a judge puts down the
 This is beyond winning. This is the project that becomes the example they show next year.
 
 - **Someone in the real world could actually use this.** Not a polished demo with fake data. A working tool with real 211.org integration, real resource data for at least one city, and a path to actual deployment.
-- **The architecture is clean enough to scale.** We build for one city, but the code doesn't hardcode "Austin, TX." Adding a new city = adding a new data source. The AI pipeline doesn't change. The frontend doesn't change. Plug and play.
+- **The architecture is clean enough to scale.** We build for one city, but the code doesn't hardcode "Houston, TX." Adding a new city = adding a new data source. The API routes don't change. The frontend doesn't change. Plug and play.
 - **Other hackathon teams reference our project as the standard for responsible AI.** They read our RESPONSIBLE_AI.md and use it as a template for their own projects. We don't just win Best Responsible AI — we define what it means.
 - **USAII features ClearPath AI in their next boot camp** as an exemplar of the Community track. Our project becomes the case study.
 - **The confidence calibration is mathematically sound, not vibes.** We don't just show a percentage — we can explain WHY it's 78% and not 82%. Temperature scaling, calibration curves, real methodology. A judge who knows AI looks at it and nods, not cringes.
@@ -87,7 +87,7 @@ Every deliverable has a standard. These are not aspirational. These are what "do
 - No console errors in production
 - Loading state for every async operation
 - Error state for every failure case
-- Crisis detection works even if the AI server is down
+- Crisis detection works even if the HuggingFace API is down
 
 ### Devpost Submission
 - Thumbnail image that looks professional
@@ -106,10 +106,10 @@ Before June 14, these must be ready:
 
 - [ ] GitHub repo created with README, CHARTER.md, RESPONSIBLE_AI.md
 - [ ] Branch protection rules on `main`
-- [ ] Vercel/AWS account set up and linked
+- [ ] Vercel account set up and linked
 - [ ] Hugging Face API key obtained (free)
 - [ ] 211.org API access confirmed (or fallback data sourced)
-- [ ] MongoDB Atlas free cluster created
+- [ ] SQLite database initialized with Prisma
 - [ ] Figma/design system for the UI components
 - [ ] 3 demo scenarios written and rehearsed
 - [ ] Pitch video script drafted
@@ -122,27 +122,26 @@ Before June 14, these must be ready:
 ## 📋 BUILD WEEK DAILY CHECKLIST
 
 ### Day 1 — June 14 (Architecture)
-- [ ] Repo scaffolded: frontend/, backend/, ai_pipeline/, docs/
-- [ ] API contract between frontend and backend defined
-- [ ] API contract between backend and AI pipeline defined
-- [ ] MongoDB schemas defined
+- [ ] Repo scaffolded: Next.js App Router with `src/app/`, `src/app/api/`, `src/data/`, `prisma/`, `docs/`
+- [ ] API routes defined: `/api/classify`, `/api/community-resources`, `/api/contact`
+- [ ] Prisma schema defined for SQLite (Resource, User, Conversation, Message)
 - [ ] First deploy to Vercel (even if it's just a blank page)
 - [ ] CI pipeline green
 
 ### Day 2 — June 15 (Safety First)
-- [ ] Crisis detection module implemented and tested with 20+ keywords
+- [ ] Crisis detection regex implemented and tested with 20+ keywords
 - [ ] Crisis detection has 100% test coverage
 - [ ] Frontend skeleton: input page, results page, crisis overlay
 - [ ] "Talk to a navigator" button live (links to 211)
 
 ### Day 3 — June 16 (Intelligence)
-- [ ] Hugging Face zero-shot classifier integrated
-- [ ] Multi-label classification returns top 3 categories with scores
+- [ ] HuggingFace Inference API integrated (BART-large-MNLI)
+- [ ] Multi-label classification returns top categories with confidence scores across 9 categories
 - [ ] Confidence calibration (temperature scaling) implemented
-- [ ] Backend API routes: /classify, /crisis-check, /clarify
+- [ ] API route `/api/classify` handles both crisis detection and classification
 
 ### Day 4 — June 17 (Conversation)
-- [ ] Clarification engine: if confidence < 70%, generate follow-up question
+- [ ] Clarification logic: if confidence < 70%, generate follow-up question
 - [ ] Second-pass classification with clarified input
 - [ ] Frontend displays classification results with confidence bars
 - [ ] Frontend displays clarification questions naturally
